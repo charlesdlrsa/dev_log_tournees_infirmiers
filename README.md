@@ -5,7 +5,7 @@ Ce repo correspond au projet scolaire "Tournées des infirmiers" de l'électif D
 Makefile
 ========
 
-MAkefile allows you to run some usefull terminal command.
+Makefile allows you to run some usefull terminal command.
 
 For instance, you can quickly install all the dev_log project as a standart python library on your virtual environnement.
 To do so, right after cloning the project from GitHub, just run:
