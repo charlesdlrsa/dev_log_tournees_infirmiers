@@ -17,6 +17,7 @@ selenium
 sendgrid
 xlrd
 xlsxwriter
+flask_sqlalchemy==2.3.2
 """
 # numpy==1.14.3
 
