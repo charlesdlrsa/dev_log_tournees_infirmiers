@@ -15,4 +15,4 @@ db = SQLAlchemy(app)
 app.register_blueprint(auth.bp)
 
 db.create_all()
-app.run()
+# app.run()

@@ -1,15 +1,14 @@
-import functools
-
-from flask import (
-    Blueprint, flash, redirect, render_template, request, session, url_for
-)
+from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 import re
 
-bp = Blueprint('auth', __name__, url_prefix='/auth')
+from dev_log import db
+from dev_log.models import Nurse
+
+auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 
-@bp.route('/register', methods=['GET', 'POST'])
+@auth.route('/register', methods=['GET', 'POST'])
 def register():
     """
     View of the register page, handles the register form
@@ -26,35 +25,34 @@ def register():
 
         if not last_name:
             error = 'A lastname is required.'
-        if not first_name:
+        elif not first_name:
             error = 'A firstname is required.'
-        if re.search(regu_expr, email) is None:
+        elif re.search(regu_expr, email) is None:
             error = 'Please enter a correct email address.'
-        if not password:
+        elif not password:
             error = 'Password is required.'
-        if not address:
-            error = 'Please enter a correct address.'
-        # if db.execute(
-        #         'SELECT id FROM infirmier WHERE email = ?', (email,)
-        # ).fetchone() is not None:
-        #     error = 'The email "{}" is already used. Be sure you have written the right email. If yes, log in.'.format(email)
+        elif not address:
+            error = 'Please enter an address.'
+        elif Nurse.query.filter(Nurse.email == email).first() is not None:
+            error = 'The email "{}" is already used'.format(email)
 
-        if error is None:
+        else:
             # storing the new user information in the db
-            from nurses import Nurse
-            from app import db
+            password = generate_password_hash(password)
             nurse = Nurse(last_name, first_name, email, password, address)
             db.session.add(nurse)
             db.session.commit()
             flash('Record was successfully added')
             return redirect(url_for('auth.login'))
-
+        
+        print("on y va")
         flash(error)
+        print("oone")
 
     return render_template('auth/register.html')
 
 
-@bp.route('/login', methods=('GET', 'POST'))
+@auth.route('/login', methods=('GET', 'POST'))
 def login():
     """
     View of the login page, handles the users connections
@@ -63,32 +61,31 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        db = get_db()
         error = None
-        infirmier = db.execute(
-            'SELECT * FROM user WHERE email = ?', (email,)
-        ).fetchone()
+        infirmier = Nurse.query.filter(Nurse.email == email).first()
 
         if infirmier is None:
             error = 'Incorrect email address.'
-        elif not check_password_hash(infirmier['password'], password):
+        elif not check_password_hash(infirmier.password, password):
             error = 'Incorrect password.'
 
         if error is None:
             # storing user information in the object "session"
             session.clear()
-            session['infirmier_id'] = infirmier['id']
-            session['infirmier_last_name'] = infirmier['last_name']
-            session['infirmier_first_name'] = infirmier['first_name']
-            flash('Hi %s %s, welcome back to MyFavShows!' % (infirmier['first_name'].capitalize(), infirmier['last_name'].capitalize()))
-            return redirect(url_for('search.search'))
+            session['nurse_id'] = infirmier.id
+            session['nurse_last_name'] = infirmier.last_name
+            session['nurse_first_name'] = infirmier.first_name
+            flash('Hi %s %s, welcome back to Our Application!'
+                  % (infirmier.first_name.capitalize(),
+                     infirmier.last_name.capitalize()))
+            return render_template('home/home.html')
 
         flash(error)
 
     return render_template('auth/login.html')
 
 
-@bp.route('/logout')
+@auth.route('/logout')
 def logout():
     """
     Logs out the user by cleaning the session user and redirects to the homepage
@@ -104,6 +101,7 @@ def login_required(view):
     :param view:
     :return:
     """
+
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if session.get('infirmier_id') is None:
