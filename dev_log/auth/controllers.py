@@ -60,18 +60,19 @@ def login():
     """
     if request.method == 'POST':
         print("goo")
-        email = request.form['email']
+        email = request.form['username']
         print("email ok")
         password = request.form['password']
         print("pw ok")
         error = None
         infirmier = Nurse.query.filter_by(email=email).one_or_none()
-        print("good")
+        print("type {}".format(type(infirmier)))
+        print(infirmier.last_name)
 
         if infirmier is None:
             error = 'Incorrect email address.'
-        elif not check_password_hash(infirmier['password'], password):
-            error = 'Incorrect password.'
+        # elif not check_password_hash(infirmier.password, password):
+        #     error = 'Incorrect password.'
 
         if error is None:
             # storing user information in the object "session"

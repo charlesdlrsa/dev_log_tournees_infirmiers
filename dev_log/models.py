@@ -67,3 +67,11 @@ class Nurse(Base):
         self.password = password
         self.address = address
         # self.competences = competences
+
+    @property
+    def last_name(self):
+        return self.last_name
+
+    @property
+    def password(self):
+        return self.password
