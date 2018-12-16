@@ -35,6 +35,7 @@ def register():
             error = 'Please enter an address.'
         if Nurse.query.filter_by(email=email).one_or_none() is not None:
             error = 'The email "{}" is already used'.format(email)
+            print(error)
 
         if error is None:
             # storing the new user information in the db
@@ -58,10 +59,14 @@ def login():
     :return:
     """
     if request.method == 'POST':
+        print("goo")
         email = request.form['email']
+        print("email ok")
         password = request.form['password']
+        print("pw ok")
         error = None
-        infirmier = Nurse.query.filter_by(email=email)
+        infirmier = Nurse.query.filter_by(email=email).one_or_none()
+        print("good")
 
         if infirmier is None:
             error = 'Incorrect email address.'
