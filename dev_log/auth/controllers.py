@@ -33,8 +33,7 @@ def register():
             error = 'Password is required.'
         if not address:
             error = 'Please enter an address.'
-        if Nurse.query.filter_by(email=email) is not None:
-            print("ça marche")
+        if Nurse.query.filter_by(email=email).one_or_none() is not None:
             error = 'The email "{}" is already used'.format(email)
 
         if error is None:
@@ -44,10 +43,10 @@ def register():
             db.session.commit()
             flash('Record was successfully added')
             return redirect(url_for('auth.login'))
-        
+
         print("on y va")
         flash(error)
-        print("oone")
+        print("done")
 
     return render_template('auth/register.html')
 
