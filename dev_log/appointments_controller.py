@@ -1,6 +1,5 @@
-from flask import request, render_template
-from appointments import Appointment
-from app import db
+from flask import request, render_template, redirect
+from dev_log.models import Appointment
 
 
 class AppointmentController:
