@@ -1,6 +1,6 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
-
+import re
 from dev_log import db
 from dev_log.models import Patient
 
@@ -23,7 +23,7 @@ def home():
 
     patients = Patient.query.all()
 
-    return render_template(...., patients=patients)
+    return render_template(..., patients=patients)
 
 
 @patient.route('/add_patient', methods=['GET', 'POST'])
