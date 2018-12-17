@@ -11,7 +11,7 @@ nurse = Blueprint('nurse', __name__, url_prefix='/nurse')
 @nurse.route('/add', methods=['GET', 'POST'])
 def add_nurse():
     """
-    V
+    Add a new nurse
     :return:
     """
     if request.method == 'POST':
@@ -68,3 +68,4 @@ def edit_nurse(nurse_id):
                password=password, phone=phone, address=address)
     # except as e:
     #     pass
+
