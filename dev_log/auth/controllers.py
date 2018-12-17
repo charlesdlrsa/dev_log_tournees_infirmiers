@@ -35,6 +35,7 @@ def register():
             error = 'Please enter an address.'
         elif Nurse.query.filter(Nurse.email == email).first() is not None:
             error = 'The email "{}" is already used'.format(email)
+            print(error)
 
         else:
             # storing the new user information in the db
@@ -44,10 +45,8 @@ def register():
             db.session.commit()
             flash('Record was successfully added')
             return redirect(url_for('auth.login'))
-        
-        print("on y va")
+
         flash(error)
-        print("oone")
 
     return render_template('auth/register.html')
 
