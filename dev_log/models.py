@@ -18,38 +18,6 @@ class Appointment(Base):
         self.__date = date
         self.__care = care
 
-    # @property
-    # def nurse_id(self):
-    #     return self.__nurse_id
-    #
-    # @nurse_id.setter
-    # def nurse_id(self, id):
-    #     self.__nurse_id = id
-    #
-    # @property
-    # def patient_id(self):
-    #     return self.__patient_id
-    #
-    # @patient_id.setter
-    # def patient_id(self, id):
-    #     self.__patient_id = id
-    #
-    # @property
-    # def date(self):
-    #     return self.__date
-    #
-    # @date.setter
-    # def date(self, date):
-    #     self.__date = date
-    #
-    # @property
-    # def care(self):
-    #     return self.__care
-    #
-    # @care.setter
-    # def care(self, care):
-    #     self.__care = care
-
 
 class Nurse(Base):
     id = db.Column('nurse_id', db.Integer, primary_key=True)
@@ -67,11 +35,3 @@ class Nurse(Base):
         self.password = password
         self.address = address
         # self.competences = competences
-
-    @property
-    def last_name(self):
-        return self.last_name
-
-    @property
-    def password(self):
-        return self.password

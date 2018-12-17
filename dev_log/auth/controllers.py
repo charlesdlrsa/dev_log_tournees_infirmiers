@@ -25,29 +25,28 @@ def register():
 
         if not last_name:
             error = 'A lastname is required.'
-        if not first_name:
+        elif not first_name:
             error = 'A firstname is required.'
-        if re.search(regu_expr, email) is None:
+        elif re.search(regu_expr, email) is None:
             error = 'Please enter a correct email address.'
-        if not password:
+        elif not password:
             error = 'Password is required.'
-        if not address:
+        elif not address:
             error = 'Please enter an address.'
-        if Nurse.query.filter_by(email=email).one_or_none() is not None:
+        elif Nurse.query.filter(Nurse.email == email).first() is not None:
             error = 'The email "{}" is already used'.format(email)
             print(error)
 
-        if error is None:
+        else:
             # storing the new user information in the db
+            password = generate_password_hash(password)
             nurse = Nurse(last_name, first_name, email, password, address)
             db.session.add(nurse)
             db.session.commit()
             flash('Record was successfully added')
             return redirect(url_for('auth.login'))
 
-        print("on y va")
         flash(error)
-        print("done")
 
     return render_template('auth/register.html')
 
@@ -65,25 +64,23 @@ def login():
         password = request.form['password']
         print("pw ok")
         error = None
-        infirmier = Nurse.query.filter_by(email=email).one_or_none()
-        print("type {}".format(type(infirmier)))
-        print(infirmier.last_name)
+        infirmier = Nurse.query.filter(Nurse.email == email).first()
 
         if infirmier is None:
             error = 'Incorrect email address.'
-        # elif not check_password_hash(infirmier.password, password):
-        #     error = 'Incorrect password.'
+        elif not check_password_hash(infirmier.password, password):
+            error = 'Incorrect password.'
 
         if error is None:
             # storing user information in the object "session"
             session.clear()
-            session['nurse_id'] = infirmier['id']
-            session['nurse_last_name'] = infirmier['last_name']
-            session['nurse_first_name'] = infirmier['first_name']
+            session['nurse_id'] = infirmier.id
+            session['nurse_last_name'] = infirmier.last_name
+            session['nurse_first_name'] = infirmier.first_name
             flash('Hi %s %s, welcome back to Our Application!'
-                  % (infirmier['first_name'].capitalize(),
-                     infirmier['last_name'].capitalize()))
-            return redirect(url_for('search.search'))
+                  % (infirmier.first_name.capitalize(),
+                     infirmier.last_name.capitalize()))
+            return render_template('home/home.html')
 
         flash(error)
 

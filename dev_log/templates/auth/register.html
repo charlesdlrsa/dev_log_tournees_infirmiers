@@ -6,6 +6,10 @@
 </head>
 <body>
 
+{% for message in get_flashed_messages() %}
+<div class="flash">{{ message }}</div>
+{% endfor %}
+
 <form method="post">
     <div>
         <p>Please fill in this form to create an account.</p>
