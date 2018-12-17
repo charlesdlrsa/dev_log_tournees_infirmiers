@@ -7,10 +7,23 @@ class Base(db.Model):
 
 class Appointment(Base):
     id = db.Column('appointment_id', db.Integer, primary_key=True)
-    nurse_id = db.Column(db.Integer)
-    patient_id = db.Column(db.Integer)
-    date = db.Column(db.DateTime)
-    care = db.Column(db.String(50))
+    patient_id = db.Column(
+            db.Integer, 
+            db.ForeignKey('patient.id'), 
+            nullable=False, 
+            unique=True)
+
+    nurse_id = db.Column(
+        db.Integer, 
+        db.ForeignKey('nurse.nurse_id'), 
+        nullable=False)
+
+    date = db.Column(db.DateTime, nullable=False)
+    care_id = db.Column(
+            db.Integer, 
+            db.ForeignKey('care.care_id'), 
+            nullable=False, 
+            unique=True)
 
     def __init__(self, nurse_id, patient_id, date, care):
         self.__nurse_id = nurse_id
@@ -67,3 +80,12 @@ class Nurse(Base):
         self.password = password
         self.address = address
         # self.competences = competences
+
+class Care(Base):
+    id = db.Column('care_id', db.Integer, primary_key=True)
+    description = db.Column(db.String(200))
+    duration = db.Column(db.Integer) # duration in minutes
+
+    def __init__(self, description, duration):
+        self.description = description
+        self.duration = duration
