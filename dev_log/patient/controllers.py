@@ -1,6 +1,6 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
-
+import re
 from dev_log import db
 from dev_log.models import Patient
 
@@ -78,5 +78,5 @@ def get_patients(research):
     patients = Patient.query.filter(or_(Patient.last_name == research,Patient.first_name == research)).all()
     if patients is None:
         error = "Please enter a lastname"
-    flash(error)
+        flash(error)
     return render_template(..., patients=patients)

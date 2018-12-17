@@ -7,6 +7,23 @@ from dev_log.models import Nurse
 
 nurse = Blueprint('nurse', __name__, url_prefix='/nurse')
 
+@nurse.route('/', methods=['GET', 'POST'])
+def home():
+    if request.method == "POST":
+        research = request.form['research']
+        error = None
+
+        if not research:
+            error = 'Please enter the name of our nurse.'
+
+        if error is not None:
+            flash(error)
+        else:
+            return redirect(url_for('nurse.get_nurses', research=research))
+
+    nurses = Nurse.query.all()
+
+    return render_template(...., nurses=nurses)
 
 @nurse.route('/add', methods=['GET', 'POST'])
 def add_nurse():
@@ -69,3 +86,22 @@ def edit_nurse(nurse_id):
     # except as e:
     #     pass
 
+
+@nurse.route('/get_nurses/<str:research>', methods=['GET', 'POST'])
+def get_nurses(research):
+    if request.method == "POST":
+        error = None
+
+        if not research:
+            error = 'Please enter the name of our patient.'
+
+        if error is not None:
+            flash(error)
+        else:
+            return redirect(url_for('patient.get_patients', research=research))
+
+    nurses = Nurse.query.filter(or_(Nurse.last_name == research,Nurse.first_name == research)).all()
+    if nurses is None:
+        error = "Please enter a lastname"
+        flash(error)
+    return render_template(..., nurses=nurses)
