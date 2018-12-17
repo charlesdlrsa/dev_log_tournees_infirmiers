@@ -25,3 +25,6 @@ from dev_log.auth.controllers import auth
 app.register_blueprint(auth)
 
 db.create_all()
+
+# For CSS
+app.static_folder = 'static'
