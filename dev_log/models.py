@@ -29,7 +29,6 @@ class Appointment(Base):
         self.care = care
 
 
-
 class Nurse(BasePerson):
     id = db.Column('nurse_id', db.Integer, primary_key=True)
     password = db.Column(db.String(20))
