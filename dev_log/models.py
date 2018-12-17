@@ -11,6 +11,7 @@ class BasePerson(Base):
     last_name = db.Column(db.String(20))
     first_name = db.Column(db.String(20))
     email = db.Column(db.String(20))
+    phone = db.Column(db.String(10))
     address = db.Column(db.String(50))
 
 
@@ -26,6 +27,7 @@ class Appointment(Base):
         self.patient_id = patient_id
         self.date = date
         self.care = care
+
 
 
 class Nurse(BasePerson):
@@ -54,5 +56,4 @@ class Patient(BasePerson):
         self.email = email
         self.address = address
         self.related_office = related_office
-
 
