@@ -44,10 +44,8 @@ def register():
             db.session.commit()
             flash('Record was successfully added')
             return redirect(url_for('auth.login'))
-        
-        print("on y va")
+
         flash(error)
-        print("oone")
 
     return render_template('auth/register.html')
 
@@ -92,7 +90,7 @@ def logout():
     :return:
     """
     session.clear()
-    return redirect(url_for('search.search'))
+    return redirect(url_for('home/home.html'))
 
 
 def login_required(view):
@@ -104,7 +102,7 @@ def login_required(view):
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if session.get('infirmier_id') is None:
+        if session['infirmier_id'] is None:
             flash('You need to sign in to access this page.')
             return redirect(url_for('auth.login'))
 
