@@ -80,7 +80,7 @@ def login():
             flash('Hi %s %s, welcome back to Our Application!'
                   % (infirmier.first_name.capitalize(),
                      infirmier.last_name.capitalize()))
-            return render_template('home/home.html')
+            return render_template('landing.html')
 
         flash(error)
 
