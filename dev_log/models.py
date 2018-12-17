@@ -55,8 +55,8 @@ class Care(Base):
     duration = db.Column(db.Integer) # duration in minutes
 
     def __init__(self, description, duration):
-        self.description = description
-        self.duration = duration
+        self.__description = description
+        self.__duration = duration
 
 class Patient(Base):
     id = db.Column('patient_id', db.Integer, primary_key=True)
