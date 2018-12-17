@@ -58,11 +58,8 @@ def login():
     :return:
     """
     if request.method == 'POST':
-        print("goo")
-        email = request.form['username']
-        print("email ok")
+        email = request.form['email']
         password = request.form['password']
-        print("pw ok")
         error = None
         infirmier = Nurse.query.filter(Nurse.email == email).first()
 
