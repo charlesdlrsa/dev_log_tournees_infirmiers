@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+<body>
+
+{% for message in get_flashed_messages() %}
+<div class="flash">{{ message }}</div>
+{% endfor %}
+
+<form method="post">
+    <div>
+        <p>Please fill in this form to create an account.</p>
+        <hr>
+
+        <label for="last_name"><b>Lastname</b></label>
+        <input type="text" placeholder="Enter Lastname" name="last_name" id="last_name" required>
+
+        <label for="first_name"><b>Firstname</b></label>
+        <input type="text" placeholder="Enter Firstname" name="first_name" id="first_name" required>
+
+        <label for="email"><b>Email</b></label>
+        <input type="text" placeholder="Enter Email" name="email" id="email" required>
+
+        <label for="password"><b>Password</b></label>
+        <input type="text" placeholder="Enter Password" name="password" id="password" required>
+
+        <label for="address"><b>Address</b></label>
+        <input type="text" placeholder="Enter Address" name="address" id="address" required>
+
+        <hr>
+
+        <button type="submit">Register</button>
+    </div>
+
+</body>
+</html>
