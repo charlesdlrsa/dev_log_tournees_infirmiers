@@ -7,23 +7,24 @@ from dev_log.models import Nurse
 
 nurse = Blueprint('nurse', __name__, url_prefix='/nurse')
 
-@nurse.route('/', methods=['GET', 'POST'])
-def home():
-    if request.method == "POST":
-        research = request.form['research']
-        error = None
+# @nurse.route('/', methods=['GET', 'POST'])
+# def home():
+#     if request.method == "POST":
+#         research = request.form['research']
+#         error = None
+#
+#         if not research:
+#             error = 'Please enter the name of our nurse.'
+#
+#         if error is not None:
+#             flash(error)
+#         else:
+#             return redirect(url_for('nurse.get_nurses', research=research))
+#
+#     nurses = Nurse.query.all()
+#
+#     return render_template(...., nurses=nurses)
 
-        if not research:
-            error = 'Please enter the name of our nurse.'
-
-        if error is not None:
-            flash(error)
-        else:
-            return redirect(url_for('nurse.get_nurses', research=research))
-
-    nurses = Nurse.query.all()
-
-    return render_template(...., nurses=nurses)
 
 @nurse.route('/add', methods=['GET', 'POST'])
 def add_nurse():
@@ -63,11 +64,11 @@ def add_nurse():
             db.session.add(nurse)
             db.session.commit()
             flash('Record was successfully added')
-            return redirect(url_for('la page de récap des nurses'))
+            return redirect(url_for('nurses.get_nurses'))
 
         flash(error)
 
-    return render_template('la page de add nurse')
+    return render_template('add_nurse.html')
 
 
 @nurse.route('/edit/<int:nurse_id>', methods=['PUT'])
@@ -104,4 +105,4 @@ def get_nurses(research):
     if nurses is None:
         error = "Please enter a lastname"
         flash(error)
-    return render_template(..., nurses=nurses)
+    return render_template('nurses.html')
