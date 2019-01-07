@@ -41,7 +41,7 @@ def get_list_of_patients(research):
             return redirect(url_for('get_patients', research=research))
 
     patients = Patient.query.filter(or_(Patient.last_name.like(research+'%'),
-                                        Patient.first_name.like(research+'%')).all()
+                                        Patient.first_name.like(research+'%')).all())
     if patients is None:
         error = "Please enter a lastname"
 
@@ -88,7 +88,7 @@ def add_patient():
         first_name = request.form['first_name']
         email = request.form['email']
         address = request.form['address']
-        phone = request.form['phone']
+        phone = request.form['phone_number']
         error = None
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
 
@@ -105,7 +105,8 @@ def add_patient():
 
         else:
             # storing the new user information in the db
-            patient = Patient(last_name, first_name, email, address, phone)
+            patient = Patient(last_name=last_name, first_name=first_name,
+                              email=email, address=address, phone=phone)
             db.session.add(patient)
             db.session.commit()
             flash('Patient was successfully added')
