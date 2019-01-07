@@ -27,7 +27,7 @@ def home():
     return render_template('nurses.html', nurses=nurses)
 
 
-@nurse.route('/add', methods=['GET', 'POST'])
+@nurse.route('/add_nurse', methods=['GET', 'POST'])
 def add_nurse():
     """
     Add a new nurse
