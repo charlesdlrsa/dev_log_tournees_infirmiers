@@ -105,11 +105,11 @@ def add_patient():
 
         else:
             # storing the new user information in the db
-            patient = Patient(last_name, first_name, email, address, phone)
+            patient = Patient(last_name=last_name, first_name=first_name, email=email, address=address, phone=phone)
             db.session.add(patient)
             db.session.commit()
             flash('Patient was successfully added')
-            return redirect(url_for('home'))
+            return redirect(url_for('patients.home'))
 
         flash(error)
 

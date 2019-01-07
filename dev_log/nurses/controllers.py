@@ -116,11 +116,11 @@ def add_nurse():
             # storing the new user information in the db
             password = generate_password_hash(password)
             print('ok')
-            nurse = Nurse(last_name, first_name, email, password, phone, address, office)
+            nurse = Nurse(last_name=last_name, first_name=first_name, email=email, password=password, phone=phone, address=address)
             db.session.add(nurse)
             db.session.commit()
             flash('Record was successfully added')
-            return redirect(url_for('home'))
+            return redirect(url_for('nurses.home'))
 
         flash(error)
 
