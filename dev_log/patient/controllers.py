@@ -1,4 +1,5 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from sqlalchemy.sql import or_
 from dev_log import db
@@ -14,18 +15,50 @@ def home():
         error = None
 
         if not research:
-            error = 'Please enter the name of the patient.'
+            error = 'Please enter the name of your patient.'
+
+        if error is not None:
+            flash(error)
+        else:
+            return redirect(url_for('get_list_of_patients', research=research))
+
+    patients = Patient.query.all()
+    return render_template('list_of_patients.html', patients=patients)
+
+
+@patients.route('/results/<research>', methods=['GET', 'POST'])
+def get_list_of_patients(research):
+    if request.method == "POST":
+        research = request.form['research']
+        error = None
+
+        if not research:
+            error = 'Please enter the name of our patient.'
 
         if error is not None:
             flash(error)
         else:
             return redirect(url_for('get_patients', research=research))
 
-    patients = Patient.query.all()
-    return render_template('patients.html', patients=patients)
+    patients = Patient.query.filter(or_(Patient.last_name.like(research+'%'),
+                                        Patient.first_name.like(research+'%')).all()
+    if patients is None:
+        error = "Please enter a lastname"
+
+    if error is not None:
+        flash(error)
+
+    return render_template('list_of_patients.html', patients=patients)
 
 
-@patients.route('/edit/<int:patient_id>', methods=['GET','POST'])
+@patients.route('/information/<int:patient_id>', methods=['GET, POST'])
+def get_information_about_patient(patient_id):
+    patient = Patient.query.filter(Patient.id == patient_id)
+
+    return render_template("patient_information.html", patient=patient)
+
+
+@patients.route('/edit/<int:patient_id>', methods=['GET, POST'])
 def edit_patient(patient_id):
     if request.method == "POST":
         last_name = request.form['last_name']
@@ -41,8 +74,11 @@ def edit_patient(patient_id):
                    phone=phone,
                    address=address)
 
+        return redirect(url_for('get_information_about_patient', patient_id=patient_id))
+
     patient = Patient.query.filter(Patient.id == patient_id)
-    return render_template('patient_by_id.html', patient=patient)
+
+    return render_template("edit_patient.html", patient=patient)
 
 
 @patients.route('/add_patient', methods=['GET', 'POST'])
@@ -52,9 +88,7 @@ def add_patient():
         first_name = request.form['first_name']
         email = request.form['email']
         address = request.form['address']
-        # TODO : requete API pour latitude et longitude
-        phone = request.form['phone_number']
-        print(request.form)
+        phone = request.form['phone']
         error = None
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
 
@@ -66,42 +100,20 @@ def add_patient():
             error = 'Please enter a correct email address.'
         elif not address:
             error = 'Please enter an address.'
-        elif not phone:
-            error = 'Please enter a phone number'
-
         elif Patient.query.filter(Patient.email == email).first() is not None:
             error = 'The email "{}" is already used'.format(email)
 
         else:
             # storing the new user information in the db
-            """"patient = Patient(last_name, first_name, email, address, phone)
+            patient = Patient(last_name, first_name, email, address, phone)
             db.session.add(patient)
             db.session.commit()
-            flash('Patient was successfully added')"""
-            return redirect(url_for('patients.home'))
+            flash('Patient was successfully added')
+            return redirect(url_for('home'))
 
         flash(error)
 
     return render_template('add_patient.html')
 
 
-@patients.route('/get_patients/<research>', methods=['GET', 'POST'])
-def get_patients(research):
-    if request.method == "POST":
-        research = request.form['research']
-        error = None
 
-        if not research:
-            error = 'Please enter the name of our patient.'
-
-        if error is not None:
-            flash(error)
-        else:
-            return redirect(url_for('get_patients', research=research))
-
-    patients = Patient.query.filter(or_(Patient.last_name.like(research + '%'),
-                                        Patient.first_name.like(research + '%'))).all()
-    if patients is None:
-        error = "Please enter a lastname"
-        flash(error)
-    return render_template('patients.html', patients=patients)
