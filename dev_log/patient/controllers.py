@@ -23,8 +23,8 @@ def home():
             return redirect(url_for('get_patients', research=research))
 
     patients = Patient.query.all()
+    return render_template('patients.html')
 
-    return render_template('login.html')
 
 @patient.route('/edit/<int:patient_id>', methods=['PUT'])
 def edit_patient(patient_id):
@@ -54,6 +54,7 @@ def add_patient():
         first_name = request.form['first_name']
         email = request.form['email']
         address = request.form['address']
+        phone = request.form['phone']
         error = None
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
 
@@ -70,7 +71,7 @@ def add_patient():
 
         else:
             # storing the new user information in the db
-            patient = Patient(last_name, first_name, email, address)
+            patient = Patient(last_name, first_name, email, address, phone)
             db.session.add(patient)
             db.session.commit()
             flash('Patient was successfully added')
@@ -84,7 +85,7 @@ def add_patient():
 @patient.route('/get_patients/<str:research>', methods=['GET', 'POST'])
 def get_patients(research):
     if request.method == "POST":
-
+        research = request.form['research']
         error = None
 
         if not research:

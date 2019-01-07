@@ -3,7 +3,7 @@ import os
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
-import dev_log.auth as auth
+# import dev_log.auth as auth
 import dev_log.patient as patient
 import dev_log.nurses as nurse
 import dev_log.appointments as appointments
