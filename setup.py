@@ -32,6 +32,5 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    scripts=['scripts/dev_log_hello_world',
-             ],
+    scripts=[],
 )
