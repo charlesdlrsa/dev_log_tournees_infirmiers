@@ -1,6 +1,6 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
-import re
+
 from dev_log import db
 from dev_log.models import Patient
 
@@ -19,11 +19,31 @@ def home():
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('patient.get_patients', research=research))
+            return redirect(url_for('get_patients', research=research))
 
     patients = Patient.query.all()
 
-    return render_template(..., patients=patients)
+    return render_template('login.html')
+
+@patient.route('/edit/<int:patient_id>', methods=['PUT'])
+def edit_patient(patient_id):
+    # try:
+    last_name = request.form['last_name']
+    first_name = request.form['first_name']
+    email = request.form['email']
+    password = request.form['password']
+    # phone = request.form['phone']
+    address = request.form['address']
+
+    db.session.query(Patient).filter(Patient.id == patient_id).\
+        update(last_name=last_name,
+               first_name=first_name,
+               email=email,
+               password=password,
+               # phone=phone,
+               address=address)
+    # except as e:
+    #     pass
 
 
 @patient.route('/add_patient', methods=['GET', 'POST'])

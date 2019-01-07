@@ -15,6 +15,7 @@ def register():
     :return:
     """
     if request.method == 'POST':
+        print(request.form)
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
@@ -35,9 +36,11 @@ def register():
             error = 'Please enter an address.'
         elif Nurse.query.filter(Nurse.email == email).first() is not None:
             error = 'The email "{}" is already used'.format(email)
+            print(error)
 
         else:
             # storing the new user information in the db
+            print("Storing new user")
             password = generate_password_hash(password)
             nurse = Nurse(last_name, first_name, email, password, address)
             db.session.add(nurse)
@@ -47,7 +50,7 @@ def register():
 
         flash(error)
 
-    return render_template('auth/register.html')
+    return render_template('register.html')
 
 
 @auth.route('/login', methods=('GET', 'POST'))
@@ -76,11 +79,11 @@ def login():
             flash('Hi %s %s, welcome back to Our Application!'
                   % (infirmier.first_name.capitalize(),
                      infirmier.last_name.capitalize()))
-            return render_template('home/home.html')
+            return render_template('landing.html')
 
         flash(error)
 
-    return render_template('auth/login.html')
+    return render_template('login.html')
 
 
 @auth.route('/logout')
