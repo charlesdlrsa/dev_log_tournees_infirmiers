@@ -125,7 +125,7 @@ class Patient(BasePerson):
     appointments = db.relationship(
         'Appointment')
 
-    def __init__(self, last_name, first_name, email, address, latitude, longitude, phone):
+    def __init__(self, last_name, first_name, email, address, phone, key):
         self.__last_name = last_name
         self.__first_name = first_name
         self.__email = email
@@ -133,6 +133,7 @@ class Patient(BasePerson):
         self.__latitude = None
         self.__longitude = None
         self.__phone = phone
+        Patient.geolocation(key)
 
     def geolocation(self, key):
         gmaps = googlemaps.Client(key=str(key))
