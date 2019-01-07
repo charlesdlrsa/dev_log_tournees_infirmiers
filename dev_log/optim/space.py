@@ -34,8 +34,6 @@ class Space :
         self.lowerConvexHull = []
         self.dmin = None
         self.dmax = None
-        
-        self.centerSize = []
     
     # -------------------------------------------------------------------------
     
@@ -301,3 +299,15 @@ class Space :
             self.points_lex_sorted = []
             self.upperConvexHull = []
             self.lowerConvexHull = []
+
+    # -------------------------------------------------------------------------
+    
+    # -------------------------------------------------------------------------
+    # -- PROCESS
+    # -------------------------------------------------------------------------
+    def clustering(self):
+        """
+        run the clustering ...
+        """
+        
+        

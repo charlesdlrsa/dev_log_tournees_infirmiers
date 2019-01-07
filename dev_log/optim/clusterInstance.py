@@ -19,6 +19,10 @@ class ClusteringInstance:
         C: the list of clusters
         U: the set of unclustered points
     """
+
+    # -------------------------------------------------------------------------
+    # -- INITIALIZATION
+    # -------------------------------------------------------------------------
     
     def __init__(self,thold,k):
         self.thold = thold
@@ -29,6 +33,12 @@ class ClusteringInstance:
         self.C = []      # clusters corresponding to the previous centers
         self.U = set()   # set of unclustered points such that for all x in U, for all c in S d(c,x)>2thold
     
+    # -------------------------------------------------------------------------
+    
+    # -------------------------------------------------------------------------
+    # -- AUX FUNCTIONS 
+    # -------------------------------------------------------------------------
+
     def get_cluster_index(self,p):
         """
         Give the index in C of the cluster containing p.
@@ -37,6 +47,31 @@ class ClusteringInstance:
         for i in range(len(self.C)):
             if p in self.C[i]:
                 return i
+
+    def getR(self,center):
+        """
+        Compute the radius of a given cluster.
+        """
+        for c in self.C:
+            if center in c:
+                r = 0
+                for p in c:
+                    d = p.distanceTo(center)
+                    if d > r:
+                        r = d
+                return r
+    
+    def getRmax(self):
+        """
+        Return the maximum radius in the instance, throughout the all execution.
+        """
+        return self.rmax
+    
+    # -------------------------------------------------------------------------
+    
+    # -------------------------------------------------------------------------
+    # -- CLUSTERING PROCESS 
+    # -------------------------------------------------------------------------
         
     def insertion(self,x):
         """
@@ -138,24 +173,11 @@ class ClusteringInstance:
             C.append(cluster)
         return S,C
     
-    def getR(self,center):
-        """
-        Compute the radius of a given cluster.
-        """
-        for c in self.C:
-            if center in c:
-                r = 0
-                for p in c:
-                    d = p.distanceTo(center)
-                    if d > r:
-                        r = d
-                return r
+    # -------------------------------------------------------------------------
     
-    def getRmax(self):
-        """
-        Return the maximum radius in the instance, throughout the all execution.
-        """
-        return self.rmax
+    # -------------------------------------------------------------------------
+    # -- OUTPUTS 
+    # -------------------------------------------------------------------------
     
     def plot(self, file_name):
         """
@@ -181,4 +203,18 @@ class ClusteringInstance:
             plt.gca().add_artist(circle)
         plt.savefig(file_name, dpi = 300)
         plt.show()
-        
+    
+    def path(self,center):
+        """
+        Compute the path of a given cluster.
+        It is an hamiltonian path starting at the center of the cluster
+        """
+        for c in self.C:
+            if center in c:
+                pass
+"""
+TODO:
+    - hamiltonian cycle in a cluster
+    - hamiltonian cycle on the centers
+    - find the appropriate cluster instance in "space"
+    
