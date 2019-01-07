@@ -57,12 +57,11 @@ class Appointment(Base):
         db.DateTime,
         nullable=False)
 
-    def __init__(self, nurse_id, patient_id, date, care, phone):
+    def __init__(self, nurse_id, patient_id, date, care):
         self.__nurse_id = nurse_id
         self.__patient_id = patient_id
         self.__date = date
         self.__care = care
-        self.__phone = phone
 
 
 class Nurse(BasePerson):

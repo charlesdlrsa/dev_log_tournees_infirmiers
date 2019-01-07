@@ -1,29 +1,30 @@
 from flask import Blueprint, request, render_template, flash, redirect, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 import re
-
+from sqlalchemy.sql import or_
 from dev_log import db
 from dev_log.models import Nurse
 
 nurse = Blueprint('nurse', __name__, url_prefix='/nurse')
 
-# @nurse.route('/', methods=['GET', 'POST'])
-# def home():
-#     if request.method == "POST":
-#         research = request.form['research']
-#         error = None
-#
-#         if not research:
-#             error = 'Please enter the name of our nurse.'
-#
-#         if error is not None:
-#             flash(error)
-#         else:
-#             return redirect(url_for('nurse.get_nurses', research=research))
-#
-#     nurses = Nurse.query.all()
-#
-#     return render_template(...., nurses=nurses)
+
+@nurse.route('/', methods=['GET', 'POST'])
+def home():
+    if request.method == "POST":
+        research = request.form['research']
+        error = None
+
+        if not research:
+            error = 'Please enter the name of our nurse.'
+
+        if error is not None:
+            flash(error)
+        else:
+            return redirect(url_for('get_nurses', research=research))
+
+    nurses = Nurse.query.all()
+
+    return render_template('nurses.html', nurses=nurses)
 
 
 @nurse.route('/add', methods=['GET', 'POST'])
@@ -64,7 +65,7 @@ def add_nurse():
             db.session.add(nurse)
             db.session.commit()
             flash('Record was successfully added')
-            return redirect(url_for('nurses.get_nurses'))
+            return redirect(url_for('get_nurses'))
 
         flash(error)
 
@@ -78,10 +79,10 @@ def edit_nurse(nurse_id):
     first_name = request.form['first_name']
     email = request.form['email']
     password = request.form['password']
-    phone = request.form ['phone']
+    phone = request.form['phone']
     address = request.form['address']
 
-    db.session.query(Nurse).filter(Nurse.id==nurse_id).\
+    db.session.query(Nurse).filter(Nurse.id == nurse_id).\
         update(last_name=last_name, first_name=first_name, email=email,
                password=password, phone=phone, address=address)
     # except as e:
@@ -91,6 +92,7 @@ def edit_nurse(nurse_id):
 @nurse.route('/get_nurses/<str:research>', methods=['GET', 'POST'])
 def get_nurses(research):
     if request.method == "POST":
+        research = request.form['research']
         error = None
 
         if not research:
@@ -99,9 +101,10 @@ def get_nurses(research):
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('patient.get_patients', research=research))
+            return redirect(url_for('get_nurses', research=research))
 
-    nurses = Nurse.query.filter(or_(Nurse.last_name == research,Nurse.first_name == research)).all()
+    nurses = Nurse.query.filter(or_(Nurse.last_name == research,
+                                    Nurse.first_name == research)).all()
     if nurses is None:
         error = "Please enter a lastname"
         flash(error)

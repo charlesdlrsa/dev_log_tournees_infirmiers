@@ -48,7 +48,6 @@ def register():
             flash('Record was successfully added')
             return redirect(url_for('auth.login'))
 
-        print("on y va")
         flash(error)
 
     return render_template('register.html')
