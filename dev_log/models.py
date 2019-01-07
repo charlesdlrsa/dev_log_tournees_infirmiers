@@ -1,5 +1,5 @@
 from dev_log import db
-
+import googlemaps
 
 class Base(db.Model):
     __abstract__ = True
@@ -130,9 +130,15 @@ class Patient(BasePerson):
         self.__first_name = first_name
         self.__email = email
         self.__address = address
-        self.__latitude = latitude
-        self.__longitude = longitude
+        self.__latitude = None
+        self.__longitude = None
         self.__phone = phone
+
+    def geolocation(self, key):
+        gmaps = googlemaps.Client(key=str(key))
+        distance = gmaps.geocode(self.__address)[0]['geometry']['location']
+        self.__latitude = distance['lat']
+        self.__longitude = distance['lng']
 
 
 class Office(Base):
