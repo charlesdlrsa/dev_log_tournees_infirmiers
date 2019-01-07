@@ -1,21 +1,20 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
-from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from sqlalchemy.sql import or_
 from dev_log import db
 from dev_log.models import Patient
 
-patient = Blueprint('patient', __name__, url_prefix='/patient')
+patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
-@patient.route('/', methods=['GET', 'POST'])
+@patients.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == "POST":
         research = request.form['research']
         error = None
 
         if not research:
-            error = 'Please enter the name of our patient.'
+            error = 'Please enter the name of the patient.'
 
         if error is not None:
             flash(error)
@@ -23,37 +22,38 @@ def home():
             return redirect(url_for('get_patients', research=research))
 
     patients = Patient.query.all()
+    return render_template('patients.html', patients=patients)
 
-    return render_template('login.html')
 
-@patient.route('/edit/<int:patient_id>', methods=['PUT'])
+@patients.route('/edit/<int:patient_id>', methods=['GET','POST'])
 def edit_patient(patient_id):
-    # try:
-    last_name = request.form['last_name']
-    first_name = request.form['first_name']
-    email = request.form['email']
-    password = request.form['password']
-    # phone = request.form['phone']
-    address = request.form['address']
+    if request.method == "POST":
+        last_name = request.form['last_name']
+        first_name = request.form['first_name']
+        email = request.form['email']
+        phone = request.form['phone']
+        address = request.form['address']
 
-    db.session.query(Patient).filter(Patient.id == patient_id).\
-        update(last_name=last_name,
-               first_name=first_name,
-               email=email,
-               password=password,
-               # phone=phone,
-               address=address)
-    # except as e:
-    #     pass
+        db.session.query(Patient).filter(Patient.id == patient_id).\
+            update(last_name=last_name,
+                   first_name=first_name,
+                   email=email,
+                   phone=phone,
+                   address=address)
+
+    patient = Patient.query.filter(Patient.id == patient_id)
+    return render_template('patient_by_id.html', patient=patient)
 
 
-@patient.route('/add_patient', methods=['GET', 'POST'])
+@patients.route('/add_patient', methods=['GET', 'POST'])
 def add_patient():
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
         address = request.form['address']
+        # TODO : requete API pour latitude et longitude
+        phone = request.form['phone']
         error = None
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
 
@@ -70,7 +70,7 @@ def add_patient():
 
         else:
             # storing the new user information in the db
-            patient = Patient(last_name, first_name, email, address)
+            patient = Patient(last_name, first_name, email, address, latitude, longitude, phone)
             db.session.add(patient)
             db.session.commit()
             flash('Patient was successfully added')
@@ -81,10 +81,10 @@ def add_patient():
     return render_template('add_patient.html')
 
 
-@patient.route('/get_patients/<str:research>', methods=['GET', 'POST'])
+@patients.route('/get_patients/<research>', methods=['GET', 'POST'])
 def get_patients(research):
     if request.method == "POST":
-
+        research = request.form['research']
         error = None
 
         if not research:
@@ -95,8 +95,8 @@ def get_patients(research):
         else:
             return redirect(url_for('get_patients', research=research))
 
-    patients = Patient.query.filter(or_(Patient.last_name == research,
-                                        Patient.first_name == research)).all()
+    patients = Patient.query.filter(or_(Patient.last_name.like(research + '%'),
+                                        Patient.first_name.like(research + '%'))).all()
     if patients is None:
         error = "Please enter a lastname"
         flash(error)

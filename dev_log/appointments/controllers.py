@@ -10,7 +10,16 @@ appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 @appointments.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == "POST":
+        research = request.form['research']
+        error = None
 
+        if not research:
+            error = 'Please enter the name of our patient.'
+
+        if error is not None:
+            flash(error)
+        else:
+            return redirect(url_for('get_appointments', patient_name=research))
 
         return redirect(url_for(get_appointments, last_name=last_name, first_name=first_name))
 
@@ -53,7 +62,13 @@ def add_nurse():
     return render_template('add_appointment.html')
 
 
-@appointments.route('/get_appointments/<str:last_name>/<str:first_name>',  methods=['GET', 'POST'])
-def get_appointments(last_name, first_name):
+@appointments.route('/get_appointments/<last_name>/<first_name>',  methods=['GET', 'POST'])
+def get_appointments(patient_name):
+    if request.method == "POST":
+
+        error = None
+
+
+    # appointments = Appointment.query.filter().join(Appointment.patient)
     return
 

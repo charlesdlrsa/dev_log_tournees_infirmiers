@@ -21,10 +21,22 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 
 from dev_log.auth.controllers import auth
-
 app.register_blueprint(auth)
+
+from dev_log.nurses.controllers import nurse
+app.register_blueprint(nurse)
+
+from dev_log.patient.controllers import patients
+app.register_blueprint(patients)
+
+from dev_log.appointments.controllers import appointments
+app.register_blueprint(appointments)
+
+
+
 
 db.create_all()
 
 # For CSS
 app.static_folder = 'static'
+

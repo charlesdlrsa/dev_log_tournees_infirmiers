@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from sqlalchemy.sql import or_
 from dev_log import db
-from dev_log.models import Nurse
+from dev_log.models import Nurse, Office
 
 nurse = Blueprint('nurse', __name__, url_prefix='/nurse')
 
@@ -27,7 +27,7 @@ def home():
     return render_template('nurses.html', nurses=nurses)
 
 
-@nurse.route('/add', methods=['GET', 'POST'])
+@nurse.route('/add_nurse', methods=['GET', 'POST'])
 def add_nurse():
     """
     Add a new nurse
@@ -38,8 +38,10 @@ def add_nurse():
         first_name = request.form['first_name']
         email = request.form['email']
         password = request.form['password']
-        phone = request.form ['phone']
+        phone_number = request.form ['phone_number']
         address = request.form['address']
+        office = request.form['office']
+        print(request.form)
         error = None
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
 
@@ -51,17 +53,20 @@ def add_nurse():
             error = 'Please enter a correct email address.'
         elif not password:
             error = 'Password is required.'
-        elif not phone:
+        elif not phone_number:
             error = 'Phone is required.'
         elif not address:
             error = 'Please enter an address.'
+        elif not office:
+            error = 'Please enter an office.'
         elif Nurse.query.filter(Nurse.email == email).first() is not None:
             error = 'The email "{}" is already used'.format(email)
 
         else:
             # storing the new user information in the db
             password = generate_password_hash(password)
-            nurse = Nurse(last_name, first_name, email, password, phone, address)
+
+            nurse = Nurse(last_name, first_name, email, password, phone, address,office)
             db.session.add(nurse)
             db.session.commit()
             flash('Record was successfully added')
@@ -79,17 +84,18 @@ def edit_nurse(nurse_id):
     first_name = request.form['first_name']
     email = request.form['email']
     password = request.form['password']
-    phone = request.form['phone']
+    phone_number = request.form['phone_number']
     address = request.form['address']
+    office = request.form['office']
 
     db.session.query(Nurse).filter(Nurse.id == nurse_id).\
         update(last_name=last_name, first_name=first_name, email=email,
-               password=password, phone=phone, address=address)
+               password=password, phone=phone_number, address=address,office=office)
     # except as e:
     #     pass
 
 
-@nurse.route('/get_nurses/<str:research>', methods=['GET', 'POST'])
+@nurse.route('/get_nurses/<research>', methods=['GET', 'POST'])
 def get_nurses(research):
     if request.method == "POST":
         research = request.form['research']

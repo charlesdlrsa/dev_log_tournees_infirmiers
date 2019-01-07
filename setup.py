@@ -26,12 +26,11 @@ setup(
     name='dev_log',
     setup_requires=['setuptools_scm'],
     use_scm_version=True,
-    author='Zettafox',flask_sqlalchemy
+    author='Zettafox',
     author_email='luis@zettafox',
     install_requires=requirements,
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    scripts=['scripts/dev_log_hello_world',
-             ],
+    scripts=[],
 )
