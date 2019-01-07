@@ -30,6 +30,8 @@ from dev_log.patient.controllers import patients
 app.register_blueprint(patients)
 
 from dev_log.appointments.controllers import appointments
+app.register_blueprint(appointments)
+
 
 db.create_all()
 

@@ -89,8 +89,9 @@ def add_nurse():
         first_name = request.form['first_name']
         email = request.form['email']
         password = request.form['password']
-        phone = request.form ['phone']
+        phone = request.form['phone']
         address = request.form['address']
+        office = request.form['office']
         error = None
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
 
@@ -106,6 +107,8 @@ def add_nurse():
             error = 'Phone is required.'
         elif not address:
             error = 'Please enter an address.'
+        elif not office:
+            error = 'Please enter an office.'
         elif Nurse.query.filter(Nurse.email == email).first() is not None:
             error = 'The email "{}" is already used'.format(email)
 

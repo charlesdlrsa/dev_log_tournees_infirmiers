@@ -83,9 +83,10 @@ class Nurse(BasePerson):
     office = db.relationship(
         'AssociationOfficeNurse')
 
-    def __init__(self, last_name, first_name, email, password, address, office):
+    def __init__(self, last_name, first_name, email, password, phone,  address, office):
         self.__last_name = last_name
         self.__first_name = first_name
+        self.__phone = phone
         self.__email = email
         self.__password = password
         self.__address = address
@@ -125,11 +126,13 @@ class Patient(BasePerson):
     appointments = db.relationship(
         'Appointment')
 
-    def __init__(self, last_name, first_name, email, address, phone):
+    def __init__(self, last_name, first_name, email, address, latitude, longitude, phone):
         self.__last_name = last_name
         self.__first_name = first_name
         self.__email = email
         self.__address = address
+        self.__latitude = latitude
+        self.__longitude = longitude
         self.__phone = phone
 
 

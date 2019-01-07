@@ -62,7 +62,7 @@ def add_nurse():
     return render_template('add_appointment.html')
 
 
-@appointments.route('/get_appointments/<str:last_name>/<str:first_name>',  methods=['GET', 'POST'])
+@appointments.route('/get_appointments/<last_name>/<first_name>',  methods=['GET', 'POST'])
 def get_appointments(patient_name):
     if request.method == "POST":
 
