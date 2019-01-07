@@ -180,4 +180,3 @@ class AssociationOfficeNurse(Base):
     nurse = db.relationship("Nurse")
 
     office = db.relationship("Office")
-    
