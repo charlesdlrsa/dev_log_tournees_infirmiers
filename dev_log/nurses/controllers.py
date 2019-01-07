@@ -89,7 +89,7 @@ def edit_nurse(nurse_id):
     #     pass
 
 
-@nurse.route('/get_nurses/<str:research>', methods=['GET', 'POST'])
+@nurse.route('/get_nurses/<research>', methods=['GET', 'POST'])
 def get_nurses(research):
     if request.method == "POST":
         research = request.form['research']

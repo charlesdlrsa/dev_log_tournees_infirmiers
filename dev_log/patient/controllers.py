@@ -82,7 +82,7 @@ def add_patient():
     return render_template('add_patient.html')
 
 
-@patient.route('/get_patients/<str:research>', methods=['GET', 'POST'])
+@patient.route('/get_patients/<research>', methods=['GET', 'POST'])
 def get_patients(research):
     if request.method == "POST":
         research = request.form['research']
