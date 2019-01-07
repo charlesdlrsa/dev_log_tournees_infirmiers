@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from sqlalchemy.sql import or_
 from dev_log import db
-from dev_log.models import Nurse
+from dev_log.models import Nurse, Office
 
 nurse = Blueprint('nurse', __name__, url_prefix='/nurse')
 
@@ -41,6 +41,9 @@ def add_nurse():
         phone = request.form['phone']
         address = request.form['address']
         office = request.form['office']
+
+        print(last_name)
+
         error = None
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
 
@@ -52,10 +55,12 @@ def add_nurse():
             error = 'Please enter a correct email address.'
         elif not password:
             error = 'Password is required.'
-        elif not phone:
+        elif not phone_number:
             error = 'Phone is required.'
         elif not address:
             error = 'Please enter an address.'
+        elif not office:
+            error = 'Please enter an office.'
         elif Nurse.query.filter(Nurse.email == email).first() is not None:
             error = 'The email "{}" is already used'.format(email)
 
@@ -80,12 +85,13 @@ def edit_nurse(nurse_id):
     first_name = request.form['first_name']
     email = request.form['email']
     password = request.form['password']
-    phone = request.form['phone']
+    phone_number = request.form['phone_number']
     address = request.form['address']
+    office = request.form['office']
 
     db.session.query(Nurse).filter(Nurse.id == nurse_id).\
         update(last_name=last_name, first_name=first_name, email=email,
-               password=password, phone=phone, address=address)
+               password=password, phone=phone_number, address=address,office=office)
     # except as e:
     #     pass
 
