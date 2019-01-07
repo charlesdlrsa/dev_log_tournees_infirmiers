@@ -65,33 +65,39 @@ class Appointment(Base):
 
 
 class Nurse(BasePerson):
+
     id = db.Column(
         'nurse_id',
         db.Integer,
         primary_key=True,
-        nullable=False)
+        nullable=False,
+        autoincrement=True)
 
     password = db.Column(
         db.String(20),
         nullable=False)
+
+    office = db.Column(
+        db.String(20)
+    )
 
     # competences = db.Column(db.String(50))
 
     appointments = db.relationship(
         'Appointment')
 
-    office = db.relationship(
-        'AssociationOfficeNurse')
+    # office = db.relationship(
+    #     'AssociationOfficeNurse')
 
-    def __init__(self, last_name, first_name, email, password, phone,  address, office):
-        self.__last_name = last_name
-        self.__first_name = first_name
-        self.__phone = phone
-        self.__email = email
-        self.__password = password
-        self.__phone = phone
-        self.__address = address
-        self.__office = office
+    # def __init__(self, last_name, first_name, email, password, phone, address, office):
+    #     BasePerson.__init__(self)
+    #     self.__last_name = last_name
+    #     self.__first_name = first_name
+    #     self.__email = email
+    #     self.__password = password
+    #     self.__phone = phone
+    #     self.__address = address
+    #     self.__office = office
         # self.competences = competences
 
 
@@ -123,6 +129,14 @@ class Patient(BasePerson):
         db.Integer,
         primary_key=True,
         nullable=False)
+
+    latitude = db.Column(
+        db.Float
+    )
+
+    longitude = db.Column(
+        db.Float
+    )
 
     appointments = db.relationship(
         'Appointment')

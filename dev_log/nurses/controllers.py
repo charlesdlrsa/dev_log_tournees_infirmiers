@@ -38,12 +38,9 @@ def add_nurse():
         first_name = request.form['first_name']
         email = request.form['email']
         password = request.form['password']
-        phone = request.form['phone']
+        phone = request.form['phone_number']
         address = request.form['address']
         office = request.form['office']
-
-        print(last_name)
-
         error = None
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
 
@@ -55,7 +52,7 @@ def add_nurse():
             error = 'Please enter a correct email address.'
         elif not password:
             error = 'Password is required.'
-        elif not phone_number:
+        elif not phone:
             error = 'Phone is required.'
         elif not address:
             error = 'Please enter an address.'
@@ -66,12 +63,16 @@ def add_nurse():
 
         else:
             # storing the new user information in the db
+            print(phone)
+            print(last_name)
             password = generate_password_hash(password)
-            nurse = Nurse(last_name, first_name, email, password, phone, address, office)
+            nurse = Nurse(last_name=last_name, first_name=first_name, email=email, password=password, phone=phone,
+                          address=address, office=office)
+            print(nurse.last_name)
             db.session.add(nurse)
             db.session.commit()
             flash('Record was successfully added')
-            return redirect(url_for('get_nurses'))
+            return redirect(url_for('home'))
 
         flash(error)
 
