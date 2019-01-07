@@ -53,7 +53,8 @@ def add_patient():
         email = request.form['email']
         address = request.form['address']
         # TODO : requete API pour latitude et longitude
-        phone = request.form['phone']
+        phone = request.form['phone_number']
+        print(request.form)
         error = None
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
 
@@ -65,16 +66,19 @@ def add_patient():
             error = 'Please enter a correct email address.'
         elif not address:
             error = 'Please enter an address.'
+        elif not phone:
+            error = 'Please enter a phone number'
+
         elif Patient.query.filter(Patient.email == email).first() is not None:
             error = 'The email "{}" is already used'.format(email)
 
         else:
             # storing the new user information in the db
-            patient = Patient(last_name, first_name, email, address, latitude, longitude, phone)
+            """"patient = Patient(last_name, first_name, email, address, phone)
             db.session.add(patient)
             db.session.commit()
-            flash('Patient was successfully added')
-            return redirect(url_for('home'))
+            flash('Patient was successfully added')"""
+            return redirect(url_for('patients.home'))
 
         flash(error)
 

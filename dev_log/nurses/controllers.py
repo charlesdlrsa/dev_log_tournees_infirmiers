@@ -73,9 +73,6 @@ def add_nurse():
             db.session.commit()
             flash('Record was successfully added')
             return redirect(url_for('home'))
-
-        flash(error)
-
     return render_template('add_nurse.html')
 
 
