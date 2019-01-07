@@ -57,11 +57,11 @@ class Appointment(Base):
         db.DateTime,
         nullable=False)
 
-    def __init__(self, nurse_id, patient_id, date, care):
-        self.__nurse_id = nurse_id
-        self.__patient_id = patient_id
-        self.__date = date
-        self.__care = care
+    # def __init__(self, nurse_id, patient_id, date, care):
+    #     self.__nurse_id = nurse_id
+    #     self.__patient_id = patient_id
+    #     self.__date = date
+    #     self.__care = care
 
 
 class Nurse(BasePerson):
@@ -69,7 +69,8 @@ class Nurse(BasePerson):
         'nurse_id',
         db.Integer,
         primary_key=True,
-        nullable=False)
+        nullable=False,
+        autoincrement=True)
 
     password = db.Column(
         db.String(20),
@@ -111,9 +112,9 @@ class Care(Base):
     appointments = db.relationship(
         'Appointment')
 
-    def __init__(self, description, duration):
-        self.__description = description
-        self.__duration = duration
+    # def __init__(self, description, duration):
+    #     self.__description = description
+    #     self.__duration = duration
 
 
 class Patient(BasePerson):
@@ -157,10 +158,10 @@ class Office(Base):
 
     nurses = db.relationship("AssociationOfficeNurse")
 
-    def __init__(self, name, phone, adress):
-        self.__name = name
-        self.__phone = phone
-        self.__address = adress
+    # def __init__(self, name, phone, adress):
+    #     self.__name = name
+    #     self.__phone = phone
+    #     self.__address = adress
 
 
 # Many to Many relation

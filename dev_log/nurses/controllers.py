@@ -115,8 +115,8 @@ def add_nurse():
         else:
             # storing the new user information in the db
             password = generate_password_hash(password)
-            print('ok')
-            nurse = Nurse(last_name=last_name, first_name=first_name, email=email, password=password, phone=phone, address=address)
+            nurse = Nurse(last_name=last_name, first_name=first_name,
+                          email=email, password=password, phone=phone, address=address)
             db.session.add(nurse)
             db.session.commit()
             flash('Record was successfully added')
