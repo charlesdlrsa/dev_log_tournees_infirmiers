@@ -5,11 +5,29 @@ from sqlalchemy.sql import or_
 from dev_log import db
 from dev_log.models import Patient
 
-patient = Blueprint('patient', __name__, url_prefix='/patient')
+patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
-@patient.route('/', methods=['GET', 'POST'])
+@patients.route('/', methods=['GET', 'POST'])
 def home():
+    if request.method == "POST":
+        research = request.form['research']
+        error = None
+
+        if not research:
+            error = 'Please enter the name of your patient.'
+
+        if error is not None:
+            flash(error)
+        else:
+            return redirect(url_for('get_list_of_patients', research=research))
+
+    patients = Patient.query.all()
+    return render_template('list_of_patients.html', patients=patients)
+
+
+@patients.route('/results/<research>', methods=['GET', 'POST'])
+def get_list_of_patients(research):
     if request.method == "POST":
         research = request.form['research']
         error = None
@@ -22,32 +40,48 @@ def home():
         else:
             return redirect(url_for('get_patients', research=research))
 
-    patients = Patient.query.all()
-    return render_template('patients.html')
+    patients = Patient.query.filter(or_(Patient.last_name.like(research+'%'),
+                                        Patient.first_name.like(research+'%')).all()
+    if patients is None:
+        error = "Please enter a lastname"
+
+    if error is not None:
+        flash(error)
+
+    return render_template('list_of_patients.html', patients=patients)
 
 
-@patient.route('/edit/<int:patient_id>', methods=['PUT'])
+@patients.route('/information/<int:patient_id>', methods=['GET, POST'])
+def get_information_about_patient(patient_id):
+    patient = Patient.query.filter(Patient.id == patient_id)
+
+    return render_template("patient_information.html", patient=patient)
+
+
+@patients.route('/edit/<int:patient_id>', methods=['GET, POST'])
 def edit_patient(patient_id):
-    # try:
-    last_name = request.form['last_name']
-    first_name = request.form['first_name']
-    email = request.form['email']
-    password = request.form['password']
-    # phone = request.form['phone']
-    address = request.form['address']
+    if request.method == "POST":
+        last_name = request.form['last_name']
+        first_name = request.form['first_name']
+        email = request.form['email']
+        phone = request.form['phone']
+        address = request.form['address']
 
-    db.session.query(Patient).filter(Patient.id == patient_id).\
-        update(last_name=last_name,
-               first_name=first_name,
-               email=email,
-               password=password,
-               # phone=phone,
-               address=address)
-    # except as e:
-    #     pass
+        db.session.query(Patient).filter(Patient.id == patient_id).\
+            update(last_name=last_name,
+                   first_name=first_name,
+                   email=email,
+                   phone=phone,
+                   address=address)
+
+        return redirect(url_for('get_information_about_patient', patient_id=patient_id))
+
+    patient = Patient.query.filter(Patient.id == patient_id)
+
+    return render_template("edit_patient.html", patient=patient)
 
 
-@patient.route('/add_patient', methods=['GET', 'POST'])
+@patients.route('/add_patient', methods=['GET', 'POST'])
 def add_patient():
     if request.method == "POST":
         last_name = request.form['last_name']
@@ -82,23 +116,4 @@ def add_patient():
     return render_template('add_patient.html')
 
 
-@patient.route('/get_patients/<research>', methods=['GET', 'POST'])
-def get_patients(research):
-    if request.method == "POST":
-        research = request.form['research']
-        error = None
 
-        if not research:
-            error = 'Please enter the name of our patient.'
-
-        if error is not None:
-            flash(error)
-        else:
-            return redirect(url_for('get_patients', research=research))
-
-    patients = Patient.query.filter(or_(Patient.last_name == research,
-                                        Patient.first_name == research)).all()
-    if patients is None:
-        error = "Please enter a lastname"
-        flash(error)
-    return render_template('patients.html', patients=patients)

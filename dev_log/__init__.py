@@ -23,14 +23,13 @@ db = SQLAlchemy(app)
 from dev_log.auth.controllers import auth
 app.register_blueprint(auth)
 
-from dev_log.nurses.controllers import nurse
-app.register_blueprint(nurse)
+from dev_log.nurses.controllers import nurses
+app.register_blueprint(nurses)
 
-from dev_log.patient.controllers import patient
+from dev_log.patient.controllers import patients
+app.register_blueprint(patients)
+
 from dev_log.appointments.controllers import appointments
-
-
-app.register_blueprint(patient)
 
 db.create_all()
 
