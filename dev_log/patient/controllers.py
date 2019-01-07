@@ -41,7 +41,7 @@ def get_list_of_patients(research):
             return redirect(url_for('get_patients', research=research))
 
     patients = Patient.query.filter(or_(Patient.last_name.like(research+'%'),
-                                        Patient.first_name.like(research+'%')).all()
+                                        Patient.first_name.like(research+'%')).all())
     if patients is None:
         error = "Please enter a lastname"
 

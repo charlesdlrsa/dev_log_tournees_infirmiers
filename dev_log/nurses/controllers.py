@@ -89,7 +89,7 @@ def add_nurse():
         first_name = request.form['first_name']
         email = request.form['email']
         password = request.form['password']
-        phone = request.form['phone_number']
+        phone = request.form['phone']
         address = request.form['address']
         office = request.form['office']
         error = None
@@ -120,8 +120,8 @@ def add_nurse():
             db.session.commit()
             flash('Record was successfully added')
             return redirect(url_for('home'))
+
         flash(error)
 
     return render_template('add_nurse.html')
-
 
