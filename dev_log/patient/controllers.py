@@ -24,7 +24,7 @@ def home():
     patients = Patient.query.all()
     for patient in patients:
         print(patient.__dict__)
-        
+
     return render_template('patients.html', patients=patients)
 
 
