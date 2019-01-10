@@ -23,8 +23,6 @@ def home():
             return redirect(url_for('get_list_of_nurses', research=research))
 
     nurses = Nurse.query.all()
-    for nurse in nurses:
-        print(nurse.__dict__)
     return render_template('nurses.html', nurses=nurses)
 
 
