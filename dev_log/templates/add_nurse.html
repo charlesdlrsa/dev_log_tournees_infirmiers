@@ -24,9 +24,10 @@
 
   <body class="bg-dark">
 
-  {% for message in get_flashed_messages() %}
-  <div class="flash">{{ message }}</div>
-  {% endfor %}
+    {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div>
+    {% endfor %}
+
 
     <div class="container">
       <div class="card card-register mx-auto mt-5">
@@ -37,13 +38,13 @@
               <div class="form-row">
                 <div class="col-md-6">
                   <div class="form-label-group">
-                    <input type="text" id="firstName" class="form-control" placeholder="First name" required="required" autofocus="autofocus" name="first_name">
+                    <input type="text" id="first_name" class="form-control" placeholder="First name" required="required" autofocus="autofocus" name="first_name">
                     <label for="first_name">First name</label>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-label-group">
-                    <input type="text" id="lastName" class="form-control" placeholder="Last name" required="required" name="last_name">
+                    <input type="text" id="last_name" class="form-control" placeholder="Last name" required="required" name="last_name">
                     <label for="last_name">Last name</label>
                   </div>
                 </div>
@@ -51,31 +52,31 @@
             </div>
             <div class="form-group">
               <div class="form-label-group">
-                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required="required" name="email">
+                <input type="email" id="email" class="form-control" placeholder="Email address" required="required" name="email">
                 <label for="email">Email address</label>
               </div>
             </div>
             <div class="form-group">
               <div class="form-label-group">
-                <input type="text" id="inputPhoneNumber" class="form-control" placeholder="Phone number" required="required" name="phone_number">
+                <input type="text" id="phone_number" class="form-control" placeholder="Phone number" required="required" name="phone_number">
                 <label for="phone_number">Phone Number</label>
               </div>
             </div>
             <div class="form-group">
               <div class="form-label-group">
-                <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="required" name="password">
+                <input type="password" id="password" class="form-control" placeholder="Password" required="required" name="password">
                 <label for="password">Password</label>
               </div>
             </div>
             <div class="form-group">
               <div class="form-label-group">
-                <input type="office" id="inputOffice" class="form-control" placeholder="Office" required="required" name="office">
+                <input type="office" id="office" class="form-control" placeholder="Office" required="required" name="office">
                 <label for="office">Office</label>
               </div>
             </div>
             <div class="form-group">
               <div class="form-label-group">
-                <input type="address" id="inputAddress" class="form-control" placeholder="Postal Address" required="required" name="address">
+                <input type="address" id="address" class="form-control" placeholder="Postal Address" required="required" name="address">
                 <label for="address">Postal address</label>
               </div>
             </div>
