@@ -42,7 +42,7 @@ def get_list_of_nurses(research):
             return redirect(url_for('get_nurses', research=research))
 
     nurses = Nurse.query.filter(or_(Nurse.last_name.like(research+'%'),
-                                    Nurse.first_name.like(research+'%'))).all()
+                                    Nurse.first_name.like(      research+'%'))).all()
     if nurses is None:
         error = "Please enter a lastname"
         flash(error)
@@ -53,8 +53,8 @@ def get_list_of_nurses(research):
 @nurses.route('/information/<int:nurse_id>', methods=['GET, POST'])
 def get_information_about_nurse(nurse_id):
     nurse = Nurse.query.filter(Nurse.id == nurse_id)
-
-    return render_template("nurse_information.html", nurse=nurse)
+    print(nurse.last_name)
+    return render_template("nurse_info.html", nurse=nurse)
 
 
 @nurses.route('/edit/<int:nurse_id>', methods=['PUT'])
