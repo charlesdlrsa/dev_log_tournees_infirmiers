@@ -1,5 +1,4 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
-from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from sqlalchemy.sql import or_
 from dev_log import db
@@ -23,7 +22,7 @@ def home():
             return redirect(url_for('get_list_of_patients', research=research))
 
     patients = Patient.query.all()
-    return render_template('list_of_patients.html', patients=patients)
+    return render_template('patients.html', patients=patients)
 
 
 @patients.route('/results/<research>', methods=['GET', 'POST'])
