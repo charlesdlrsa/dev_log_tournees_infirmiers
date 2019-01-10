@@ -98,8 +98,15 @@
             <!-- Page Content -->
             <h1>Patients</h1>
             <hr>
-            <p>This is a great starting point for new custom pages.</p>
-
+            {% for patient in patients %}
+              <p>Last Name: {{ patient.last_name }}</p>
+              <p>First  Name: {{ patient.first_name }}</p>
+              <p>Email: {{ patient.email }}</p>
+              <p>Phone: {{ patient.phone }}</p>
+              <p>Address: {{ patient.address }}</p>
+              <p>ID: {{ patient.id }}</p>
+              <hr>
+            {% endfor %}
         </div>
         <!-- /.container-fluid -->
 
@@ -141,17 +148,6 @@
         </div>
     </div>
 </div>
-
-<!-- Bootstrap core JavaScript-->
-<script src="vendor/jquery/jquery.min.js"></script>
-<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-<!-- Core plugin JavaScript-->
-<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-<!-- Custom scripts for all pages-->
-<script src="js/sb-admin.min.js"></script>
-
 </body>
 
 </html>
