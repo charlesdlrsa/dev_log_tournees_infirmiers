@@ -41,7 +41,7 @@ def get_list_of_nurses(research):
             return redirect(url_for('get_nurses', research=research))
 
     nurses = Nurse.query.filter(or_(Nurse.last_name.like(research+'%'),
-                                    Nurse.first_name.like(      research+'%'))).all()
+                                    Nurse.first_name.like(research+'%'))).all()
     if nurses is None:
         error = "Please enter a lastname"
         flash(error)
