@@ -23,8 +23,9 @@ def home():
             return redirect(url_for('get_list_of_nurses', research=research))
 
     nurses = Nurse.query.all()
-
-    return render_template('list_of_nurses.html', nurses=nurses)
+    for nurse in nurses:
+        print(nurse.__dict__)
+    return render_template('nurses.html', nurses=nurses)
 
 
 @nurses.route('/results/<research>', methods=['GET', 'POST'])
@@ -47,7 +48,7 @@ def get_list_of_nurses(research):
         error = "Please enter a lastname"
         flash(error)
 
-    return render_template('list_of_nurses.html', nurses=nurses)
+    return render_template('nurses.html', nurses=nurses)
 
 
 @nurses.route('/information/<int:nurse_id>', methods=['GET, POST'])
