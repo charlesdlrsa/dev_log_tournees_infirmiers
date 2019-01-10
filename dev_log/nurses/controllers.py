@@ -89,7 +89,7 @@ def add_nurse():
         first_name = request.form['first_name']
         email = request.form['email']
         password = request.form['password']
-        phone = request.form['phone']
+        phone = request.form['phone_number']
         address = request.form['address']
         office = request.form['office']
         error = None
@@ -115,11 +115,12 @@ def add_nurse():
         else:
             # storing the new user information in the db
             password = generate_password_hash(password)
-            nurse = Nurse(last_name, first_name, email, password, phone, address)
+            nurse = Nurse(last_name=last_name, first_name=first_name,
+                          email=email, password=password, phone=phone, address=address)
             db.session.add(nurse)
             db.session.commit()
             flash('Record was successfully added')
-            return redirect(url_for('home'))
+            return redirect(url_for('nurses.home'))
 
         flash(error)
 
