@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+  <head>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,149 +9,73 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin - Blank Page</title>
+    <title>SB Admin - Register</title>
 
     <!-- Bootstrap core CSS-->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='bootstrap.min.css')}}" rel="stylesheet">
 
     <!-- Custom fonts for this template-->
-    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-
-    <!-- Page level plugin CSS-->
-    <link href="vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='all.min.css')}}" rel="stylesheet" type="text/css">
 
     <!-- Custom styles for this template-->
-    <link href="css/sb-admin.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='sb-admin.css')}}" rel="stylesheet">
 
-</head>
+  </head>
 
-<body id="page-top">
+  <body class="bg-dark">
 
-<nav class="navbar navbar-expand navbar-dark bg-dark static-top">
-
-    <a class="navbar-brand mr-1" href="index.html">DevLog </a>
-
-    <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
-        <i class="fas fa-bars"></i>
-    </button>
+    {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div>
+    {% endfor %}
 
 
-</nav>
+    <div class="container">
 
-<div id="wrapper">
+      <div class="card card-register mx-auto mt-5">
+        <div class="card-header">Add an appointment</div>
+        <div class="card-body">
+            <form method="post">
 
-    <!-- Sidebar -->
-    <ul class="sidebar navbar-nav">
-        <li class="nav-item active">
-            <a class="nav-link" href="landing.html">
-                <i class="far fa-calendar-alt"></i>
-                <span>Global Planning</span>
-            </a>
-        </li>
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-fw fa-folder"></i>
-                <span>Pages</span>
-            </a>
-            <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-                <h6 class="dropdown-header">Login Screens:</h6>
-                <a class="dropdown-item" href="login.html">Login</a>
-                <a class="dropdown-item" href="register.html">Register</a>
-                <a class="dropdown-item" href="forgot-password.html">Forgot Password</a>
-                <div class="dropdown-divider"></div>
-                <h6 class="dropdown-header">Other Pages:</h6>
-                <a class="dropdown-item" href="404.html">404 Page</a>
-                <a class="dropdown-item" href="model.html"> Model Page</a>
-                <a class="dropdown-item" href="account.html"> Account Page</a>
-                <h6 class="dropdown-header">Nurses Pages:</h6>
-                <a class="dropdown-item" href="nurses.html"> Nurses Page</a>
-                <a class="dropdown-item" href="nurse_info.html"> Nurse Info Page</a>
-                <a class="dropdown-item" href="add_appointment.html"> Add Appointment Page</a>
-                <a class="dropdown-item" href="add_nurse.html"> Add Nurse Page</a>
-                <h6 class="dropdown-header">Patients Pages:</h6>
-                <a class="dropdown-item" href="patients.html"> Patients Page</a>
-                <a class="dropdown-item" href="patient_info.html"> Patient Info Page</a>
-                <a class="dropdown-item" href="add_patient.html"> Add Patient Page</a>
+
+            <div class="form-group">
+              <div class="form-label-group">
+                <input type="number" id="patient_id" class="form-control" placeholder="patient id" required="required" name="email">
+                <label for="patient_id">patient id</label>
+              </div>
             </div>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="patients.html">
-                <i class="fas fa-users"></i>
-                <span>Patients</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="nurses.html">
-                <i class="fas fa-user-md"></i>
-                <span>Nurses</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="account.html">
-                <i class="fas fa-address-card"></i>
-                <span>Account</span></a>
-        </li>
-    </ul>
+            <div class="form-group">
+              <div class="form-label-group">
+                <input type="number" id="nurse_id" class="form-control" placeholder="nurse id" required="required" name="phone_number">
+                <label for="nurse_id">nurse id</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="form-label-group">
+                <input type="text" id="care" class="form-control" placeholder="care" required="required" name="password">
+                <label for="care">care</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="form-label-group">
+                <input type="number" id="date" class="form-control" placeholder="date" required="required" name="office">
+                <label for="date">date</label>
+              </div>
+            </div>
 
-    <div id="content-wrapper">
-
-        <div class="container-fluid">
-
-            <!-- Page Content -->
-            <h1>Blank Page</h1>
-            <hr>
-            <p>This is a great starting point for new custom pages.</p>
-
+            <button class="btn btn-primary btn-block" type="submit">Add Appointment</button>
+          </form>
+        
         </div>
-        <!-- /.container-fluid -->
-
-        <!-- Sticky Footer -->
-        <footer class="sticky-footer">
-            <div class="container my-auto">
-                <div class="copyright text-center my-auto">
-                    <span>Copyright © CentraleSupélec 2018-2019</span>
-                </div>
-            </div>
-        </footer>
-
+      </div>
     </div>
-    <!-- /.content-wrapper -->
 
-</div>
-<!-- /#wrapper -->
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-<!-- Scroll to Top Button-->
-<a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-</a>
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
-<!-- Logout Modal-->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="login.html">Logout</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Bootstrap core JavaScript-->
-<script src="vendor/jquery/jquery.min.js"></script>
-<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-<!-- Core plugin JavaScript-->
-<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-<!-- Custom scripts for all pages-->
-<script src="js/sb-admin.min.js"></script>
-
-</body>
+  </body>
 
 </html>
