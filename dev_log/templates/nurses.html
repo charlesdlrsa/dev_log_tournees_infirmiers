@@ -98,7 +98,15 @@
             <!-- Page Content -->
             <h1>Nurses</h1>
             <hr>
-            <p>This is a great starting point for new custom pages.</p>
+            {% for nurse in nurses %}
+              <p>Last Name: {{ nurse.last_name }}</p>
+              <p>First  Name: {{ nurse.first_name }}</p>
+              <p>Email: {{ nurse.email }}</p>
+              <p>Phone: {{ nurse.phone }}</p>
+              <p>Address: {{ nurse.address }}</p>
+              <p>ID: {{ nurse.id }}</p>
+              <hr>
+            {% endfor %}
 
         </div>
         <!-- /.container-fluid -->
