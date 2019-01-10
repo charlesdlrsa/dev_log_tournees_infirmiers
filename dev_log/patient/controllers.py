@@ -23,7 +23,9 @@ def home():
             return redirect(url_for('get_list_of_patients', research=research))
 
     patients = Patient.query.all()
-    return render_template('list_of_patients.html', patients=patients)
+    for patient in patients:
+        print(patient.__dict__)
+    return render_template('patients.html', patients=patients)
 
 
 @patients.route('/results/<research>', methods=['GET', 'POST'])
@@ -48,7 +50,7 @@ def get_list_of_patients(research):
     if error is not None:
         flash(error)
 
-    return render_template('list_of_patients.html', patients=patients)
+    return render_template('patients.html', patients=patients)
 
 
 @patients.route('/information/<int:patient_id>', methods=['GET, POST'])
@@ -110,7 +112,7 @@ def add_patient():
             db.session.add(patient)
             db.session.commit()
             flash('Patient was successfully added')
-            return redirect(url_for('home'))
+            return redirect(url_for('patients.home'))
 
         flash(error)
 
