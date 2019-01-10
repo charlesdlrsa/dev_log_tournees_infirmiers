@@ -96,13 +96,14 @@
         <div class="container-fluid">
 
             <!-- Page Content -->
-            <h1>Patients</h1>
+            <h1>Appointments</h1>
             <hr>
-            {% for patient in patients %}
-              <p>Last Name: {{ patient.last_name }}</p>
-              <p>First  Name: {{ patient.first_name }}</p>
-              <p>Email: {{ patient.email }}</p>
-              <p>Phone: {{ patient.phone }}</p>
+            {% for appointment in appointments %}
+            <!--TODO-->
+              <p>Patient Name: {{ patient.last_name }}</p>
+              <p>Nurse  Name: {{ patient.first_name }}</p>
+              <p>Date: {{ patient.email }}</p>
+              <p>Care: {{ patient.phone }}</p>
               <p>Address: {{ patient.address }}</p>
               <p>ID: {{ patient.id }}</p>
               <hr>
