@@ -2,7 +2,7 @@ from flask import Blueprint, request, render_template, flash, g, session, redire
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from dev_log import db
-from dev_log.models import Appointment
+from dev_log.models import Appointment, Nurse
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 
@@ -19,42 +19,42 @@ def home():
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('get_appointments', patient_name=research))
-
-        return redirect(url_for(get_appointments, last_name=last_name, first_name=first_name))
+            return redirect(url_for('get_appointments', research=research))
 
     appointments = Appointment.query.all()
-    return render_template(..., appointments=appointments)
+    return render_template("appointments.html", appointments=appointments)
 
 
-@appointments.route('/add', methods=['GET', 'POST'])
-def add_nurse():
+@appointments.route('/add_appointment', methods=['GET', 'POST'])
+def add_appointment():
     """
     Add a new appointment
     :return:
     """
     if request.method == 'POST':
-        nurse_id = request.form['nurse_id']
+        # nurse_id = request.form['nurse_last_name']
         patient_id = request.form['patient_id']
         date = request.form['date']
         care = request.form['care']
         error = None
 
         if not nurse_id:
-            error = 'A nurse_id is required.'
+            error = 'Please select a nurse'
         elif not patient_id:
-            error = 'A patient is required.'
+            error = 'Please select a patient.'
         elif not date:
-            error = 'Date is required.'
+            error = 'A date is required.'
         elif not care:
-            error = 'Care is required.'
-
+            error = 'A care is required.'
+        elif Appointment.query.filter(Appointment.date == date).count() == Nurse.query.all().count()*3:
+            error = 'You cannot add an appointment on %s, all the nurses are already affected.' \
+                    '\n You must choose another date. Please look at the calendar to see the available slots.'.format(date)
         else:
             # storing the new appointment information in the db
-            appointment = Appointment(nurse_id, patient_id, date, care)
+            appointment = Appointment(None, patient_id, date, care)
             db.session.add(appointment)
             db.session.commit()
-            flash('Record was successfully added')
+            flash('The appointment was successfully added')
             return redirect(url_for('get_appointments'))
 
         flash(error)
@@ -62,8 +62,8 @@ def add_nurse():
     return render_template('add_appointment.html')
 
 
-@appointments.route('/get_appointments/<last_name>/<first_name>',  methods=['GET', 'POST'])
-def get_appointments(patient_name):
+@appointments.route('/get_appointments/<research>',  methods=['GET', 'POST'])
+def get_appointments(research):
     if request.method == "POST":
 
         error = None
