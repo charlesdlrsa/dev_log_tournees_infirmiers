@@ -56,12 +56,10 @@ def add_appointment():
         else:
             # storing the new appointment information in the db
             appointment = Appointment(None, patient_id, date, care)
-            print(Patient.query.with_entities(Patient.last_name).filter(Patient.id == patient_id).first())
-            # appointment.patient_name =
             db.session.add(appointment)
             db.session.commit()
             flash('The appointment was successfully added')
-            return redirect(url_for('get_appointments'))
+            return redirect(url_for('appointments.home'))
 
         flash(error)
 
@@ -71,6 +69,8 @@ def add_appointment():
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
 def get_appointments(research):
     first_name, last_name = research.split()
+    print(first_name)
+    print(last_name)
     if request.method == "POST":
         error = None
 
