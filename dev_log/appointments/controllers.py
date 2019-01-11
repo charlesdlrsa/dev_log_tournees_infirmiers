@@ -22,7 +22,7 @@ def home():
         else:
             return redirect(url_for('get_appointments', research=research))
 
-    appointments = Appointment.query.all()
+    appointments = db.session.query(Appointment).order_by(Appointment.date).all()
     return render_template("appointments.html", appointments=appointments)
 
 
@@ -33,14 +33,11 @@ def add_appointment():
     :return:
     """
     if request.method == 'POST':
-        # nurse_id = request.form['nurse_id']
         patient_id = request.form['patient_id']
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         care = request.form['care']
         error = None
 
-        # if not nurse_id:
-        #     error = 'Please select a nurse'
         if not patient_id:
             error = 'Please select a patient.'
         elif not date:

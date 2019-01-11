@@ -22,7 +22,7 @@ def home():
         else:
             return redirect(url_for('get_list_of_nurses', research=research))
 
-    nurses = Nurse.query.all()
+    nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
     return render_template('nurses.html', nurses=nurses)
 
 
