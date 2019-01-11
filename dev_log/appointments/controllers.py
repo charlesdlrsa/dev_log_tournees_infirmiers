@@ -1,8 +1,7 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
-from werkzeug.security import check_password_hash, generate_password_hash
 
 from dev_log import db
-from dev_log.models import Appointment, Nurse
+from dev_log.models import Appointment, Nurse, Patient
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 
@@ -69,6 +68,7 @@ def get_appointments(research):
         error = None
 
 
-    # appointments = Appointment.query.filter().join(Appointment.patient)
+    appointments = Appointment.query\
+        .join(Appointment.patient).filter(Patient.name.like(patient_name))
     return
 

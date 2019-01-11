@@ -1,5 +1,4 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
-from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from sqlalchemy.sql import or_
 from dev_log import db
@@ -25,6 +24,7 @@ def home():
     patients = Patient.query.all()
     for patient in patients:
         print(patient.__dict__)
+
     return render_template('patients.html', patients=patients)
 
 
