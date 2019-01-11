@@ -63,8 +63,17 @@ class Appointment(Base):
         self.patient_id = patient_id
         self.date = date
         self.care_id = care_id
-        self.patient_name = Patient.query.with_entities(Patient.last_name)\
-            .filter(Patient.id == self.patient_id).first()
+        self.patient_name = None
+        self.nurse_name = None
+
+    @property
+    def patient_name(self):
+        return self.patient_name
+
+    @patient_name.setter
+    def patient_name(self, patient_name):
+        self.patient_name = patient_name
+
 
 
 class Nurse(BasePerson):

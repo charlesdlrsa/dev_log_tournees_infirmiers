@@ -33,26 +33,28 @@ def add_appointment():
     :return:
     """
     if request.method == 'POST':
-        nurse_id = request.form['nurse_last_name']
+        #nurse_id = request.form['nurse_last_name']
         patient_id = request.form['patient_id']
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         care = request.form['care']
         error = None
 
-        if not nurse_id:
-            error = 'Please select a nurse'
-        elif not patient_id:
+        # if not nurse_id:
+        #     error = 'Please select a nurse'
+        if not patient_id:
             error = 'Please select a patient.'
         elif not date:
             error = 'A date is required.'
         elif not care:
             error = 'A care is required.'
-        elif Appointment.query.filter(Appointment.date == date).count() == Nurse.query.all().count()*3:
-            error = 'You cannot add an appointment on %s, all the nurses are already affected.' \
-                    '\n You must choose another date. Please look at the calendar to see the available slots.'.format(date)
+        # elif Appointment.query.filter(Appointment.date == date).count() == Nurse.query.all().count()*3:
+        #     error = 'You cannot add an appointment on %s, all the nurses are already affected.' \
+        #             '\n You must choose another date. Please look at the calendar to see the available slots.'.format(date)
         else:
             # storing the new appointment information in the db
             appointment = Appointment(None, patient_id, date, care)
+            print(Patient.query.with_entities(Patient.last_name).filter(Patient.id == patient_id).first())
+            # appointment.patient_name =
             db.session.add(appointment)
             db.session.commit()
             flash('The appointment was successfully added')
