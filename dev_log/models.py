@@ -45,7 +45,6 @@ class Appointment(Base):
     nurse_id = db.Column(
         db.Integer,
         db.ForeignKey('nurse.nurse_id'),
-        nullable=False,
         unique=False)
 
     care_id = db.Column(
@@ -100,11 +99,11 @@ class Nurse(BasePerson):
 
     # competences = db.Column(db.String(50))
 
-    def __init__(self, last_name, first_name, email, password, phone,  address, office):
+    def __init__(self, last_name, first_name, email, password, phone, address, office):
         self.last_name = last_name
         self.first_name = first_name
-        self.phone = phone
         self.email = email
+        self.phone = phone
         self.password = password
         self.address = address
         self.office = office
@@ -143,7 +142,7 @@ class Patient(BasePerson):
     appointments = db.relationship(
         'Appointment')
 
-    def __init__(self, last_name, first_name, email, address,phone):
+    def __init__(self, last_name, first_name, email, address, phone):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
@@ -197,3 +196,31 @@ class AssociationOfficeNurse(Base):
     nurse = db.relationship("Nurse")
 
     office = db.relationship("Office")
+
+
+def init_db():
+    import logging as lg
+    db.drop_all()
+    db.create_all()
+    db.session.add(Nurse(last_name="Cabaret", first_name="Laurent", email="laurent.cabaret@hotmail.fr",
+                         phone="0699458758", password="password", address="35 rue Bobigny", office="Paris"))
+    db.session.add(Nurse(last_name="Poly", first_name="Jean Philippe", email="jpp@hotmail.fr",
+                         phone="0699458758", password="password", address="48 rue Clovis", office="Paris"))
+    db.session.add(Nurse(last_name="Hulot", first_name="Celine", email="celine.hulot@hotmail.fr",
+                         phone="0699469858", password="password", address="76 rue Paul André", office="Paris"))
+    db.session.add(Nurse(last_name="Detriche", first_name="Jean Marie", email="jeanmarie.detriche@hotmail.fr",
+                         phone="0694699858", password="password", address="24 rue Terrence", office="Paris"))
+    db.session.add(Patient(last_name="De la roche", first_name="Charles", email="charles.dlrsa@hotmail.fr",
+                           address="40 rue Victor Hugo", phone="0699497758"))
+    db.session.add(Patient(last_name="Mallard", first_name="Alix", email="alix.mallard@hotmail.fr",
+                           address="25 rue Pasteur", phone="0699265758"))
+    db.session.add(Patient(last_name="Dieudonne", first_name="Maxime", email="maxime.dieudo@hotmail.fr",
+                           address="79 rue Vinci", phone="0649697758"))
+    db.session.add(Patient(last_name="Pascual", first_name="Romain", email="romain.pascual@hotmail.fr",
+                           address="178 rue Sadi Carnot", phone="0678697758"))
+    db.session.add(Patient(last_name="Leveque", first_name="Hippolyte", email="hippolyte.leveque@hotmail.fr",
+                           address="41 rue Boulard", phone="0674697758"))
+    db.session.add(Patient(last_name="Castagne", first_name="Louis", email="louis.castagne@hotmail.fr",
+                           address="325 rue Lecourbe", phone="0674695898"))
+    db.session.commit()
+    lg.warning('Database initialized!')

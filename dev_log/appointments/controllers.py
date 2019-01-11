@@ -1,6 +1,6 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 from sqlalchemy.sql import or_
-from datetime import datetime
+from datetime import datetime, date
 from dev_log import db
 from dev_log.models import Appointment, Patient, Nurse
 
@@ -33,7 +33,7 @@ def add_appointment():
     :return:
     """
     if request.method == 'POST':
-        #nurse_id = request.form['nurse_last_name']
+        # nurse_id = request.form['nurse_id']
         patient_id = request.form['patient_id']
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         care = request.form['care']
@@ -45,11 +45,14 @@ def add_appointment():
             error = 'Please select a patient.'
         elif not date:
             error = 'A date is required.'
+        elif date < date.today():
+            error = 'You selected a day already passed.'
         elif not care:
             error = 'A care is required.'
-        # elif Appointment.query.filter(Appointment.date == date).count() == Nurse.query.all().count()*3:
-        #     error = 'You cannot add an appointment on %s, all the nurses are already affected.' \
-        #             '\n You must choose another date. Please look at the calendar to see the available slots.'.format(date)
+        elif Appointment.query.filter(Appointment.date == date).count() == db.session.query(Nurse).count()*3:
+            error = 'You cannot add an appointment on %s, all the nurses are already affected.' \
+                    '\n You must choose another date. Please look at the calendar to see the available slots.'.format(date)
+
         else:
             # storing the new appointment information in the db
             appointment = Appointment(None, patient_id, date, care)
