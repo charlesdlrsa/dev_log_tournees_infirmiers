@@ -1,6 +1,7 @@
 from dev_log import db
 from sqlalchemy.sql import select
 
+
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(

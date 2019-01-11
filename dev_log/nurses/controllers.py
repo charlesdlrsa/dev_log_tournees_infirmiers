@@ -91,8 +91,8 @@ def add_nurse():
         phone = request.form['phone_number']
         address = request.form['address']
         office = request.form['office']
-        error = None
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
+        error = None
 
         if not last_name:
             error = 'A lastname is required.'

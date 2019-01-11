@@ -2,7 +2,8 @@ from flask import Blueprint, request, render_template, flash, g, session, redire
 from sqlalchemy.sql import or_
 from datetime import datetime
 from dev_log import db
-from dev_log.models import Appointment, Patient
+from dev_log.models import Appointment, Patient, Nurse
+
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 
@@ -21,10 +22,8 @@ def home():
         else:
             return redirect(url_for('get_appointments', research=research))
 
-        return redirect(url_for(get_appointments, research=research))
-
     appointments = Appointment.query.all()
-    return render_template('appointments.html', appointments=appointments)
+    return render_template("appointments.html", appointments=appointments)
 
 
 @appointments.route('/add_appointment', methods=['GET', 'POST'])
@@ -34,28 +33,30 @@ def add_appointment():
     :return:
     """
     if request.method == 'POST':
-        nurse_id = request.form['nurse_id']
+        # nurse_id = request.form['nurse_last_name']
         patient_id = request.form['patient_id']
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         care = request.form['care']
         error = None
 
         if not nurse_id:
-            error = 'A nurse is required.'
+            error = 'Please select a nurse'
         elif not patient_id:
-            error = 'A patient is required.'
+            error = 'Please select a patient.'
         elif not date:
-            error = 'Date is required.'
+            error = 'A date is required.'
         elif not care:
-            error = 'Care is required.'
-
+            error = 'A care is required.'
+        elif Appointment.query.filter(Appointment.date == date).count() == Nurse.query.all().count()*3:
+            error = 'You cannot add an appointment on %s, all the nurses are already affected.' \
+                    '\n You must choose another date. Please look at the calendar to see the available slots.'.format(date)
         else:
             # storing the new appointment information in the db
-            appointment = Appointment(nurse_id, patient_id, date, care)
+            appointment = Appointment(None, patient_id, date, care)
             db.session.add(appointment)
             db.session.commit()
-            flash('Record was successfully added')
-            return redirect(url_for('appointments.home'))
+            flash('The appointment was successfully added')
+            return redirect(url_for('get_appointments'))
 
         flash(error)
 
