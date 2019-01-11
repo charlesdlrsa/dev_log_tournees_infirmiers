@@ -58,26 +58,30 @@ def login():
     :return:
     """
     if request.method == 'POST':
+        user_type = request.form['user-type']
         email = request.form['email']
         password = request.form['password']
         error = None
-        infirmier = Nurse.query.filter(Nurse.email == email).first()
+        if user_type == 'nurse':
+            infirmier = Nurse.query.filter(Nurse.email == email).first()
+            if infirmier is None:
+                error = 'Incorrect email address.'
+            elif not check_password_hash(infirmier.password, password):
+                error = 'Incorrect password.'
 
-        if infirmier is None:
-            error = 'Incorrect email address.'
-        elif not check_password_hash(infirmier.password, password):
-            error = 'Incorrect password.'
-
-        if error is None:
-            # storing user information in the object "session"
-            session.clear()
-            session['nurse_id'] = infirmier.id
-            session['nurse_last_name'] = infirmier.last_name
-            session['nurse_first_name'] = infirmier.first_name
-            flash('Hi %s %s, welcome back to Our Application!'
-                  % (infirmier.first_name.capitalize(),
-                     infirmier.last_name.capitalize()))
-            return render_template('landing.html')
+            if error is None:
+                # storing user information in the object "session"
+                session.clear()
+                session['nurse_id'] = infirmier.id
+                session['nurse_last_name'] = infirmier.last_name
+                session['nurse_first_name'] = infirmier.first_name
+                flash('Hi %s %s, welcome back to Our Application!'
+                      % (infirmier.first_name.capitalize(),
+                         infirmier.last_name.capitalize()))
+        else:
+            #user is Admin
+            pass
+        return render_template('landing.html')
 
         flash(error)
 
