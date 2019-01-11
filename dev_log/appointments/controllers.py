@@ -1,7 +1,9 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
-
+from sqlalchemy.sql import or_
+from datetime import datetime
 from dev_log import db
-from dev_log.models import Appointment, Nurse, Patient
+from dev_log.models import Appointment, Patient, Nurse
+
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 
@@ -31,9 +33,9 @@ def add_appointment():
     :return:
     """
     if request.method == 'POST':
-        # nurse_id = request.form['nurse_last_name']
+        nurse_id = request.form['nurse_last_name']
         patient_id = request.form['patient_id']
-        date = request.form['date']
+        date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         care = request.form['care']
         error = None
 
@@ -61,14 +63,13 @@ def add_appointment():
     return render_template('add_appointment.html')
 
 
-@appointments.route('/get_appointments/<research>',  methods=['GET', 'POST'])
+@appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
 def get_appointments(research):
+    first_name, last_name = research.split()
     if request.method == "POST":
-
         error = None
 
-
-    appointments = Appointment.query\
-        .join(Appointment.patient).filter(Patient.name.like(patient_name))
-    return
-
+    appointments = Appointment.query \
+        .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
+                                              Patient.first_name.like('%' + first_name + '%')))
+    return render_template('appointments.html', appointments=appointments)

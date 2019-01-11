@@ -1,4 +1,5 @@
-from dev_log.__init__ import db
+from dev_log import db
+from sqlalchemy.sql import select
 
 
 class Base(db.Model):
@@ -39,29 +40,31 @@ class Appointment(Base):
         db.Integer,
         db.ForeignKey('patient.patient_id'),
         nullable=False,
-        unique=True)
+        unique=False)
 
     nurse_id = db.Column(
         db.Integer,
         db.ForeignKey('nurse.nurse_id'),
         nullable=False,
-        unique=True)
+        unique=False)
 
     care_id = db.Column(
         db.Integer,
         db.ForeignKey('care.care_id'),
         nullable=False,
-        unique=True)
+        unique=False)
 
     date = db.Column(
         db.DateTime,
         nullable=False)
 
-    def __init__(self, nurse_id, patient_id, date, care):
+    def __init__(self, nurse_id, patient_id, date, care_id):
         self.nurse_id = nurse_id
         self.patient_id = patient_id
         self.date = date
-        self.care = care
+        self.care_id = care_id
+        self.patient_name = Patient.query.with_entities(Patient.last_name)\
+            .filter(Patient.id == self.patient_id).first()
 
 
 class Nurse(BasePerson):
