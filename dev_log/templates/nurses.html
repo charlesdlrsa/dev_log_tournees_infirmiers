@@ -96,7 +96,19 @@
         <div class="container-fluid">
 
             <!-- Page Content -->
+
+          <div class="row">
             <h1>Nurses</h1>
+              <div class="col-md-4 col-md-offset-3">
+                  <form method='post' class="search-form">
+                      <div class="form-group has-feedback">
+                  		<label for="search" class="sr-only">Search Nurse Name</label>
+                  		<input type="text" class="form-control" name="research" id="search" placeholder="search">
+                    		<span class="glyphicon glyphicon-search form-control-feedback"></span>
+                  	</div>
+                  </form>
+              </div>
+            </div>
             <hr>
             {% for nurse in nurses %}
               <p>Last Name: {{ nurse.last_name }}</p>

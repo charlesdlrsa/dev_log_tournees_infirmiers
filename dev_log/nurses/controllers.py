@@ -13,14 +13,14 @@ def home():
     if request.method == "POST":
         research = request.form['research']
         error = None
-
+        print(research)
         if not research:
             error = 'Please enter the name of our nurse.'
 
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('get_list_of_nurses', research=research))
+            return redirect(url_for('nurses.get_list_of_nurses', research=research))
 
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
     return render_template('nurses.html', nurses=nurses)
@@ -38,7 +38,7 @@ def get_list_of_nurses(research):
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('get_nurses', research=research))
+            return redirect(url_for('nurses.get_list_of_nurses', research=research))
 
     nurses = Nurse.query.filter(or_(Nurse.last_name.like(research+'%'),
                                     Nurse.first_name.like(research+'%'))).all()
