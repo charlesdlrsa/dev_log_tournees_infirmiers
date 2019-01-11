@@ -37,8 +37,6 @@ def add_appointment():
         nurse_id = request.form['nurse_id']
         patient_id = request.form['patient_id']
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
-        print('le type:')
-        print(type(date))
         care = request.form['care']
         error = None
 
@@ -53,10 +51,7 @@ def add_appointment():
 
         else:
             # storing the new appointment information in the db
-            print('here')
             appointment = Appointment(nurse_id, patient_id, date, care)
-            print('there we are')
-            print(appointment.patient_name)
             db.session.add(appointment)
             db.session.commit()
             flash('Record was successfully added')
