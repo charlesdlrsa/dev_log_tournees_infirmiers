@@ -1,4 +1,4 @@
-from dev_log import db
+from dev_log.__init__ import db
 
 
 class Base(db.Model):
