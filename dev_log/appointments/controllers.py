@@ -49,6 +49,7 @@ def add_appointment():
         elif Appointment.query.filter(Appointment.date == date).count() == db.session.query(Nurse).count()*3:
             error = 'You cannot add an appointment on %s, all the nurses are already affected.' \
                     '\n You must choose another date. Please look at the calendar to see the available slots.'.format(date)
+
         else:
             # storing the new appointment information in the db
             appointment = Appointment(None, patient_id, date, care)

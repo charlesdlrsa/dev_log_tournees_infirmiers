@@ -100,12 +100,10 @@
             <hr>
             {% for appointment in appointments %}
             <!--TODO-->
-              <p>Patient Name: {{ patient.last_name }}</p>
-              <p>Nurse  Name: {{ patient.first_name }}</p>
-              <p>Date: {{ patient.email }}</p>
-              <p>Care: {{ patient.phone }}</p>
-              <p>Address: {{ patient.address }}</p>
-              <p>ID: {{ patient.id }}</p>
+              <p>Patient Name: {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</p>
+              <p>Nurse  Name: {{ appointment.nurse.first_name }} {{ appointment.nurse.last_name }}</p>
+              <p>Date: {{ appointment.date }}</p>
+              <p>Care: {{ appointment.care.description }}</p>
               <hr>
             {% endfor %}
         </div>
