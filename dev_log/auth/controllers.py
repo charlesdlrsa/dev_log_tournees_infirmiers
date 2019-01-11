@@ -14,7 +14,6 @@ def register():
     :return:
     """
     if request.method == 'POST':
-        print(request.form)
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
