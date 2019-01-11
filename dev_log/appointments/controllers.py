@@ -33,7 +33,7 @@ def add_appointment():
     :return:
     """
     if request.method == 'POST':
-        # nurse_id = request.form['nurse_last_name']
+        nurse_id = request.form['nurse_last_name']
         patient_id = request.form['patient_id']
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         care = request.form['care']
