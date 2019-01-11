@@ -66,8 +66,6 @@ def add_appointment():
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
 def get_appointments(research):
     first_name, last_name = research.split()
-    print(first_name)
-    print(last_name)
     if request.method == "POST":
         error = None
 
