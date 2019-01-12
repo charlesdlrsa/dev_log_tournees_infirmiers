@@ -59,9 +59,11 @@ def search_patients(research):
 #     return render_template("patient_information.html", patient=patient)
 
 
-@patients.route('/edit/<int:patient_id>', methods=['GET, POST'])
+@patients.route('/edit/<int:patient_id>', methods=['GET', 'POST'])
 def edit_patient(patient_id):
+
     if request.method == "POST":
+        print(request.form)
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
@@ -78,8 +80,8 @@ def edit_patient(patient_id):
         flash("The patient's information have been updated")
         return redirect(url_for('patients.home'))
 
-    patient = Patient.query.filter(Patient.id == patient_id)
-
+    patient = Patient.query.filter(Patient.id == patient_id).all()[0]
+    print(patient.phone)
     return render_template("edit_patient.html", patient=patient)
 
 
