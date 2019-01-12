@@ -109,16 +109,42 @@
                   </form>
               </div>
             </div>
-            <hr>
-            {% for nurse in nurses %}
-              <p>Last Name: {{ nurse.last_name }}</p>
-              <p>First  Name: {{ nurse.first_name }}</p>
-              <p>Email: {{ nurse.email }}</p>
-              <p>Phone: {{ nurse.phone }}</p>
-              <p>Address: {{ nurse.address }}</p>
-              <p>ID: {{ nurse.id }}</p>
-              <hr>
-            {% endfor %}
+
+
+            <div class="card mb-3">
+
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                    <th>Last Name</th>
+                    <th>First Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Adress</th>
+                    <th>ID</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {% for nurse in nurses %}
+                  <tr>
+                    <td>{{ nurse.last_name }}</td>
+                    <td> {{ nurse.first_name }}</td>
+                    <td> {{ nurse.email }}</td>
+                    <td> {{ nurse.phone }}</td>
+                    <td> {{ nurse.address }}</td>
+                    <td> {{ nurse.id }}</td>
+                  <tr>
+                  {% endfor %}
+
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
         </div>
         <!-- /.container-fluid -->
