@@ -59,29 +59,29 @@ def search_nurses(research):
 
 @nurses.route('/edit/<int:nurse_id>', methods=['GET','POST'])
 def edit_nurse(nurse_id):
+    print(nurse_id)
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
-        phone = request.form['phone_number']
+        phone = request.form['phone']
         password = request.form['password']
         address = request.form['address']
-        office = request.form['office']
+        #office = request.form['office']
 
         password = generate_password_hash(password)
         db.session.query(Nurse).filter(Nurse.id == nurse_id).\
-            update(last_name=last_name,
+            update(dict(last_name=last_name,
                    first_name=first_name,
                    email=email,
                    phone=phone,
                    password=password,
-                   address=address,
-                   office=office)
-
+                   address=address))
+        db.session.commit()
         flash("The nurse's information have been updated")
         return redirect(url_for('nurses.home'))
 
-    nurse = Nurse.query.filter(Nurse.id == nurse_id)
+    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
 
     return render_template("edit_nurse.html", nurse=nurse)
 

@@ -129,6 +129,7 @@
                     <th>Phone</th>
                     <th>Adress</th>
                     <th>ID</th>
+                    <th></th>
                   </tr>
                 </thead>
 
@@ -142,9 +143,12 @@
                       <td> {{ nurse.phone }}</td>
                       <td> {{ nurse.address }}</td>
                       <td> {{ nurse.id }}</td>
+                      <td> <a href="{{ url_for('nurses.edit_nurse',nurse_id=nurse.id)}}" class="btn btn-secondary btn-sm active"
+                        role="button">Edit</a>
+                      </td>
                     <tr>
-                    <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                   
+
                   {% endfor %}
 
 
