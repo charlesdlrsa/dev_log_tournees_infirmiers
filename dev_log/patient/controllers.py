@@ -63,24 +63,22 @@ def search_patients(research):
 def edit_patient(patient_id):
 
     if request.method == "POST":
-        print(request.form)
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
         address = request.form['address']
         phone = request.form['phone']
-
         db.session.query(Patient).filter(Patient.id == patient_id).\
-            update(last_name=last_name,
+            update(dict(last_name=last_name,
                    first_name=first_name,
                    email=email,
                    address=address,
-                   phone=phone)
-
+                   phone=phone))
+        db.session.commit()
         flash("The patient's information have been updated")
         return redirect(url_for('patients.home'))
 
-    patient = Patient.query.filter(Patient.id == patient_id).all()[0]
+    patient = Patient.query.filter(Patient.id == patient_id).first()
     print(patient.phone)
     return render_template("edit_patient.html", patient=patient)
 
