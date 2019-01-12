@@ -16,6 +16,10 @@
             </div>
           </form>
       </div>
+      <div class="col-lg-8 col-lg-8">
+        <a href="{{ url_for('nurses.add_nurse')}}" class="btn btn-secondary btn-md active"
+          role="button">Add Nurse</a>
+      </div>
     </div>
 
 
@@ -24,8 +28,11 @@
   <div class="card-body">
     <div class="table-responsive">
       <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+
         <div class="card-header">
-          <h1>Nurses</h1>
+          <div class="row">
+            <h1>Nurses</h1>
+        </div>
         </div>
 
         <thead>
