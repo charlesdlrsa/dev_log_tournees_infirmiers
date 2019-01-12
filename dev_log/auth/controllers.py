@@ -58,15 +58,16 @@ def login():
     :return:
     """
     if request.method == 'POST':
+        user_type = request.form['user-type']
         email = request.form['email']
         password = request.form['password']
         error = None
-        nurse = Nurse.query.filter(Nurse.email == email).first()
-
-        if infirmier is None:
-            error = 'Incorrect email address.'
-        elif not check_password_hash(infirmier.password, password):
-            error = 'Incorrect password.'
+        if user_type == 'nurse':
+            nurse = Nurse.query.filter(Nurse.email == email).first()
+            if nurse is None:
+                error = 'Incorrect email address.'
+            elif not check_password_hash(nurse.password, password):
+                error = 'Incorrect password.'
 
         else:
             # storing user information in the object "session"
