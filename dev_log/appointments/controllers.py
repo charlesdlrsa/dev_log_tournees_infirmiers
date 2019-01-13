@@ -20,7 +20,7 @@ def home():
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('get_appointments', research=research))
+            return redirect(url_for('appointments.get_appointments', research=research))
 
     appointments = db.session.query(Appointment).order_by(Appointment.date).all()
     return render_template("appointments.html", appointments=appointments)
