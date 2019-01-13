@@ -34,8 +34,9 @@ def add_appointment():
     """
     if request.method == 'POST':
         print(request.form)
-        patient = request.form['patient'].split()
-        nurse = request.form['nurse'].split()
+        patient = request.form['patient'].split(' - ')
+        print(patient)
+        nurse = request.form['nurse'].split(' - ')
         patient_id = db.session.query(Patient).filter(Patient.first_name==patient[1]).filter(Patient.last_name==patient[0]).first().id
         nurse_id = db.session.query(Nurse).filter(Nurse.first_name==nurse[1]).filter(Nurse.last_name==nurse[0]).first().id
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
@@ -62,6 +63,7 @@ def add_appointment():
             return redirect(url_for('appointments.home'))
         flash(error)
     patients = db.session.query(Patient).order_by(Patient.last_name).all()
+    print(patients)
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
     return render_template('add_appointment.html',patients=patients,nurses=nurses)
 
