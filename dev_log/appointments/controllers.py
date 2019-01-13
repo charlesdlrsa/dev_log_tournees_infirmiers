@@ -1,8 +1,9 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
-from werkzeug.security import check_password_hash, generate_password_hash
-
+from sqlalchemy.sql import or_
+from datetime import datetime, date
 from dev_log import db
-from dev_log.models import Appointment
+from dev_log.models import Appointment, Patient, Nurse
+
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 
@@ -19,56 +20,61 @@ def home():
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('get_appointments', patient_name=research))
+            return redirect(url_for('appointments.get_appointments', research=research))
 
-        return redirect(url_for(get_appointments, last_name=last_name, first_name=first_name))
-
-    appointments = Appointment.query.all()
-    return render_template(..., appointments=appointments)
+    appointments = db.session.query(Appointment).order_by(Appointment.date).all()
+    return render_template("appointments.html", appointments=appointments)
 
 
-@appointments.route('/add', methods=['GET', 'POST'])
-def add_nurse():
+@appointments.route('/add_appointment', methods=['GET', 'POST'])
+def add_appointment():
     """
     Add a new appointment
     :return:
     """
     if request.method == 'POST':
-        nurse_id = request.form['nurse_id']
-        patient_id = request.form['patient_id']
-        date = request.form['date']
+        print(request.form)
+        patient = request.form['patient'].split(' - ')
+        print(patient)
+        nurse = request.form['nurse'].split(' - ')
+        patient_id = db.session.query(Patient).filter(Patient.first_name==patient[1]).filter(Patient.last_name==patient[0]).first().id
+        nurse_id = db.session.query(Nurse).filter(Nurse.first_name==nurse[1]).filter(Nurse.last_name==nurse[0]).first().id
+        date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         care = request.form['care']
+
         error = None
-
-        if not nurse_id:
-            error = 'A nurse_id is required.'
-        elif not patient_id:
-            error = 'A patient is required.'
+        if not patient:
+            error = 'Please select a patient.'
         elif not date:
-            error = 'Date is required.'
+            error = 'A date is required.'
+        elif date < date.today():
+            error = 'You selected a day already passed.'
         elif not care:
-            error = 'Care is required.'
-
+            error = 'A care is required.'
+        elif Appointment.query.filter(Appointment.date == date).count() == db.session.query(Nurse).count()*3:
+            error = 'You cannot add an appointment on %s, all the nurses are already affected.' \
+                    '\n You must choose another date. Please look at the calendar to see the available slots.'.format(date)
         else:
             # storing the new appointment information in the db
             appointment = Appointment(nurse_id, patient_id, date, care)
             db.session.add(appointment)
             db.session.commit()
-            flash('Record was successfully added')
-            return redirect(url_for('get_appointments'))
-
+            flash('The appointment was successfully added')
+            return redirect(url_for('appointments.home'))
         flash(error)
+    patients = db.session.query(Patient).order_by(Patient.last_name).all()
+    print(patients)
+    nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
+    return render_template('add_appointment.html',patients=patients,nurses=nurses)
 
-    return render_template('add_appointment.html')
 
-
-@appointments.route('/get_appointments/<last_name>/<first_name>',  methods=['GET', 'POST'])
-def get_appointments(patient_name):
+@appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
+def get_appointments(research):
+    first_name, last_name = research.split()
     if request.method == "POST":
-
         error = None
 
-
-    # appointments = Appointment.query.filter().join(Appointment.patient)
-    return
-
+    appointments = Appointment.query \
+        .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
+                                              Patient.first_name.like('%' + first_name + '%')))
+    return render_template('appointments.html', appointments=appointments)
