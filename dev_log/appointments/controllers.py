@@ -55,7 +55,7 @@ def add_appointment():
                     '\n You must choose another date. Please look at the calendar to see the available slots.'.format(date)
         else:
             # storing the new appointment information in the db
-            appointment = Appointment(None, patient_id, date, care)
+            appointment = Appointment(nurse_id, patient_id, date, care)
             db.session.add(appointment)
             db.session.commit()
             flash('The appointment was successfully added')
