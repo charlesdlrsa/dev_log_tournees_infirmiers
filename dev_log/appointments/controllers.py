@@ -24,8 +24,9 @@ def home():
             flash(error)
         else:
             return redirect(url_for('appointments.get_appointments', research=research))
+
     appointments = dict()
-    for i in range(1,8):
+    for i in range(1, 8):
         appointments[i] = []
     appointments_list = db.session.query(Appointment).order_by(Appointment.date).all()
     for appointment in appointments_list:
@@ -44,17 +45,13 @@ def home():
         current_date = datetime.now()
         week = current_date.isocalendar()[1]
         year = current_date.isocalendar()[0]
-    start_week=iso_to_gregorian(year,week,1)
-    end_week=iso_to_gregorian(year,week,7)
+    start_week = iso_to_gregorian(year, week, 1)
+    end_week = iso_to_gregorian(year, week, 7)
     start_week = str(start_week.day) + '/' + str(start_week.month)
     end_week = str(end_week.day) + '/' + str(end_week.month)
 
-    return render_template("appointments.html",
-    appointments=appointments,
-    start_week=start_week,
-    end_week=end_week,
-    year=year,
-    week=week)
+    return render_template("appointments.html", appointments=appointments, start_week=start_week,
+                           end_week=end_week, year=year, week=week)
 
 
 @appointments.route('/add_appointment', methods=['GET', 'POST'])
@@ -110,7 +107,7 @@ def add_appointment():
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
     cares = db.session.query(Care).all()
 
-    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares,time=time)
+    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares, time=time)
 
 
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
