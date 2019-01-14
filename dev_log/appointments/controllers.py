@@ -83,7 +83,7 @@ def add_appointment():
 
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         halfday = request.form['halfday']
-        care = request.form['care']
+        care = Care.query.filter(Care.description == request.form['care']).first().id
         error = None
 
         if not patient:
