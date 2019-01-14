@@ -63,7 +63,7 @@ def add_appointment():
             db.session.add(appointment)
             db.session.commit()
             flash('The appointment was successfully added')
-            return redirect(url_for('appointments.home'))
+            return redirect(url_for('appointments.planning'))
         flash(error)
 
     patients = db.session.query(Patient).order_by(Patient.last_name).all()
