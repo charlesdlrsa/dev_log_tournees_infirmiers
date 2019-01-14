@@ -19,8 +19,8 @@ app.config.from_object('config')
 # Create database connection object
 db = SQLAlchemy(app)
 
-from dev_log.home.controllers import home
-app.register_blueprint(home)
+from dev_log.planning.controllers import planning
+app.register_blueprint(planning)
 
 from dev_log.auth.controllers import auth
 app.register_blueprint(auth)

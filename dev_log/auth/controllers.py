@@ -5,7 +5,7 @@ from dev_log import db
 from dev_log.models import Nurse, Office
 import functools
 
-auth = Blueprint('auth', __name__, url_prefix='/auth')
+auth = Blueprint('auth', __name__)
 
 #
 # @auth.route('/register', methods=['GET', 'POST'])
@@ -52,7 +52,8 @@ auth = Blueprint('auth', __name__, url_prefix='/auth')
 #     return render_template('register.html')
 
 
-@auth.route('/login', methods=('GET', 'POST'))
+@auth.route('/', methods=('GET', 'POST'))
+@auth.route('/auth/login', methods=('GET', 'POST'))
 def login():
     """
     View of the login page, handles the users connections
@@ -84,6 +85,10 @@ def login():
                       % (nurse.first_name.capitalize(),
                          nurse.last_name.capitalize()))
 
+                return redirect(url_for("planning.home"))
+            flash(error)
+            return redirect(request.referrer)
+
         elif user_type == 'admin':
             office = Office.query.filter(Office.email == email).first()
 
@@ -97,29 +102,20 @@ def login():
                 session.clear()
                 session['office_id'] = office.id
                 session['office_name'] = office.name
-                flash('Hi %s %s, welcome back to Our Application!'
+                flash('Hi %s, welcome back to Our Application!'
                       % (office.name.capitalize()))
 
-            return redirect(url_for("home.index"))
+                return redirect(url_for("planning.home"))
+            flash(error)
+            return redirect(request.referrer)
 
         else:
             error = "Please select a user type"
 
         flash(error)
-        return render_template('landing.html')
+        return redirect(request.referrer)
 
     return render_template('login.html')
-
-
-@auth.route('/logout')
-@login_required
-def logout():
-    """
-    Logs out the user by cleaning the session user and redirects to the homepage
-    :return:
-    """
-    session.clear()
-    return redirect(url_for('home.index'))
 
 
 def login_required(view):
@@ -131,9 +127,9 @@ def login_required(view):
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if session.get('nurse_id') is None:
-            flash('You need to login as a nurse to access this page.')
-            return redirect(request.referrer)
+        if session.get('nurse_id') is None and session.get('office_id') is None:
+            flash('You need to login to access this page.')
+            return redirect(url_for('auth.login'))
 
         return view(**kwargs)
 
@@ -151,8 +147,19 @@ def admin_required(view):
     def wrapped_view(**kwargs):
         if session.get('office_id') is None:
             flash('You need to login as an administrator to access this page.')
-            return redirect(request.referrer)
+            return redirect(url_for('auth.login'))
 
         return view(**kwargs)
 
     return wrapped_view
+
+
+@auth.route('/logout')
+@login_required
+def logout():
+    """
+    Logs out the user by cleaning the session user and redirects to the homepage
+    :return:
+    """
+    session.clear()
+    return redirect(url_for('auth.login'))

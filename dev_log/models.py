@@ -1,5 +1,9 @@
 from dev_log import db
+<<<<<<< HEAD
 #import googlemaps
+=======
+# import googlemaps
+>>>>>>> 65c1bed94036275f21f6b90589c6527482a04565
 from werkzeug.security import check_password_hash, generate_password_hash
 
 class Base(db.Model):
@@ -55,13 +59,13 @@ class Patient(BasePerson):
         self.email = email
         self.address = address
         self.phone = phone
-        Patient.geolocation(key)
-
-    def geolocation(self, key):
-        gmaps = googlemaps.Client(key=str(key))
-        distance = gmaps.geocode(self.address)[0]['geometry']['location']
-        self.latitude = distance['lat']
-        self.longitude = distance['lng']
+    #     Patient.geolocation(key)
+    #
+    # def geolocation(self, key):
+    #     gmaps = googlemaps.Client(key=str(key))
+    #     distance = gmaps.geocode(self.address)[0]['geometry']['location']
+    #     self.latitude = distance['lat']
+    #     self.longitude = distance['lng']
 
 
 class Nurse(BasePerson):
@@ -156,8 +160,8 @@ class Care(Base):
         nullable=False)
 
     def __init__(self, description, duration):
-        self.__description = description
-        self.__duration = duration
+        self.description = description
+        self.duration = duration
 
 
 class Office(Base):
@@ -243,5 +247,12 @@ def init_db():
                            address="41 rue Boulard", phone="0674697758"))
     db.session.add(Patient(last_name="Cassedanne", first_name="Louis", email="louis.cassedanne@hotmail.fr",
                            address="325 rue Lecourbe", phone="0674695898"))
+    db.session.add(Care(description="Pansement", duration=60))
+    db.session.add(Care(description="Piqûre", duration=60))
+    db.session.add(Care(description="Post opératoire", duration=60))
     db.session.commit()
+<<<<<<< HEAD
+=======
+
+>>>>>>> 65c1bed94036275f21f6b90589c6527482a04565
     lg.warning('Database initialized!')

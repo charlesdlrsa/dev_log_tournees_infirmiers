@@ -3,11 +3,14 @@ import re
 from sqlalchemy.sql import or_
 from dev_log import db
 from dev_log.models import Patient
+from dev_log.auth.controllers import login_required
+from dev_log.auth.controllers import admin_required
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
 @patients.route('/', methods=['GET', 'POST'])
+@admin_required
 def home():
     if request.method == "POST":
         research = request.form['research']
