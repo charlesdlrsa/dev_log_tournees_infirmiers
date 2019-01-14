@@ -68,9 +68,9 @@
                 <select id="inputcare" class="form-control" placeholder="nurse" required="required" name="care">
                   <option selected>Select care</option>
 
-                  {% for care in ['Soin 1', 'Soin 2', 'Soin 3'] %}
+                  {% for care in cares %}
                   <option>
-                  {{ care }}
+                  {{ care.description }}
                   </option>
                   {% endfor %}
                 </select>

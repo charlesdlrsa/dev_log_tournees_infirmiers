@@ -13,7 +13,7 @@ planning = Blueprint('planning', __name__, url_prefix='/planning')
 @planning.route("/", methods=['GET', 'POST'])
 def home():
     if request.method == "POST":
-        print('lol')
+        init_db()
     if "week" in request.args:
         week=int(request.args['week'])
         year=int(request.args['year'])
@@ -24,7 +24,7 @@ def home():
             week=1
             year=year+1
     else:
-        current_date = datetime.now()
+        current_date = datetime.datetime.now()
         week = current_date.isocalendar()[1]
         year = current_date.isocalendar()[0]
     start_week=iso_to_gregorian(year,week,1)

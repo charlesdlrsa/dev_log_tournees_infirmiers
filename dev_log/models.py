@@ -91,9 +91,9 @@ class Nurse(BasePerson):
         self.password = password
         self.address = address
         self.office = office
-        for care in cares:
-            if care not in ["soin 1", "soin 2", "soin 3"]:
-                raise ValueError("Unvalid care")
+        # for care in cares:
+        #     if care not in ["soin 1", "soin 2", "soin 3"]:
+        #         raise ValueError("Unvalid care")
         self.cares = cares
         # self.competences = competences
 

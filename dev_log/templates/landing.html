@@ -15,14 +15,12 @@
         {{end_week}}
       </h1>
       <div class='flex-row'>
-<<<<<<< HEAD
         <div class="d-flex justify-content-between">
           <a href="{{url_for('planning.home')}}"  class="btn btn-secondary btn-sm active"
             >Previous Week</a>
           <a href="{{ url_for('planning.home')}}" class="btn btn-secondary btn-sm active"
             >Next Week</a>
         </div>
-=======
 
           <form method="post">
 
@@ -30,13 +28,13 @@
                 <div class="d-flex justify-content-between">
                   <div class='from-group'>
                   <div class="form-label-group">
-                    <a href="{{url_for('home.index',week=week-1,year=year)}}"  class="btn btn-secondary btn-sm active"
+                    <a href="{{url_for('planning.home',week=week-1,year=year)}}"  class="btn btn-secondary btn-sm active"
                     role=button  >Previous Week</a>
                   </div>
                   </div>
                   <div class='from-group'>
                   <div class="form-label-group">
-                    <a href="{{ url_for('home.index',week=week+1,year=year)}}" class="btn btn-secondary btn-sm active"
+                    <a href="{{ url_for('planning.home',week=week+1,year=year)}}" class="btn btn-secondary btn-sm active"
                       role=button>Next Week</a>
                   </div>
                   </div>

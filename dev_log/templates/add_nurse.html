@@ -52,10 +52,10 @@
             </div>
             <div class="form-group">
               <div class="form-label-group">
-                <input type="checkbox" name="soin1" value="soin1"> Soin 1<br>
-                <input type="checkbox" name="soin2" value="soin2"> Soin 2<br>
-                <input type="checkbox" name="soin3" value="soin3"> Soin 3<br>
-                <label for="email">Cares</label>
+                {% for care in cares %}
+                <input type="checkbox" name="soin1" value="soin1">{{ care.description }} <br>
+                {% endfor %}
+                <label for="cares">Cares</label>
               </div>
             </div>
             <div class="form-group">
