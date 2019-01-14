@@ -108,6 +108,7 @@ def login():
 
 
 @auth.route('/logout')
+@login_required
 def logout():
     """
     Logs out the user by cleaning the session user and redirects to the homepage
@@ -126,7 +127,7 @@ def login_required(view):
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if session['infirmier_id'] is None:
+        if session['nurse_id'] is None:
             flash('You need to sign in to access this page.')
             return redirect(url_for('auth.login'))
 
