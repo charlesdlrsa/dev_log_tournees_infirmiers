@@ -29,4 +29,4 @@ def matrix_distance(addresses, key, mode):
     for i in range(length):
         for j in range(length):
             matrix_distance[i][j] = distance['rows'][i]['elements'][j]['duration']['value']
-
+    return matrix_distance

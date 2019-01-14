@@ -103,7 +103,16 @@ class Space :
         
         return delta_lat * delta_long
 
-
+    def matrix_distance(self, addresses, key, mode):
+        gmaps = googlemaps.Client(key=str(key))
+        length = len(addresses)
+        liste_coordonnees = [(addresses[i].getLatitude(),adresses[i].getLongitude()) for i in range(length)]
+        distance = gmaps.distance_matrix(liste_coordonnees, liste_coordonnees, mode)
+        matrix_distance = np.zeros((length, length))
+        for i in range(length):
+            for j in range(length):
+                matrix_distance[i][j] = distance['rows'][i]['elements'][j]['duration']['value']
+        return matrix_distance
         
     # -------------------------------------------------------------------------
      
