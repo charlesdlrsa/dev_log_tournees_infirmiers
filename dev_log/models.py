@@ -83,7 +83,7 @@ class Nurse(BasePerson):
     # competences = db.Column(db.String(50))
 
     def __init__(self, last_name, first_name, email, password,
-                 phone, address, office, cares):
+                 phone, address, office, cares=None):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
@@ -246,6 +246,7 @@ def init_db():
     db.session.add(Care(description="Pansement", duration=60))
     db.session.add(Care(description="Piqûre", duration=60))
     db.session.add(Care(description="Post opératoire", duration=60))
+
     db.session.commit()
 
     lg.warning('Database initialized!')
