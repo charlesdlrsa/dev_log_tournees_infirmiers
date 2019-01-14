@@ -82,7 +82,7 @@ def edit_nurse(nurse_id):
                    address=address))
         db.session.commit()
         flash("The nurse's information have been updated")
-        return redirect(url_for('nurses.planning'))
+        return redirect(url_for('nurses.home'))
 
     nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
 
@@ -131,7 +131,7 @@ def add_nurse():
             db.session.add(nurse)
             db.session.commit()
             flash('The nurse was successfully added')
-            return redirect(url_for('nurses.planning'))
+            return redirect(url_for('nurses.home'))
 
         flash(error)
 

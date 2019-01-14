@@ -79,7 +79,7 @@ def edit_patient(patient_id):
                    phone=phone))
         db.session.commit()
         flash("The patient's information have been updated")
-        return redirect(url_for('patients.planning'))
+        return redirect(url_for('patients.home'))
 
     patient = Patient.query.filter(Patient.id == patient_id).first()
     print(patient.phone)
@@ -117,7 +117,7 @@ def add_patient():
             db.session.add(patient)
             db.session.commit()
             flash('The patient was successfully added')
-            return redirect(url_for('patients.planning'))
+            return redirect(url_for('patients.home'))
 
         flash(error)
 
