@@ -1,5 +1,5 @@
 from dev_log import db
-import googlemaps
+#import googlemaps
 from werkzeug.security import check_password_hash, generate_password_hash
 
 class Base(db.Model):
@@ -244,4 +244,4 @@ def init_db():
     db.session.add(Patient(last_name="Cassedanne", first_name="Louis", email="louis.cassedanne@hotmail.fr",
                            address="325 rue Lecourbe", phone="0674695898"))
     db.session.commit()
-lg.warning('Database initialized!')
+    lg.warning('Database initialized!')
