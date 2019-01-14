@@ -122,6 +122,11 @@ class Appointment(Base):
         db.Date,
         nullable=False)
 
+    halfday = db.Column(
+        db.String,
+        nullable=False
+    )
+
     patient = db.relationship(
         "Patient",
         backref="patient")
@@ -134,10 +139,11 @@ class Appointment(Base):
         "Care",
         backref="care")
 
-    def __init__(self, nurse_id, patient_id, date, care_id):
+    def __init__(self, nurse_id, patient_id, date, halfday, care_id):
         self.nurse_id = nurse_id
         self.patient_id = patient_id
         self.date = date
+        self.halfday = halfday
         self.care_id = care_id
 
 

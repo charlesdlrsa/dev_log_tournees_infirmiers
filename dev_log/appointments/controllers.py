@@ -23,9 +23,8 @@ def home():
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('appointments.get_appointments', research=research))
+            return redirect(url_for('appointments.search_appointments', research=research))
     appointments = db.session.query(Appointment).order_by(Appointment.date).all()
-
 
     if "week" in request.args:
         week=int(request.args['week'])
@@ -101,7 +100,7 @@ def add_appointment():
 
 
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
-def get_appointments(research):
+def search_appointments(research):
     if request.method == "POST":
         error = None
         new_research = request.form['research']
@@ -112,7 +111,7 @@ def get_appointments(research):
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('nurses.search_nurses', research=new_research))
+            return redirect(url_for('appointment.search_appointment', research=new_research))
 
     if len(research.split()) >= 2:
         first_name, last_name = research.split()[0], " ".join(research.split()[1:])
