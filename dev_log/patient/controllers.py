@@ -19,17 +19,15 @@ def home():
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('get_list_of_patients', research=research))
+            return redirect(url_for('patients.search_patients', research=research))
 
-    patients = Patient.query.all()
-    for patient in patients:
-        print(patient.__dict__)
+    patients = db.session.query(Patient).order_by(Patient.last_name).all()
 
     return render_template('patients.html', patients=patients)
 
 
 @patients.route('/results/<research>', methods=['GET', 'POST'])
-def get_list_of_patients(research):
+def search_patients(research):
     if request.method == "POST":
         research = request.form['research']
         error = None
@@ -40,46 +38,48 @@ def get_list_of_patients(research):
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('get_patients', research=research))
+            return redirect(url_for('patients.search_patients', research=research))
+
+
 
     patients = Patient.query.filter(or_(Patient.last_name.like(research+'%'),
-                                        Patient.first_name.like(research+'%')).all())
+                                        Patient.first_name.like(research+'%'))).all()
+
     if patients is None:
         error = "Please enter a lastname"
-
-    if error is not None:
         flash(error)
 
     return render_template('patients.html', patients=patients)
 
 
-@patients.route('/information/<int:patient_id>', methods=['GET, POST'])
-def get_information_about_patient(patient_id):
-    patient = Patient.query.filter(Patient.id == patient_id)
+# @patients.route('/information/<int:patient_id>', methods=['GET, POST'])
+# def get_information_about_patient(patient_id):
+#     patient = Patient.query.filter(Patient.id == patient_id)
+#
+#     return render_template("patient_information.html", patient=patient)
 
-    return render_template("patient_information.html", patient=patient)
 
-
-@patients.route('/edit/<int:patient_id>', methods=['GET, POST'])
+@patients.route('/edit/<int:patient_id>', methods=['GET', 'POST'])
 def edit_patient(patient_id):
+
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
-        phone = request.form['phone']
         address = request.form['address']
-
+        phone = request.form['phone']
         db.session.query(Patient).filter(Patient.id == patient_id).\
-            update(last_name=last_name,
+            update(dict(last_name=last_name,
                    first_name=first_name,
                    email=email,
-                   phone=phone,
-                   address=address)
+                   address=address,
+                   phone=phone))
+        db.session.commit()
+        flash("The patient's information have been updated")
+        return redirect(url_for('patients.home'))
 
-        return redirect(url_for('get_information_about_patient', patient_id=patient_id))
-
-    patient = Patient.query.filter(Patient.id == patient_id)
-
+    patient = Patient.query.filter(Patient.id == patient_id).first()
+    print(patient.phone)
     return render_template("edit_patient.html", patient=patient)
 
 
@@ -102,6 +102,8 @@ def add_patient():
             error = 'Please enter a correct email address.'
         elif not address:
             error = 'Please enter an address.'
+        elif not phone:
+            error = 'Phone is required.'
         elif Patient.query.filter(Patient.email == email).first() is not None:
             error = 'The email "{}" is already used'.format(email)
 
@@ -111,7 +113,7 @@ def add_patient():
                               email=email, address=address, phone=phone)
             db.session.add(patient)
             db.session.commit()
-            flash('Patient was successfully added')
+            flash('The patient was successfully added')
             return redirect(url_for('patients.home'))
 
         flash(error)

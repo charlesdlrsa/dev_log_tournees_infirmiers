@@ -58,12 +58,12 @@ def login():
     :return:
     """
     if request.method == 'POST':
+        user_type = request.form['user-type']
         email = request.form['email']
         password = request.form['password']
         error = None
         if request.form['user_type'] == "nurse":
             nurse = Nurse.query.filter(Nurse.email == email).first()
-
             if nurse is None:
                 error = 'Incorrect email address.'
             elif not check_password_hash(nurse.password, password):
@@ -75,6 +75,10 @@ def login():
                 session['nurse_id'] = nurse.id
                 session['nurse_last_name'] = nurse.last_name
                 session['nurse_first_name'] = nurse.first_name
+                session['nurse_email'] = nurse.email
+                session['nurse_phone_number'] = nurse.phone
+                session['nurse_office'] = nurse.office
+                session['nurse_address'] = nurse.address
                 flash('Hi %s %s, welcome back to Our Application!'
                       % (nurse.first_name.capitalize(),
                          nurse.last_name.capitalize()))
@@ -95,6 +99,8 @@ def login():
                 flash('Hi %s %s, welcome back to Our Application!'
                       % (office.name.capitalize()))
 
+            return redirect(url_for("home.index"))
+
         flash(error)
         return render_template('landing.html')
 
@@ -108,7 +114,7 @@ def logout():
     :return:
     """
     session.clear()
-    return redirect(url_for('home/home.html'))
+    return redirect(url_for('home.index'))
 
 
 def login_required(view):

@@ -20,7 +20,7 @@ def home():
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('get_appointments', research=research))
+            return redirect(url_for('appointments.get_appointments', research=research))
 
     appointments = db.session.query(Appointment).order_by(Appointment.date).all()
     return render_template("appointments.html", appointments=appointments)
@@ -33,12 +33,17 @@ def add_appointment():
     :return:
     """
     if request.method == 'POST':
-        patient_id = request.form['patient_id']
+        print(request.form)
+        patient = request.form['patient'].split(' - ')
+        print(patient)
+        nurse = request.form['nurse'].split(' - ')
+        patient_id = db.session.query(Patient).filter(Patient.first_name==patient[1]).filter(Patient.last_name==patient[0]).first().id
+        nurse_id = db.session.query(Nurse).filter(Nurse.first_name==nurse[1]).filter(Nurse.last_name==nurse[0]).first().id
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         care = request.form['care']
-        error = None
 
-        if not patient_id:
+        error = None
+        if not patient:
             error = 'Please select a patient.'
         elif not date:
             error = 'A date is required.'
@@ -49,18 +54,18 @@ def add_appointment():
         elif Appointment.query.filter(Appointment.date == date).count() == db.session.query(Nurse).count()*3:
             error = 'You cannot add an appointment on %s, all the nurses are already affected.' \
                     '\n You must choose another date. Please look at the calendar to see the available slots.'.format(date)
-
         else:
             # storing the new appointment information in the db
-            appointment = Appointment(None, patient_id, date, care)
+            appointment = Appointment(nurse_id, patient_id, date, care)
             db.session.add(appointment)
             db.session.commit()
             flash('The appointment was successfully added')
             return redirect(url_for('appointments.home'))
-
         flash(error)
-
-    return render_template('add_appointment.html')
+    patients = db.session.query(Patient).order_by(Patient.last_name).all()
+    print(patients)
+    nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
+    return render_template('add_appointment.html',patients=patients,nurses=nurses)
 
 
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
