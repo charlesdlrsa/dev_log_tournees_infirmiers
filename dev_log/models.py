@@ -1,5 +1,5 @@
 from dev_log import db
-import googlemaps
+# import googlemaps
 from werkzeug.security import check_password_hash, generate_password_hash
 
 class Base(db.Model):
@@ -154,8 +154,8 @@ class Care(Base):
         nullable=False)
 
     def __init__(self, description, duration):
-        self.__description = description
-        self.__duration = duration
+        self.description = description
+        self.duration = duration
 
 
 class Office(Base):

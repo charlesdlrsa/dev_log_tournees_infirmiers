@@ -52,7 +52,7 @@ auth = Blueprint('auth', __name__)
 #     return render_template('register.html')
 
 
-@auth.route('/')
+@auth.route('/', methods=('GET', 'POST'))
 @auth.route('/auth/login', methods=('GET', 'POST'))
 def login():
     """
@@ -85,6 +85,10 @@ def login():
                       % (nurse.first_name.capitalize(),
                          nurse.last_name.capitalize()))
 
+                return redirect(url_for("planning.home"))
+            flash(error)
+            return redirect(request.referrer)
+
         elif user_type == 'admin':
             office = Office.query.filter(Office.email == email).first()
 
@@ -98,10 +102,12 @@ def login():
                 session.clear()
                 session['office_id'] = office.id
                 session['office_name'] = office.name
-                flash('Hi %s %s, welcome back to Our Application!'
+                flash('Hi %s, welcome back to Our Application!'
                       % (office.name.capitalize()))
 
-            return redirect(url_for("planning.home"))
+                return redirect(url_for("planning.home"))
+            flash(error)
+            return redirect(request.referrer)
 
         else:
             error = "Please select a user type"
@@ -121,9 +127,9 @@ def login_required(view):
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if session.get('nurse_id') is None:
-            flash('You need to login as a nurse to access this page.')
-            return redirect(request.referrer)
+        if session.get('nurse_id') is None and session.get('office_id') is None:
+            flash('You need to login to access this page.')
+            return redirect(url_for('auth.login'))
 
         return view(**kwargs)
 
@@ -141,7 +147,7 @@ def admin_required(view):
     def wrapped_view(**kwargs):
         if session.get('office_id') is None:
             flash('You need to login as an administrator to access this page.')
-            return redirect(request.referrer)
+            return redirect(url_for('auth.login'))
 
         return view(**kwargs)
 
