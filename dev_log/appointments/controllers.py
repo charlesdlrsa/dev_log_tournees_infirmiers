@@ -23,8 +23,13 @@ def home():
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('appointments.search_appointments', research=research))
-    appointments = db.session.query(Appointment).order_by(Appointment.date).all()
+            return redirect(url_for('appointments.get_appointments', research=research))
+    appointments = dict()
+    for i in range(1,8):
+        appointments[i] = []
+    appointments_list = db.session.query(Appointment).order_by(Appointment.date).all()
+    for appointment in appointments_list:
+        appointments[appointment.date.weekday()].append(appointment)
 
     if "week" in request.args:
         week=int(request.args['week'])
@@ -43,7 +48,7 @@ def home():
     end_week=iso_to_gregorian(year,week,7)
     start_week = str(start_week.day) + '/' + str(start_week.month)
     end_week = str(end_week.day) + '/' + str(end_week.month)
-    print(appointments)
+
     return render_template("appointments.html",
     appointments=appointments,
     start_week=start_week,

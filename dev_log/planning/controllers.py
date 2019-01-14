@@ -23,7 +23,6 @@ def home():
             week=1
             year=year+1
     else:
-
         current_date = datetime.datetime.now()
         week = current_date.isocalendar()[1]
         year = current_date.isocalendar()[0]
