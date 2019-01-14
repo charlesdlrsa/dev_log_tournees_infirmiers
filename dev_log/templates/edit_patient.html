@@ -30,61 +30,46 @@
 
     <div class="container">
       <div class="card card-register mx-auto mt-5">
-        <div class="card-header">Register an Account</div>
+        <div class="card-header">Edit Patient</div>
         <div class="card-body">
-          <form method="post">
+            <form method="post">
             <div class="form-group">
               <div class="form-row">
                 <div class="col-md-6">
                   <div class="form-label-group">
-                    <input type="text" id="firstName" class="form-control" placeholder="First name" required="required" autofocus="autofocus" name="first_name">
-                    <label for="first_name">First name</label>
+                    <input type="text" id="first_name" class="form-control" placeholder="{{patient.first_name}}" required="required" autofocus="autofocus" name="first_name" value="{{patient.first_name}}" >
+                    <label for="first_name">First Name</label>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-label-group">
-                    <input type="text" id="lastName" class="form-control" placeholder="Last name" required="required" name="last_name">
-                    <label for="last_name">Last name</label>
+                    <input type="text" id="last_name" class="form-control" placeholder="{{patient.last_name}}" required="required" name="last_name" value="{{patient.last_name}}">
+                    <label for="last_name">Last Name</label>
                   </div>
                 </div>
               </div>
             </div>
             <div class="form-group">
               <div class="form-label-group">
-                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required="required" name="email">
-                <label for="email">Email address</label>
+                <input type="email" id="email" class="form-control" placeholder="{{patient.email}}" required="required" name="email" value="{{patient.email}}">
+                <label for="email">Email</label>
               </div>
             </div>
             <div class="form-group">
               <div class="form-label-group">
-                <input type="text" id="inputPhoneNumber" class="form-control" placeholder="Phone number" required="required" name="phone_number">
-                <label for="phone_number">Phone Number</label>
+                <input type="text" id="phone" class="form-control" placeholder="{{patient.phone}}" required="required" name="phone" value="{{patient.phone}}">
+                <label for="phone">Phone</label>
               </div>
             </div>
             <div class="form-group">
               <div class="form-label-group">
-                <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="required" name="password">
-                <label for="password">Password</label>
+                <input type="address" id="address" class="form-control" placeholder="{{patient.address}}" required="required" name="address" value="{{patient.address}}">
+                <label for="address">Address</label>
               </div>
             </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="office" id="inputOffice" class="form-control" placeholder="Office" required="required" name="office">
-                <label for="office">Office</label>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="address" id="inputAddress" class="form-control" placeholder="Postal Address" required="required" name="address">
-                <label for="address">Postal address</label>
-              </div>
-            </div>
-            <button class="btn btn-primary btn-block" type="submit">Register</button>
+            <button class="btn btn-primary btn-block" type="submit">Edit</button>
           </form>
-          <div class="text-center">
-            <a class="d-block small mt-3" href="login.html">Login Page</a>
-            <a class="d-block small" href="forgot-password.html">Forgot Password?</a>
-          </div>
+
         </div>
       </div>
     </div>
