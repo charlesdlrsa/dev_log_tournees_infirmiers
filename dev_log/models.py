@@ -82,7 +82,8 @@ class Nurse(BasePerson):
 
     # competences = db.Column(db.String(50))
 
-    def __init__(self, last_name, first_name, email, password, phone, address, office):
+    def __init__(self, last_name, first_name, email, password,
+                 phone, address, office, cares):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
@@ -90,6 +91,7 @@ class Nurse(BasePerson):
         self.password = password
         self.address = address
         self.office = office
+        self.cares = cares
         # self.competences = competences
 
 
