@@ -5,7 +5,7 @@ from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 from dev_log.utils.calendar import *
 from datetime import *
-from dev_log.models.calendar import *
+from dev_log.utils.calendar import *
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
