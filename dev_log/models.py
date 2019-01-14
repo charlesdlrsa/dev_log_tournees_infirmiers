@@ -163,12 +163,23 @@ class Office(Base):
         db.String(50),
         nullable=False)
 
+    email = db.Column(
+        db.String(20),
+        nullable=False)
+
+    password = db.Column(
+        db.String(20),
+        nullable=False)
+
     nurses = db.relationship("AssociationOfficeNurse")
 
-    def __init__(self, name, phone, address):
+    def __init__(self, name, phone, address, email, password):
         self.__name = name
         self.__phone = phone
         self.__address = address
+        self.email = email
+        self.password = password
+
 
 
 # Many to Many relation
