@@ -90,8 +90,7 @@
   </div>
   </div>
   {% for appointment in appointments %}
-
-    <td>{{ appointment.date}}</td>
+    <td>{{ appointment.date.weekday()}}</td>
 
 
   {% endfor %}
