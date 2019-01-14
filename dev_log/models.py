@@ -91,6 +91,9 @@ class Nurse(BasePerson):
         self.password = password
         self.address = address
         self.office = office
+        # for care in cares:
+        #     if care not in ["soin 1", "soin 2", "soin 3"]:
+        #         raise ValueError("Unvalid care")
         self.cares = cares
         # self.competences = competences
 
@@ -252,7 +255,5 @@ def init_db():
     db.session.add(Care(description="Pansement", duration=60))
     db.session.add(Care(description="Piqûre", duration=60))
     db.session.add(Care(description="Post opératoire", duration=60))
-
     db.session.commit()
-
     lg.warning('Database initialized!')

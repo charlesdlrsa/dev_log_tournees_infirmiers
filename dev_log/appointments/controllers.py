@@ -3,7 +3,7 @@ from sqlalchemy.sql import or_
 from datetime import datetime, date
 from dev_log.utils.calendar import *
 from dev_log import db
-from dev_log.models import Appointment, Patient, Nurse
+from dev_log.models import Appointment, Patient, Nurse, Care
 from datetime import *
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
@@ -95,8 +95,9 @@ def add_appointment():
 
     patients = db.session.query(Patient).order_by(Patient.last_name).all()
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
+    cares = db.session.query(Care).all()
 
-    return render_template('add_appointment.html', patients=patients, nurses=nurses)
+    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares)
 
 
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])

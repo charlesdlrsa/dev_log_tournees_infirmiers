@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from sqlalchemy.sql import or_
 from dev_log import db
-from dev_log.models import Nurse
+from dev_log.models import Nurse, Care
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 
@@ -139,4 +139,7 @@ def add_nurse():
 
         flash(error)
 
-    return render_template('add_nurse.html')
+    cares = db.session.query(Care).all()
+    print(cares)
+    return render_template('add_nurse.html', cares=cares)
+
