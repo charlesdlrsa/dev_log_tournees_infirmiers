@@ -33,12 +33,13 @@ def add_appointment():
     :return:
     """
     if request.method == 'POST':
-        print(request.form)
         patient = request.form['patient'].split(' - ')
-        print(patient)
         nurse = request.form['nurse'].split(' - ')
         patient_id = db.session.query(Patient).filter(Patient.first_name==patient[1]).filter(Patient.last_name==patient[0]).first().id
+
+        # en principe à enlever car l'attribution se fait avec l'optimiseur
         nurse_id = db.session.query(Nurse).filter(Nurse.first_name==nurse[1]).filter(Nurse.last_name==nurse[0]).first().id
+
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         care = request.form['care']
 
