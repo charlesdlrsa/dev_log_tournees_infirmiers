@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from sqlalchemy.sql import or_
 from dev_log import db
-from dev_log.models import Nurse
+from dev_log.models import Nurse, Care
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 
@@ -32,20 +32,24 @@ def home():
 @nurses.route('/results/<research>', methods=['GET', 'POST'])
 def search_nurses(research):
     if request.method == "POST":
-        research = request.form['research']
+        new_research = request.form['research']
         error = None
 
-        if not research:
-            error = 'Please enter the name of our patient.'
+        if not new_research:
+            error = 'Please enter the name of a nurse.'
 
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('nurses.search_nurses', research=research))
+            return redirect(url_for('nurses.search_nurses', research=new_research))
 
-    nurses = Nurse.query.filter(or_(Nurse.last_name.like(research+'%'),
-                                    Nurse.first_name.like(research+'%'))).all()
-
+    if len(research.split()) >= 2:
+        first_name, last_name = research.split()[0], " ".join(research.split()[1:])
+        nurses = Nurse.query.filter(or_(Nurse.last_name.like('%' + last_name + '%'),
+                                        Nurse.first_name.like('%' + first_name + '%')))
+    else:
+        nurses = Nurse.query.filter(or_(Nurse.last_name.like('%' + research + '%'),
+                                        Nurse.first_name.like('%' + research + '%')))
     if nurses is None:
         error = "Please enter a lastname"
         flash(error)
@@ -60,7 +64,7 @@ def search_nurses(research):
 #     return render_template("nurse_info.html", nurse=nurse)
 
 
-@nurses.route('/edit/<int:nurse_id>', methods=['GET','POST'])
+@nurses.route('/edit/<int:nurse_id>', methods=['GET', 'POST'])
 def edit_nurse(nurse_id):
     print(nurse_id)
     if request.method == "POST":
@@ -70,16 +74,16 @@ def edit_nurse(nurse_id):
         phone = request.form['phone']
         password = request.form['password']
         address = request.form['address']
-        #office = request.form['office']
+        # office = request.form['office']
 
         password = generate_password_hash(password)
-        db.session.query(Nurse).filter(Nurse.id == nurse_id).\
+        db.session.query(Nurse).filter(Nurse.id == nurse_id). \
             update(dict(last_name=last_name,
-                   first_name=first_name,
-                   email=email,
-                   phone=phone,
-                   password=password,
-                   address=address))
+                        first_name=first_name,
+                        email=email,
+                        phone=phone,
+                        password=password,
+                        address=address))
         db.session.commit()
         flash("The nurse's information have been updated")
         return redirect(url_for('nurses.home'))
@@ -135,5 +139,7 @@ def add_nurse():
 
         flash(error)
 
-    return render_template('add_nurse.html')
+    cares = db.session.query(Care).all()
+    print(cares)
+    return render_template('add_nurse.html', cares=cares)
 

@@ -68,16 +68,16 @@
                 <select id="inputcare" class="form-control" placeholder="nurse" required="required" name="care">
                   <option selected>Select care</option>
 
-                  {% for care in ['Soin 1', 'Soin 2', 'Soin 3'] %}
+                  {% for care in cares %}
                   <option>
-                  {{ care }}
+                  {{ care.description }}
                   </option>
                   {% endfor %}
                 </select>
             </div>
             <div class="form-group">
               <div class="form-label-group">
-                <input type="date" id="date" class="form-control" placeholder="date" required="required" name="date">
+                <input type="date" id="date" class="form-control" placeholder="date" required="required" name="date" value="{{time}}">
                 <label for="date">Date</label>
               </div>
             </div>

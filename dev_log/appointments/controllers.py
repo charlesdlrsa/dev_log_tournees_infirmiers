@@ -3,7 +3,7 @@ from sqlalchemy.sql import or_
 from datetime import datetime, date
 from dev_log.utils.calendar import *
 from dev_log import db
-from dev_log.models import Appointment, Patient, Nurse
+from dev_log.models import Appointment, Patient, Nurse, Care
 from datetime import *
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
@@ -24,8 +24,12 @@ def home():
             flash(error)
         else:
             return redirect(url_for('appointments.get_appointments', research=research))
-    appointments = db.session.query(Appointment).order_by(Appointment.date).all()
-
+    appointments = dict()
+    for i in range(1,8):
+        appointments[i] = []
+    appointments_list = db.session.query(Appointment).order_by(Appointment.date).all()
+    for appointment in appointments_list:
+        appointments[appointment.date.weekday()].append(appointment)
 
     if "week" in request.args:
         week=int(request.args['week'])
@@ -44,7 +48,7 @@ def home():
     end_week=iso_to_gregorian(year,week,7)
     start_week = str(start_week.day) + '/' + str(start_week.month)
     end_week = str(end_week.day) + '/' + str(end_week.month)
-    print(appointments)
+
     return render_template("appointments.html",
     appointments=appointments,
     start_week=start_week,
@@ -59,6 +63,14 @@ def add_appointment():
     Add a new appointment
     :return:
     """
+    if "week" in request.args:
+        day=int(request.args["day"])
+        week=int(request.args["week"])
+        year=int(request.args["year"])
+        time=iso_to_gregorian(year,week,day)
+        time = time.strftime('%Y-%m-%d')
+    else:
+        time=None
     if request.method == 'POST':
         patient = request.form['patient'].split(' - ')
         nurse = request.form['nurse'].split(' - ')
@@ -96,19 +108,27 @@ def add_appointment():
 
     patients = db.session.query(Patient).order_by(Patient.last_name).all()
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
+    cares = db.session.query(Care).all()
 
-    return render_template('add_appointment.html', patients=patients, nurses=nurses)
+    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares,time=time)
 
 
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
-def get_appointments(research):
+def search_appointments(research):
     if request.method == "POST":
         error = None
         new_research = request.form['research']
-        return redirect(url_for('appointments.get_appointments', research=new_research))
 
-    if len(research.split()) == 2:
-        first_name, last_name = research.split()
+        if not new_research:
+            error = 'Please enter the name of a patient.'
+
+        if error is not None:
+            flash(error)
+        else:
+            return redirect(url_for('appointment.search_appointment', research=new_research))
+
+    if len(research.split()) >= 2:
+        first_name, last_name = research.split()[0], " ".join(research.split()[1:])
         appointments = Appointment.query \
             .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
                                                   Patient.first_name.like('%' + first_name + '%')))

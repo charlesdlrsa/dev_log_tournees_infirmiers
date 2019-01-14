@@ -91,6 +91,9 @@ class Nurse(BasePerson):
         self.password = password
         self.address = address
         self.office = office
+        # for care in cares:
+        #     if care not in ["soin 1", "soin 2", "soin 3"]:
+        #         raise ValueError("Unvalid care")
         self.cares = cares
         # self.competences = competences
 
@@ -122,6 +125,11 @@ class Appointment(Base):
         db.Date,
         nullable=False)
 
+    halfday = db.Column(
+        db.String,
+        nullable=False
+    )
+
     patient = db.relationship(
         "Patient",
         backref="patient")
@@ -134,10 +142,11 @@ class Appointment(Base):
         "Care",
         backref="care")
 
-    def __init__(self, nurse_id, patient_id, date, care_id):
+    def __init__(self, nurse_id, patient_id, date, halfday, care_id):
         self.nurse_id = nurse_id
         self.patient_id = patient_id
         self.date = date
+        self.halfday = halfday
         self.care_id = care_id
 
 
@@ -246,7 +255,5 @@ def init_db():
     db.session.add(Care(description="Pansement", duration=60))
     db.session.add(Care(description="Piqûre", duration=60))
     db.session.add(Care(description="Post opératoire", duration=60))
-
     db.session.commit()
-
     lg.warning('Database initialized!')
