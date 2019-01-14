@@ -23,8 +23,7 @@ def home():
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('appointments.get_appointments', research=research))
-
+            return redirect(url_for('appointments.search_appointments', research=research))
     appointments = dict()
     for i in range(1, 8):
         appointments[i] = []
@@ -79,7 +78,8 @@ def add_appointment():
             Nurse.last_name == nurse[0]).first().id
 
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
-        care = request.form['care']
+        halfday = request.form['halfday']
+        care = Care.query.filter(Care.description == request.form['care']).first().id
         error = None
 
         if not patient:
@@ -90,13 +90,15 @@ def add_appointment():
             error = 'You selected a day already passed.'
         elif not care:
             error = 'A care is required.'
+        elif not halfday:
+            error = 'Please give a halfday'
         elif Appointment.query.filter(Appointment.date == date).count() == db.session.query(Nurse).count() * 3:
             error = 'You cannot add an appointment on %s, all the nurses are already affected.' \
                     '\n You must choose another date. Please look at the calendar to see the available slots.'.format(
                 date)
         else:
             # storing the new appointment information in the db
-            appointment = Appointment(nurse_id, patient_id, date, care)
+            appointment = Appointment(nurse_id, patient_id, date, care, halfday)
             db.session.add(appointment)
             db.session.commit()
             flash('The appointment was successfully added')
