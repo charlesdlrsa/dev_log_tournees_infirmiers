@@ -9,6 +9,8 @@ import math
 from operator import attrgetter
 import numpy as np
 import googlemaps
+import key
+googlekey = key.key
 
 class Space :
     
@@ -103,8 +105,8 @@ class Space :
         
         return delta_lat * delta_long
 
-    def matrix_distance(self, addresses, key, mode):
-        gmaps = googlemaps.Client(key=str(key))
+    def matrix_distance(self, addresses, mode):
+        gmaps = googlemaps.Client(key=googlekey)
         length = len(addresses)
         liste_coordonnees = [(addresses[i].getLatitude(),adresses[i].getLongitude()) for i in range(length)]
         distance = gmaps.distance_matrix(liste_coordonnees, liste_coordonnees, mode)

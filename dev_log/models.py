@@ -1,5 +1,7 @@
 from dev_log import db
 import googlemaps
+import key
+googlekey = key.key
 
 class Base(db.Model):
     __abstract__ = True
@@ -48,7 +50,7 @@ class Patient(BasePerson):
         self.latitude = None
         self.longitude = None
         self.phone = phone
-        Patient.geolocation(key)
+        Patient.geolocation(googlekey)
 
     def geolocation(self, key):
         gmaps = googlemaps.Client(key=str(key))
