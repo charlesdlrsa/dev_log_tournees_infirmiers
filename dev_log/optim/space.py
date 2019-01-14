@@ -7,6 +7,8 @@
 from point import Point
 import math
 from operator import attrgetter
+import numpy as np
+import googlemaps
 
 class Space :
     
@@ -100,6 +102,8 @@ class Space :
         delta_lat = self.points_by_lat[-1].getLatitude() - self.points_by_lat[0].getLatitude()
         
         return delta_lat * delta_long
+
+
         
     # -------------------------------------------------------------------------
      

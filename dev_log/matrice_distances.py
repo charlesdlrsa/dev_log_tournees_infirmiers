@@ -1,4 +1,4 @@
- gmaps = googlemaps.Client(key='AIzaSyDLCCZa9YjI1Swt2vRuotgrCLBaWijDEK8')
+
 >>> distance = gmaps.distance_matrix('32 rue Florence Arthaud Massy France', '3 rue Joliot-Curie Gif-sur-Yvette France')
 >>> print(distance)
 
