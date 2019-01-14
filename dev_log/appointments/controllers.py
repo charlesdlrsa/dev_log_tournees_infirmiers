@@ -1,10 +1,13 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 from sqlalchemy.sql import or_
-from datetime import datetime
+from datetime import datetime, date
+from dev_log.utils.calendar import *
 from dev_log import db
 from dev_log.models import Appointment, Patient, Nurse
+from datetime import *
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
+
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 
@@ -15,17 +18,39 @@ def home():
     if request.method == "POST":
         research = request.form['research']
         error = None
-
         if not research:
             error = 'Please enter the name of our patient.'
-
         if error is not None:
             flash(error)
         else:
             return redirect(url_for('appointments.get_appointments', research=research))
-
     appointments = db.session.query(Appointment).order_by(Appointment.date).all()
-    return render_template("appointments.html", appointments=appointments)
+
+
+    if "week" in request.args:
+        week=int(request.args['week'])
+        year=int(request.args['year'])
+        if week==0:
+            week=52
+            year=year-1
+        elif week==53:
+            week=1
+            year=year+1
+    else:
+        current_date = datetime.now()
+        week = current_date.isocalendar()[1]
+        year = current_date.isocalendar()[0]
+    start_week=iso_to_gregorian(year,week,1)
+    end_week=iso_to_gregorian(year,week,7)
+    start_week = str(start_week.day) + '/' + str(start_week.month)
+    end_week = str(end_week.day) + '/' + str(end_week.month)
+    print(appointments)
+    return render_template("appointments.html",
+    appointments=appointments,
+    start_week=start_week,
+    end_week=end_week,
+    year=year,
+    week=week)
 
 
 @appointments.route('/add_appointment', methods=['GET', 'POST'])

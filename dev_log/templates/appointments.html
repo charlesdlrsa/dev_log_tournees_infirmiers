@@ -19,16 +19,82 @@
         role="button">New appointment</a>
     </div>
   </div>
-    <h1>Appointments</h1>
-    <hr>
-    {% for appointment in appointments %}
-    <!--TODO-->
-      <p>Patient Name: {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</p>
-      <p>Nurse  Name: {{ appointment.nurse.first_name }} {{ appointment.nurse.last_name }}</p>
-      <p>Date: {{ appointment.date }}</p>
-      <p>Care: {{ appointment.care.description }}</p>
-      <hr>
-    {% endfor %}
+  <div class="card-body">
+  <div class="table-responsive">
+    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+      <div class="card-header">
+        <h1>Appointments from
+          {{start_week}}
+          to
+          {{end_week}}
+        </h1>
+        <div class='flex-row'>
+
+            <form method="post">
+
+
+                  <div class="d-flex justify-content-between">
+                    <div class='from-group'>
+                    <div class="form-label-group">
+                      <a href="{{url_for('appointments.home',week=week-1,year=year)}}"  class="btn btn-secondary btn-sm active"
+                      role=button  >Previous Week</a>
+                    </div>
+                    </div>
+                    <div class='from-group'>
+                    <div class="form-label-group">
+                      <a href="{{ url_for('appointments.home',week=week+1,year=year)}}" class="btn btn-secondary btn-sm active"
+                        role=button>Next Week</a>
+                    </div>
+                    </div>
+                  </div>
+
+
+                </form>
+
+        </div>
+      </div>
+
+      <thead>
+        <tr>
+          <th>Monday</th>
+          <th>Tuesday</th>
+          <th>Wednesday</th>
+          <th>Thursday</th>
+          <th>Friday</th>
+          <th>Saturday</th>
+          <th>Sunday</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+  {% for appointment in appointments %}
+    <td>{{ appointment.date.weekday()}}</td>
+
+
+  {% endfor %}
+
 </div>
 
 {% endblock%}
