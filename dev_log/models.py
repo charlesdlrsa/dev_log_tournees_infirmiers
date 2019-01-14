@@ -1,5 +1,5 @@
 from dev_log import db
-
+import googlemaps
 
 class Base(db.Model):
     __abstract__ = True
@@ -54,6 +54,13 @@ class Patient(BasePerson):
         self.email = email
         self.address = address
         self.phone = phone
+        Patient.geolocation(key)
+
+    def geolocation(self, key):
+        gmaps = googlemaps.Client(key=str(key))
+        distance = gmaps.geocode(self.address)[0]['geometry']['location']
+        self.latitude = distance['lat']
+        self.longitude = distance['lng']
 
 
 class Nurse(BasePerson):
@@ -231,4 +238,4 @@ def init_db():
     db.session.add(Patient(last_name="Cassedanne", first_name="Louis", email="louis.cassedanne@hotmail.fr",
                            address="325 rue Lecourbe", phone="0674695898"))
     db.session.commit()
-    lg.warning('Database initialized!')
+lg.warning('Database initialized!')
