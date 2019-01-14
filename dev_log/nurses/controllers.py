@@ -100,6 +100,7 @@ def add_nurse():
     :return:
     """
     if request.method == 'POST':
+        print(request.form)
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
@@ -107,6 +108,9 @@ def add_nurse():
         phone = request.form['phone_number']
         address = request.form['address']
         office = request.form['office']
+        # care = request.form['care']
+        #care = Care.query.filter(Care.description == request.form['care']).first().id
+        #print(care)
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
         error = None
 
