@@ -241,6 +241,9 @@ def init_db():
                            address="41 rue Boulard", phone="0674697758"))
     db.session.add(Patient(last_name="Cassedanne", first_name="Louis", email="louis.cassedanne@hotmail.fr",
                            address="325 rue Lecourbe", phone="0674695898"))
+    db.session.add(Care(description="Pansement", duration=60))
+    db.session.add(Care(description="Piqûre", duration=60))
+    db.session.add(Care(description="Post opératoire", duration=60))
     db.session.commit()
 
     lg.warning('Database initialized!')
