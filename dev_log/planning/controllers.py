@@ -5,7 +5,7 @@ from datetime import datetime,timedelta
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
 
-@planning.route("/global_planning", methods=['GET', 'POST'])
+@planning.route("/", methods=['GET', 'POST'])
 def home():
     if request.method == "POST":
         init_db()
@@ -14,10 +14,7 @@ def home():
     end_week = start_week + timedelta(6)
     start_week = str(start_week.day) + '/' + str(start_week.month)
     end_week = str(end_week.day) + '/' + str(end_week.month)
-    return render_template("landing.html",
-    start_week=start_week,
-    end_week=end_week,
-    date=date)
+    return render_template("landing.html", start_week=start_week, end_week=end_week, date=date)
 
 
 

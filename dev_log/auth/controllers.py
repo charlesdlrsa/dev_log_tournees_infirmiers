@@ -107,7 +107,7 @@ def login():
             error = "Please select a user type"
 
         flash(error)
-        return render_template('landing.html')
+        return redirect(request.referrer)
 
     return render_template('login.html')
 
