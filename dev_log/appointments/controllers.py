@@ -23,7 +23,7 @@ def home():
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('appointments.get_appointments', research=research))
+            return redirect(url_for('appointments.search_appointments', research=research))
     appointments = dict()
     for i in range(1,8):
         appointments[i] = []
@@ -110,7 +110,7 @@ def add_appointment():
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
     cares = db.session.query(Care).all()
 
-    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares,time=time)
+    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares, time=time)
 
 
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
