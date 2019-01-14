@@ -63,6 +63,14 @@ def add_appointment():
     Add a new appointment
     :return:
     """
+    if "week" in request.args:
+        day=int(request.args["day"])
+        week=int(request.args["week"])
+        year=int(request.args["year"])
+        time=iso_to_gregorian(year,week,day)
+        time = time.strftime('%Y-%m-%d')
+    else:
+        time=None
     if request.method == 'POST':
         patient = request.form['patient'].split(' - ')
         nurse = request.form['nurse'].split(' - ')
@@ -102,7 +110,7 @@ def add_appointment():
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
     cares = db.session.query(Care).all()
 
-    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares)
+    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares,time=time)
 
 
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
