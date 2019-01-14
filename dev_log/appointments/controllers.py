@@ -1,6 +1,6 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 from sqlalchemy.sql import or_
-from datetime import datetime, date
+from datetime import datetime
 from dev_log import db
 from dev_log.models import Appointment, Patient, Nurse
 
