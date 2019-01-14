@@ -154,8 +154,8 @@ class Care(Base):
         nullable=False)
 
     def __init__(self, description, duration):
-        self.__description = description
-        self.__duration = duration
+        self.description = description
+        self.duration = duration
 
 
 class Office(Base):

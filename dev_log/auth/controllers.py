@@ -52,7 +52,7 @@ auth = Blueprint('auth', __name__)
 #     return render_template('register.html')
 
 
-@auth.route('/')
+@auth.route('/', methods=('GET', 'POST'))
 @auth.route('/auth/login', methods=('GET', 'POST'))
 def login():
     """
@@ -85,6 +85,11 @@ def login():
                       % (nurse.first_name.capitalize(),
                          nurse.last_name.capitalize()))
 
+                return redirect(url_for("planning.home"))
+
+            flash(error)
+            return redirect(request.referrer)
+
         elif user_type == 'admin':
             office = Office.query.filter(Office.email == email).first()
 
@@ -98,7 +103,7 @@ def login():
                 session.clear()
                 session['office_id'] = office.id
                 session['office_name'] = office.name
-                flash('Hi %s %s, welcome back to Our Application!'
+                flash('Hi %s, welcome back to Our Application!'
                       % (office.name.capitalize()))
 
             return redirect(url_for("planning.home"))
