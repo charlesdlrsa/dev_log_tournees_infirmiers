@@ -187,7 +187,6 @@ class Office(Base):
         self.password = password
 
 
-
 # Many to Many relation
 class AssociationOfficeNurse(Base):
     office_id = db.Column(
