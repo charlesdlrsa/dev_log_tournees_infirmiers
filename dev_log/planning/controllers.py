@@ -2,11 +2,11 @@ from flask import Blueprint, request, render_template, flash, g, session, redire
 from dev_log.models import init_db
 from datetime import datetime,timedelta
 
-home = Blueprint('home', __name__)
+planning = Blueprint('planning', __name__, url_prefix='/planning')
 
 
-@home.route("/", methods=['GET', 'POST'])
-def index():
+@planning.route("/global_planning", methods=['GET', 'POST'])
+def home():
     if request.method == "POST":
         init_db()
     date = datetime.now()

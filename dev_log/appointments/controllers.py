@@ -4,7 +4,6 @@ from datetime import datetime
 from dev_log import db
 from dev_log.models import Appointment, Patient, Nurse
 
-
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 
 
@@ -35,8 +34,13 @@ def add_appointment():
     if request.method == 'POST':
         patient = request.form['patient'].split(' - ')
         nurse = request.form['nurse'].split(' - ')
-        patient_id = db.session.query(Patient).filter(Patient.first_name == patient[1]).filter(Patient.last_name == patient[0]).first().id
-        nurse_id = db.session.query(Nurse).filter(Nurse.first_name == nurse[1]).filter(Nurse.last_name == nurse[0]).first().id
+        patient_id = db.session.query(Patient).filter(Patient.first_name == patient[1]).filter(
+            Patient.last_name == patient[0]).first().id
+
+        # en principe à enlever car l'attribution se fait avec l'optimiseur
+        nurse_id = db.session.query(Nurse).filter(Nurse.first_name == nurse[1]).filter(
+            Nurse.last_name == nurse[0]).first().id
+
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         care = request.form['care']
         error = None
@@ -49,16 +53,17 @@ def add_appointment():
             error = 'You selected a day already passed.'
         elif not care:
             error = 'A care is required.'
-        elif Appointment.query.filter(Appointment.date == date).count() == db.session.query(Nurse).count()*3:
+        elif Appointment.query.filter(Appointment.date == date).count() == db.session.query(Nurse).count() * 3:
             error = 'You cannot add an appointment on %s, all the nurses are already affected.' \
-                    '\n You must choose another date. Please look at the calendar to see the available slots.'.format(date)
+                    '\n You must choose another date. Please look at the calendar to see the available slots.'.format(
+                date)
         else:
             # storing the new appointment information in the db
             appointment = Appointment(nurse_id, patient_id, date, care)
             db.session.add(appointment)
             db.session.commit()
             flash('The appointment was successfully added')
-            return redirect(url_for('appointments.home'))
+            return redirect(url_for('appointments.planning'))
         flash(error)
 
     patients = db.session.query(Patient).order_by(Patient.last_name).all()
