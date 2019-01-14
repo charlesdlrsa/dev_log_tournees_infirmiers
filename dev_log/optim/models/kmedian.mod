@@ -1,10 +1,15 @@
-param d;
+reset;
+option solver gurobi;
 
+param k;
 set V;
-param distance{V, V} >= 0;
+param distance{V, V};
 
 # variable de décision
 var center{V}, binary;
+
+subject to maxKCenter:
+	sum{v in V} center[v] <= k;
 
 # variable de clustering
 var nearestCenter{V cross V}, binary;
@@ -15,9 +20,6 @@ subject to isCenter{v in V, c in V}:
 subject to hasCenter{v in V}:
 	sum{c in V} nearestCenter[v,c] = 1;
 
-subject to maxDistance{v in V, c in C}:
-	distance[v,c] * nearestCenter[v,c] <= d
-
-# minimising number of centers
-minimize numberCenters:
-	sum{v in V} center[v];
+# minimising distance
+minimize distanceMediane:
+	sum{v in V, c in V} distance[v,c] * nearestCenter[v,c];

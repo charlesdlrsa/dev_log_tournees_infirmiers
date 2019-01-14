@@ -4,8 +4,11 @@
 
 # @class Space
 
-from .point import Point
-import math, os
+
+import sys, os, math
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+from point import Point
 from operator import attrgetter
 
 class Space :
@@ -15,9 +18,6 @@ class Space :
     # points: list of the points
     # dmin: minimal distance between two points in the space
     # dmax: maximal distance between two points in the space
-    
-    # threshold for walking distance
-    walkingThreshold = 1.0
 
     # -------------------------------------------------------------------------
     # -- INITIALIZATION
@@ -319,11 +319,15 @@ class Space :
     # -------------------------------------------------------------------------
     # -- PROCESS
     # -------------------------------------------------------------------------
-    def clustering(self):
+    def getNumberOfCluster(self, walkingThreshold=3.0):
+        """
+        Compute the minimum number of cluster having a radius bounded by
+        walkingThreshold, which is a distance in kilometers (=3.0 by default)
+        """
         dist = self.getKmDistance()
-        with open("clustering.dat", "w") as clustering:
+        with open("models/clustering.dat", "w") as clustering:
             clustering.write("# threshold for walking distance\n")
-            clustering.write("param d:= {};\n".format(Space.walkingThreshold))
+            clustering.write("param d:= {};\n".format(walkingThreshold))
             
             clustering.write("\n")
             
@@ -348,7 +352,85 @@ class Space :
                     clustering.write("\t{} {} {:.4f}\n".format(p_ID2, p_ID1, dist[i][j]))
             clustering.write(";\n")
 
+        from amplpy import AMPL, Environment
+        ampl = AMPL(Environment('ampl'))
 
-        #os.system("ampl/ampl ampl/models/clustering.run") 
+        # Interpret the two files
+        ampl.read('models/clustering.mod')
+        ampl.readData('models/clustering.dat')
+
+        # Solve
+        ampl.solve()
+
+        # Get objective entity by AMPL name
+        numberCenters = ampl.getObjective('numberCenters')
         
+        return int(numberCenters.get().value())
+
+    def getCenters(self, k):
+        """
+        Cluster the space, using the k-median paradigm:
+            provide the set of $k$ vertices $\{c_1, \dots c_k\}$ minimizing
+                sum_{v in V} min_i d_{c_i,v}
+        """
+        with open("models/clustering.dat", "r") as clustering:
+            with open("models/kmedian.dat", "w") as kmedian:
+                kmedian.write("# number of clusters\n")
+                kmedian.write("param k := {};\n".format(k))
+
+                kmedian.write("\n")
+
+                clustering.readline()
+                clustering.readline()
+                clustering.readline()
+
+                for line in clustering.readlines():
+                    kmedian.write(line)
+
+        from amplpy import AMPL, Environment
+        ampl = AMPL(Environment('ampl'))
+
+        # Interpret the two files
+        ampl.read('models/kmedian.mod')
+        ampl.readData('models/kmedian.dat')
+
+        # Solve
+        ampl.solve()
+
+        # Get objective entity by AMPL name
+        centers = ampl.getVariable('center')
         
+        listCenters = []
+
+        # Access all instances using an iterator
+        for index, instance in centers:
+            if instance.value():
+                listCenters.append(int(index))
+        
+        print(listCenters)
+
+if __name__ == "__main__":
+    from random import random, seed
+    seed(9001)
+    lonMin = 2.313721
+    lonMax = 2.394590
+
+    latMin = 48.832261
+    latMax = 48.892978
+
+    lonRef = lonMin
+    lonRange = lonMax - lonMin
+
+    latRef = latMin
+    latRange = latMax - latMin
+
+    patientDict = dict()
+    for k in range(20):
+        lon = lonRef + random() * lonRange
+        lat = latRef + random() * latRange
+        patientDict[k] = (lat,lon)
+
+    s = Space()
+    s.buildSpaceFromDict(patientDict)
+    k = s.getNumberOfCluster()
+    s.getCenters(k)
