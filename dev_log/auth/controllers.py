@@ -3,6 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from dev_log import db
 from dev_log.models import Nurse, Office
+import functools
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -62,7 +63,7 @@ def login():
         email = request.form['email']
         password = request.form['password']
         error = None
-        if request.form['user_type'] == "nurse":
+        if user_type == "nurse":
             nurse = Nurse.query.filter(Nurse.email == email).first()
             if nurse is None:
                 error = 'Incorrect email address.'
@@ -83,7 +84,7 @@ def login():
                       % (nurse.first_name.capitalize(),
                          nurse.last_name.capitalize()))
 
-        elif request.form['user_type'] == 'admin':
+        elif user_type == 'admin':
             office = Office.query.filter(Office.email == email).first()
 
             if office is None:
@@ -100,6 +101,9 @@ def login():
                       % (office.name.capitalize()))
 
             return redirect(url_for("home.index"))
+
+        else:
+            error = "Please select a user type"
 
         flash(error)
         return render_template('landing.html')
@@ -126,9 +130,27 @@ def login_required(view):
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if session['infirmier_id'] is None:
-            flash('You need to sign in to access this page.')
-            return redirect(url_for('auth.login'))
+        if session.get('nurse_id') is None:
+            flash('You need to login as a nurse to access this page.')
+            return redirect(request.referrer)
+
+        return view(**kwargs)
+
+    return wrapped_view
+
+
+def admin_required(view):
+    """
+    Decorator that will check if a user is signed in and redirect him to the sign in page if not
+    :param view:
+    :return:
+    """
+
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if session.get('office_id') is None:
+            flash('You need to login as an administrator to access this page.')
+            return redirect(request.referrer)
 
         return view(**kwargs)
 
