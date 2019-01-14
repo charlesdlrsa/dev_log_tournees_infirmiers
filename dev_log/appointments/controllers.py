@@ -80,10 +80,17 @@ def get_appointments(research):
     if request.method == "POST":
         error = None
         new_research = request.form['research']
-        return redirect(url_for('appointments.get_appointments', research=new_research))
 
-    if len(research.split()) == 2:
-        first_name, last_name = research.split()
+        if not new_research:
+            error = 'Please enter the name of a patient.'
+
+        if error is not None:
+            flash(error)
+        else:
+            return redirect(url_for('nurses.search_nurses', research=new_research))
+
+    if len(research.split()) >= 2:
+        first_name, last_name = research.split()[0], " ".join(research.split()[1:])
         appointments = Appointment.query \
             .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
                                                   Patient.first_name.like('%' + first_name + '%')))
