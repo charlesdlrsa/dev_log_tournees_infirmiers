@@ -4,7 +4,6 @@ from datetime import datetime,timedelta
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 from dev_log.utils.calendar import *
-from datetime import *
 from dev_log.utils.calendar import *
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
@@ -24,6 +23,7 @@ def home():
             week=1
             year=year+1
     else:
+
         current_date = datetime.datetime.now()
         week = current_date.isocalendar()[1]
         year = current_date.isocalendar()[0]

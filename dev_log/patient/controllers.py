@@ -32,21 +32,24 @@ def home():
 @patients.route('/results/<research>', methods=['GET', 'POST'])
 def search_patients(research):
     if request.method == "POST":
-        research = request.form['research']
+        new_research = request.form['research']
         error = None
 
-        if not research:
+        if not new_research:
             error = 'Please enter the name of our patient.'
 
         if error is not None:
             flash(error)
         else:
-            return redirect(url_for('patients.search_patients', research=research))
+            return redirect(url_for('patients.search_patients', research=new_research))
 
-
-
-    patients = Patient.query.filter(or_(Patient.last_name.like(research+'%'),
-                                        Patient.first_name.like(research+'%'))).all()
+    if len(research.split()) >= 2:
+        first_name, last_name = research.split()[0], " ".join(research.split()[1:])
+        patients = Patient.query.filter(or_(Patient.last_name.like('%' + last_name + '%'),
+                                        Patient.first_name.like('%' + first_name + '%')))
+    else:
+        patients = Patient.query.filter(or_(Patient.last_name.like('%' + research + '%'),
+                                        Patient.first_name.like('%' + research + '%')))
 
     if patients is None:
         error = "Please enter a lastname"
