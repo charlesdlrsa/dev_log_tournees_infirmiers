@@ -4,7 +4,7 @@
 
 # @class Space
 
-from point import Point
+from .point import Point
 import math, os
 from operator import attrgetter
 
@@ -321,7 +321,7 @@ class Space :
     # -------------------------------------------------------------------------
     def clustering(self):
         dist = self.getKmDistance()
-        with open("ampl/models/clustering.dat", "w") as clustering:
+        with open("clustering.dat", "w") as clustering:
             clustering.write("# threshold for walking distance\n")
             clustering.write("param d:= {};\n".format(Space.walkingThreshold))
             
@@ -349,6 +349,6 @@ class Space :
             clustering.write(";\n")
 
 
-        os.system("ampl/ampl ampl/models/clustering.run") 
+        #os.system("ampl/ampl ampl/models/clustering.run") 
         
         

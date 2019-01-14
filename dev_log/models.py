@@ -1,10 +1,6 @@
 from dev_log import db
-<<<<<<< HEAD
-#import googlemaps
-=======
-# import googlemaps
->>>>>>> 65c1bed94036275f21f6b90589c6527482a04565
 from werkzeug.security import check_password_hash, generate_password_hash
+import datetime
 
 class Base(db.Model):
     __abstract__ = True
@@ -87,7 +83,7 @@ class Nurse(BasePerson):
     # competences = db.Column(db.String(50))
 
     def __init__(self, last_name, first_name, email, password,
-                 phone, address, office, cares):
+                 phone, address, office, cares=None):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
@@ -250,9 +246,9 @@ def init_db():
     db.session.add(Care(description="Pansement", duration=60))
     db.session.add(Care(description="Piqûre", duration=60))
     db.session.add(Care(description="Post opératoire", duration=60))
-    db.session.commit()
-<<<<<<< HEAD
-=======
 
->>>>>>> 65c1bed94036275f21f6b90589c6527482a04565
+    ## Appointment : nurse_id, patient_id, date, care_id
+    for pID in range(1,7):
+        db.session.add(Appointment(nurse_id=1,patient_id=pID,date=datetime.date(2018,1,22),care_id=1))
+    db.session.commit()
     lg.warning('Database initialized!')

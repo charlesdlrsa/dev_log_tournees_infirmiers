@@ -128,3 +128,7 @@ nohup.out
 
 # database
 *.db
+
+# optim
+*.dat
+scriptAppointment.py
