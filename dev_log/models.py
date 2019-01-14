@@ -1,5 +1,6 @@
 from dev_log import db
 import googlemaps
+from werkzeug.security import check_password_hash, generate_password_hash
 
 class Base(db.Model):
     __abstract__ = True
@@ -186,11 +187,11 @@ class Office(Base):
 
     nurses = db.relationship("AssociationOfficeNurse")
 
-    def __init__(self, name, phone, address, email, password):
-        self.__name = name
-        self.__phone = phone
-        self.__address = address
+    def __init__(self, name, address, email, phone, password):
+        self.name = name
+        self.address = address
         self.email = email
+        self.phone = phone
         self.password = password
 
 
@@ -217,14 +218,17 @@ def init_db():
     import logging as lg
     db.drop_all()
     db.create_all()
+    password = generate_password_hash("password")
+    db.session.add(Office(name="Doctissimo", phone="0647859648", address="38 rue Lecourbe",
+                          email="doctissimo@hotmail.fr", password=password))
     db.session.add(Nurse(last_name="Cabaret", first_name="Laurent", email="laurent.cabaret@hotmail.fr",
-                         phone="0699458758", password="password", address="35 rue Bobigny", office="Paris"))
+                         phone="0699458758", password=password, address="35 rue Bobigny", office="Paris"))
     db.session.add(Nurse(last_name="Poly", first_name="Jean-Philippe", email="jpp@hotmail.fr",
-                         phone="0699458758", password="password", address="48 rue Clovis", office="Paris"))
+                         phone="0699458758", password=password, address="48 rue Clovis", office="Paris"))
     db.session.add(Nurse(last_name="Hulot", first_name="Celine", email="celine.hulot@hotmail.fr",
-                         phone="0699469858", password="password", address="76 rue Paul André", office="Paris"))
+                         phone="0699469858", password=password, address="76 rue Paul André", office="Paris"))
     db.session.add(Nurse(last_name="Detriche", first_name="Jean-Marie", email="jeanmarie.detriche@hotmail.fr",
-                         phone="0694699858", password="password", address="24 rue Terrence", office="Paris"))
+                         phone="0694699858", password=password, address="24 rue Terrence", office="Paris"))
     db.session.add(Patient(last_name="De la roche", first_name="Charles", email="charles.dlrsa@hotmail.fr",
                            address="40 rue Victor Hugo", phone="0699497758"))
     db.session.add(Patient(last_name="Mallard", first_name="Alix", email="alix.mallard@hotmail.fr",
