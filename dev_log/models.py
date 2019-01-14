@@ -176,6 +176,15 @@ class Office(Base):
         self.__name = name
         self.__phone = phone
         self.__address = address
+        self.__latitude = None
+        self.__longitude = None
+        Office.geolocation(key)
+
+    def geolocation(self, key):
+        gmaps = googlemaps.Client(key=str(key))
+        distance = gmaps.geocode(self.__address)[0]['geometry']['location']
+        self.__latitude = distance['lat']
+        self.__longitude = distance['lng']
 
 
 # Many to Many relation
