@@ -128,3 +128,6 @@ nohup.out
 
 # database
 *.db
+
+# google key
+dev_log/key.py
