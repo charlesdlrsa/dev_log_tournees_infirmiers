@@ -112,6 +112,7 @@ def login():
 
 
 @auth.route('/logout')
+@login_required
 def logout():
     """
     Logs out the user by cleaning the session user and redirects to the homepage

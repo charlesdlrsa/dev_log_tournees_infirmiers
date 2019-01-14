@@ -1,4 +1,5 @@
 from dev_log import db
+import googlemaps
 from werkzeug.security import check_password_hash, generate_password_hash
 
 class Base(db.Model):
@@ -40,14 +41,27 @@ class Patient(BasePerson):
         primary_key=True,
         nullable=False)
 
-    def __init__(self, last_name, first_name, email, address, phone):
+    latitude = db.Column(
+        db.Float
+    )
+
+    longitude = db.Column(
+        db.Float
+    )
+
+    def __init__(self, last_name, first_name, email, address, phone, latitude = None, longitude = None):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
         self.address = address
-        self.latitude = None
-        self.longitude = None
         self.phone = phone
+        Patient.geolocation(key)
+
+    def geolocation(self, key):
+        gmaps = googlemaps.Client(key=str(key))
+        distance = gmaps.geocode(self.address)[0]['geometry']['location']
+        self.latitude = distance['lat']
+        self.longitude = distance['lng']
 
 
 class Nurse(BasePerson):
@@ -181,7 +195,6 @@ class Office(Base):
         self.password = password
 
 
-
 # Many to Many relation
 class AssociationOfficeNurse(Base):
     office_id = db.Column(
@@ -229,4 +242,4 @@ def init_db():
     db.session.add(Patient(last_name="Cassedanne", first_name="Louis", email="louis.cassedanne@hotmail.fr",
                            address="325 rue Lecourbe", phone="0674695898"))
     db.session.commit()
-    lg.warning('Database initialized!')
+lg.warning('Database initialized!')
