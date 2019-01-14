@@ -40,13 +40,19 @@ class Patient(BasePerson):
         primary_key=True,
         nullable=False)
 
-    def __init__(self, last_name, first_name, email, address, phone):
+    latitude = db.Column(
+        db.Float
+    )
+
+    longitude = db.Column(
+        db.Float
+    )
+
+    def __init__(self, last_name, first_name, email, address, phone, latitude = None, longitude = None):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
         self.address = address
-        self.latitude = None
-        self.longitude = None
         self.phone = phone
 
 
