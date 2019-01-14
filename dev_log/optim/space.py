@@ -5,7 +5,7 @@
 # @class Space
 
 from point import Point
-import math
+import math, os
 from operator import attrgetter
 
 class Space :
@@ -16,6 +16,9 @@ class Space :
     # dmin: minimal distance between two points in the space
     # dmax: maximal distance between two points in the space
     
+    # threshold for walking distance
+    walkingThreshold = 1.0
+
     # -------------------------------------------------------------------------
     # -- INITIALIZATION
     # -------------------------------------------------------------------------
@@ -98,6 +101,17 @@ class Space :
         delta_lat = self.points_by_lat[-1].getLatitude() - self.points_by_lat[0].getLatitude()
         
         return delta_lat * delta_long
+    
+    def getKmDistance(self):
+        """
+        Compute the matrix of distance between the points
+        """
+        dist = [[0 for k in range(self.nb_points)] for k in range(self.nb_points)]
+        for i in range(self.nb_points):
+            for j in range(i+1, self.nb_points):
+                dist[i][j] = self.points[i].distanceKmTo(self.points[j])
+        return dist
+
         
     # -------------------------------------------------------------------------
      
@@ -306,8 +320,35 @@ class Space :
     # -- PROCESS
     # -------------------------------------------------------------------------
     def clustering(self):
-        """
-        run the clustering ...
-        """
+        dist = self.getKmDistance()
+        with open("ampl/models/clustering.dat", "w") as clustering:
+            clustering.write("# threshold for walking distance\n")
+            clustering.write("param d:= {};\n".format(Space.walkingThreshold))
+            
+            clustering.write("\n")
+            
+            clustering.write("# nombre de sommets {}\n".format(self.nb_points))
+            clustering.write("set V :=\n")
+            for p in self.points:
+                clustering.write("\t{}\n".format(p.getPatientID()))
+            clustering.write(";\n")
+
+            clustering.write("\n")
+
+            clustering.write("# id_sommet1, id_sommet2, distance\n")
+            clustering.write("param distance :=\n")
+            for p in self.points:
+                p_ID = p.getPatientID()
+                clustering.write("\t{} {} 0\n".format(p_ID, p_ID))
+            for i in range(self.nb_points):
+                for j in range(i+1, self.nb_points):
+                    p_ID1 = self.points[i].getPatientID()
+                    p_ID2 = self.points[j].getPatientID()
+                    clustering.write("\t{} {} {:.4f}\n".format(p_ID1, p_ID2, dist[i][j]))
+                    clustering.write("\t{} {} {:.4f}\n".format(p_ID2, p_ID1, dist[i][j]))
+            clustering.write(";\n")
+
+
+        os.system("ampl/ampl ampl/models/clustering.run") 
         
         

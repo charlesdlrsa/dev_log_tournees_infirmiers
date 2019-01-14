@@ -15,6 +15,10 @@ class Point :
         longitude: longitude of the point in the euclidien space
         latitude: latitude of the point in the euclidien space
     """
+
+    ## Earth Radius
+    R = 6373.0
+
     
     def __init__(
             self,
@@ -51,6 +55,24 @@ class Point :
             return 
         return math.sqrt((self.longitude - other.getLongitude())**2 +(self.latitude - other.getLatitude())**2)
     
+    def distanceKmTo(self, other):
+        """
+        Compute the distance in kilometers between two points
+        """
+        lon1 = math.radians(self.longitude)
+        lon2 = math.radians(other.longitude)
+        dlon = lon2 - lon1
+        lat1 = math.radians(self.latitude)
+        lat2 = math.radians(other.latitude)
+        dlat = lat2 - lat1
+
+        
+        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+        return Point.R * c
+        
+
     def sameLocation(self, other):
         """
         Determine if two points are at the same location (faster than testing d ==0)

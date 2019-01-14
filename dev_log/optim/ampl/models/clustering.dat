@@ -1,0 +1,15 @@
+# threshold for walking distance
+param d := 10;
+
+# nombre de sommets 5
+set V :=
+    1
+    2
+    3
+    4
+    5
+;
+
+# # id_sommet1, id_sommet2, distance
+param distance :=
+    ;

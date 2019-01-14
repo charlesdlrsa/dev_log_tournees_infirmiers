@@ -1,0 +1,5 @@
+model clustering.mod;
+data clustering.dat;
+option solver gurobi;
+solve;
+display center > ../res/clustering.ans;
