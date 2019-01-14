@@ -127,7 +127,8 @@ def login_required(view):
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if session.get('nurse_id') is None and session.get('office_id') is None:
+        if session.get('nurse_id') is None \
+                and session.get('office_id') is None:
             flash('You need to login to access this page.')
             return redirect(url_for('auth.login'))
 

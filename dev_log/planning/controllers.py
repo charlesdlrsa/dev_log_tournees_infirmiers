@@ -8,7 +8,6 @@ planning = Blueprint('planning', __name__, url_prefix='/planning')
 
 
 @planning.route("/", methods=['GET', 'POST'])
-@login_required
 def home():
     if request.method == "POST":
         init_db()
