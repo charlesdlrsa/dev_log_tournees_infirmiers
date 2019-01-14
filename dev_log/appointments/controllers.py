@@ -6,7 +6,6 @@ from dev_log.models import Appointment, Patient, Nurse
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 
-
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 
 
@@ -78,11 +77,19 @@ def add_appointment():
 
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
 def get_appointments(research):
-    first_name, last_name = research.split()
     if request.method == "POST":
         error = None
+        new_research = request.form['research']
+        return redirect(url_for('appointments.get_appointments', research=new_research))
 
-    appointments = Appointment.query \
-        .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
-                                              Patient.first_name.like('%' + first_name + '%')))
+    if len(research.split()) == 2:
+        first_name, last_name = research.split()
+        appointments = Appointment.query \
+            .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
+                                                  Patient.first_name.like('%' + first_name + '%')))
+    else:
+        appointments = Appointment.query \
+            .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + research + '%'),
+                                                  Patient.first_name.like('%' + research + '%')))
+
     return render_template('appointments.html', appointments=appointments)
