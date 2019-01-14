@@ -5,7 +5,7 @@ from datetime import datetime,timedelta
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
 
-@planning.route("/global_planning", methods=['GET', 'POST'])
+@planning.route("/", methods=['GET', 'POST'])
 def home():
     if request.method == "POST":
         init_db()
