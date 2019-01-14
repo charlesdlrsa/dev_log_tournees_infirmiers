@@ -246,6 +246,7 @@ def init_db():
     db.session.add(Care(description="Pansement", duration=60))
     db.session.add(Care(description="Piqûre", duration=60))
     db.session.add(Care(description="Post opératoire", duration=60))
+    
     db.session.commit()
 
     lg.warning('Database initialized!')
