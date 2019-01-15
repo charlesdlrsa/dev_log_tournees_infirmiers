@@ -2,7 +2,7 @@ import googlemaps
 from werkzeug.security import generate_password_hash
 
 from dev_log import db
-from dev_log import key
+from dev_log.key import key
 
 
 class Base(db.Model):
@@ -52,7 +52,7 @@ class Patient(BasePerson):
         db.Float
     )
 
-    def __init__(self, last_name, first_name, email, address, phone, latitude = None, longitude = None):
+    def __init__(self, last_name, first_name, email, address, phone):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
