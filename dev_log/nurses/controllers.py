@@ -107,9 +107,11 @@ def add_nurse():
         phone = request.form['phone_number']
         address = request.form['address']
         office = request.form['office']
-        # TODO mettre en liste de care_id
-        care = Care.query.filter(Care.description.like('%'+request.form['care']+'%')).all()
-        print("iciiii {}".format(care))
+        care = Care.query.all()
+        cares = ""
+        for c in care:
+            if request.form.get(str(c.id)) is not None:
+                cares += "{}-".format(c.id)
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
         error = None
 
@@ -134,7 +136,7 @@ def add_nurse():
             # storing the new user information in the db
             password = generate_password_hash(password)
             nurse = Nurse(last_name=last_name, first_name=first_name,
-                          email=email, password=password, phone=phone, address=address, office=office)
+                          email=email, password=password, phone=phone, address=address, office=office, cares=cares)
             db.session.add(nurse)
             db.session.commit()
             flash('The nurse was successfully added')
