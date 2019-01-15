@@ -107,6 +107,7 @@ def add_nurse():
         phone = request.form['phone_number']
         address = request.form['address']
         office = request.form['office']
+        # TODO mettre en liste de care_id
         care = Care.query.filter(Care.description.like('%'+request.form['care']+'%')).all()
         print("iciiii {}".format(care))
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
