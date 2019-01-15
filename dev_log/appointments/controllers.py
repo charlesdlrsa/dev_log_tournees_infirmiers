@@ -151,7 +151,6 @@ def search_appointments(research):
 
 
 def check_availability(date, halfday, care_id):
-
     nb_appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).count()
     nb_nurses = db.session.query(Nurse).count()
 
@@ -160,8 +159,8 @@ def check_availability(date, halfday, care_id):
     else:
         nb_specific_appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday,
                                                             Appointment.care_id == care_id).count()
-        nb_specific_nurses = Nurse.query.filter(Nurse.cares.contains(care_id)).count()
-
+        nb_specific_nurses = Nurse.query.filter(Nurse.cares.contains("-{}-".format(care_id))).count()
+        print(nb_specific_nurses)
         if nb_specific_appointments >= nb_specific_nurses * 4:
             return False
         else:

@@ -6,6 +6,7 @@ from dev_log import db
 from dev_log.models import Nurse, Care
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
+import numpy
 
 nurses = Blueprint('nurses', __name__, url_prefix='/nurses')
 
@@ -74,7 +75,14 @@ def edit_nurse(nurse_id):
         phone = request.form['phone']
         password = request.form['password']
         address = request.form['address']
-        # office = request.form['office']
+        office = request.form['office']
+        care = Care.query.all()
+        cares = ""
+        for c in care:
+            if request.form.get(str(c.id)) is not None:
+                cares += "-{}-".format(c.id)
+        regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
+        error = None
 
         password = generate_password_hash(password)
         db.session.query(Nurse).filter(Nurse.id == nurse_id). \
@@ -111,7 +119,7 @@ def add_nurse():
         cares = ""
         for c in care:
             if request.form.get(str(c.id)) is not None:
-                cares += "{}-".format(c.id)
+                cares += "-{}-".format(c.id)
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
         error = None
 
@@ -145,6 +153,5 @@ def add_nurse():
         flash(error)
 
     cares = db.session.query(Care).all()
-    print(cares)
     return render_template('add_nurse.html', cares=cares)
 
