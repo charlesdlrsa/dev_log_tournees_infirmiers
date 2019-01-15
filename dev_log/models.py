@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash
 from dev_log import db
 from dev_log import key
 
+
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(
