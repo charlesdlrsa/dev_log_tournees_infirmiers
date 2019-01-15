@@ -1,0 +1,158 @@
+{% extends 'base_template.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Content -->
+  <div class="row">
+    <div class="col-md-4 col-md-offset-3">
+        <form method='post' class="search-form">
+            <div class="form-group has-feedback">
+            <label for="search" class="sr-only">Search appointment with patient or nurse name</label>
+            <input type="text" class="form-control" name="research" id="search" placeholder="search">
+              <span class="glyphicon glyphicon-search form-control-feedback"></span>
+          </div>
+        </form>
+    </div>
+    <div class="col-lg-8 col-lg-8">
+      <a href="{{ url_for('appointments.add_appointment')}}" class="btn btn-secondary btn-md active"
+        role="button">New appointment</a>
+    </div>
+  </div>
+  <div class="card-body">
+  <div class="table-responsive">
+    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+      <div class="card-header">
+        <h1>Appointments from
+          {{start_week}}
+          to
+          {{end_week}}
+        </h1>
+        <div class='flex-row'>
+
+            <form method="post">
+
+
+                  <div class="d-flex justify-content-between">
+                    <div class='from-group'>
+                    <div class="form-label-group">
+                      <a href="{{url_for('appointments.home',week=week-1,year=year)}}"  class="btn btn-secondary btn-sm active"
+                      role=button  >Previous Week</a>
+                    </div>
+                    </div>
+                    <div class='from-group'>
+                    <div class="form-label-group">
+                      <a href="{{ url_for('appointments.home',week=week+1,year=year)}}" class="btn btn-secondary btn-sm active"
+                        role=button>Next Week</a>
+                    </div>
+                    </div>
+                  </div>
+
+
+                </form>
+
+        </div>
+      </div>
+
+      <thead>
+        <tr>
+          <th>Monday</th>
+          <th>Tuesday</th>
+          <th>Wednesday</th>
+          <th>Thursday</th>
+          <th>Friday</th>
+          <th>Saturday</th>
+          <th>Sunday</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          {% if not availabilities[0][0] %}
+            <td> </td>
+          {% else %}
+
+          <td> <div class="col-lg-8 col-lg-8">
+            <a href="{{ url_for('appointments.add_appointment',day=1,week=week,year=year)}}" class="btn btn-secondary btn-sm active"
+              role="button">New </a>
+          </div></td>
+          {% endif %}
+          {% if not availabilities[1][0] %}
+            <td> </td>
+          {% else %}
+
+          <td><div class="col-lg-8 col-lg-8">
+            <a href="{{ url_for('appointments.add_appointment',day=2,week=week,year=year)}}" class="btn btn-secondary btn-sm active"
+              role="button">New </a>
+          </div> </td>
+          {% endif %}
+          {% if not availabilities[2][0] %}
+            <td> </td>
+          {% else %}
+
+          <td><div class="col-lg-8 col-lg-8">
+            <a href="{{ url_for('appointments.add_appointment',day=3,week=week,year=year)}}" class="btn btn-secondary btn-sm active"
+              role="button">New </a>
+          </div> </td>
+          {% endif %}
+          {% if not availabilities[3][0] %}
+            <td> </td>
+          {% else %}
+
+          <td> <div class="col-lg-8 col-lg-8">
+            <a href="{{ url_for('appointments.add_appointment',day=4,week=week,year=year)}}" class="btn btn-secondary btn-sm active"
+              role="button">New </a>
+          </div></td>
+          {% endif %}
+          {% if not availabilities[4][0] %}
+            <td>  </td>
+          {% else %}
+
+          <td><div class="col-lg-8 col-lg-8">
+            <a href="{{ url_for('appointments.add_appointment',day=5,week=week,year=year)}}" class="btn btn-secondary btn-sm active"
+              role="button">New </a>
+          </div> </td>
+          {% endif %}
+          {% if not availabilities[5][0] %}
+            <td> </td>
+          {% else %}
+
+          <td> <div class="col-lg-8 col-lg-8">
+            <a href="{{ url_for('appointments.add_appointment',day=6,week=week,year=year)}}" class="btn btn-secondary btn-sm active"
+              role="button">New </a>
+          </div></td>
+          {% endif %}
+          {% if not availabilities[6][0] %}
+            <td> </td>
+          {% else %}
+
+          <td><div class="col-lg-8 col-lg-8">
+            <a href="{{ url_for('appointments.add_appointment',day=7,week=week,year=year)}}" class="btn btn-secondary btn-sm active"
+              role="button">New </a>
+          </div> </td>
+          {% endif %}
+
+
+
+
+
+
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+
+
+</div>
+
+{% endblock%}
