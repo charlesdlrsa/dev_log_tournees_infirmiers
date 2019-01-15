@@ -235,7 +235,7 @@ def init_db():
                          phone="0699458758", password=password, address="35 rue Bobigny", office="Paris"))
     db.session.add(Nurse(last_name="Poli", first_name="Jean-Philippe", email="jpp@hotmail.fr",
                          phone="0699458758", password=password, address="48 rue Clovis", office="Paris"))
-    db.session.add(Nurse(last_name="Hudlot", first_name="Celine", email="celine.hulot@hotmail.fr",
+    db.session.add(Nurse(last_name="Hudelot", first_name="Celine", email="celine.hudelot@hotmail.fr",
                          phone="0699469858", password=password, address="76 rue Paul André", office="Paris"))
     db.session.add(Nurse(last_name="Detriche", first_name="Jean-Marie", email="jeanmarie.detriche@hotmail.fr",
                          phone="0694699858", password=password, address="24 rue Terrence", office="Paris"))

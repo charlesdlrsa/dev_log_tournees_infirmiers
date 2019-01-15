@@ -54,7 +54,7 @@
             <div class="form-group">
               <div class="form-label-group">
                 {% for care in cares %}
-                <input type="checkbox" name="soin1" value="soin1">{{ care.description }} <br>
+                <input type="checkbox" name="care" value={{care.description}}>{{ care.description }} <br>
                 {% endfor %}
                 <label for="cares">Cares</label>
               </div>
