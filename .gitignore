@@ -130,4 +130,4 @@ nohup.out
 *.db
 
 # google maps key
-dev_log/gmaps_key.py
+key.py
