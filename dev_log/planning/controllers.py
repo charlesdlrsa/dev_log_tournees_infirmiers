@@ -1,6 +1,6 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 from dev_log.models import init_db
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 from dev_log.utils.calendar import *
