@@ -2,7 +2,7 @@ import googlemaps
 from werkzeug.security import generate_password_hash
 
 from dev_log import db
-from dev_log import key
+from dev_log.key import key
 
 
 class Base(db.Model):
