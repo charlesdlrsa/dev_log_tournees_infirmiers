@@ -88,7 +88,7 @@ def add_appointment():
         nurse_id = db.session.query(Nurse).filter(Nurse.first_name == nurse[1]).filter(
             Nurse.last_name == nurse[0]).first().id
 
-        date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+        date = datetime.datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         halfday = request.form['halfday']
         care = Care.query.filter(Care.description == request.form['care']).first().id
         error = None

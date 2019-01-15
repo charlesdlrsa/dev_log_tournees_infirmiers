@@ -52,7 +52,7 @@ class Patient(BasePerson):
         db.Float
     )
 
-    def __init__(self, last_name, first_name, email, address, phone):
+    def __init__(self, last_name, first_name, email, address, phone, latitude=None, longitude=None):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
@@ -87,10 +87,7 @@ class Nurse(BasePerson):
         db.String(50),
     )
 
-    # competences = db.Column(db.String(50))
-
-    def __init__(self, last_name, first_name, email, password,
-                 phone, address, office, cares=None):
+    def __init__(self, last_name, first_name, email, password, phone, address, office, cares):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
@@ -98,11 +95,7 @@ class Nurse(BasePerson):
         self.password = password
         self.address = address
         self.office = office
-        # for care in cares:
-        #     if care not in ["soin 1", "soin 2", "soin 3"]:
-        #         raise ValueError("Unvalid care")
         self.cares = cares
-        # self.competences = competences
 
 
 class Appointment(Base):
@@ -240,7 +233,7 @@ def init_db():
                           email="doctissimo@hotmail.fr", password=password))
     db.session.add(Nurse(last_name="Cabaret", first_name="Laurent", email="laurent.cabaret@hotmail.fr",
                          phone="0699458758", password=password, address="35 rue Bobigny", office="Paris",
-                         cares = "1"))
+                         cares="1"))
     db.session.add(Nurse(last_name="Poli", first_name="Jean-Philippe", email="jpp@hotmail.fr",
                          phone="0699458758", password=password, address="48 rue Clovis", office="Paris",
                          cares="1"))
