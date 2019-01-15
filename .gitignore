@@ -128,3 +128,6 @@ nohup.out
 
 # database
 *.db
+
+# google maps key
+key.py

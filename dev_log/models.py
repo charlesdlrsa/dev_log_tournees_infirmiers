@@ -1,6 +1,8 @@
-from dev_log import db
-# import googlemaps
+import googlemaps
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from dev_log import db
+from dev_log import key
 
 class Base(db.Model):
     __abstract__ = True
@@ -55,13 +57,13 @@ class Patient(BasePerson):
         self.email = email
         self.address = address
         self.phone = phone
-    #     Patient.geolocation(key)
-    #
-    # def geolocation(self, key):
-    #     gmaps = googlemaps.Client(key=str(key))
-    #     distance = gmaps.geocode(self.address)[0]['geometry']['location']
-    #     self.latitude = distance['lat']
-    #     self.longitude = distance['lng']
+        Patient.geolocation(self, key)
+
+    def geolocation(self, key):
+        gmaps = googlemaps.Client(key=str(key))
+        distance = gmaps.geocode(self.address)[0]['geometry']['location']
+        self.latitude = distance['lat']
+        self.longitude = distance['lng']
 
 
 class Nurse(BasePerson):

@@ -117,6 +117,7 @@ def add_patient():
             # storing the new user information in the db
             patient = Patient(last_name=last_name, first_name=first_name,
                               email=email, address=address, phone=phone)
+            print("latitude : {}, longitude : {} ".format(patient.latitude, patient.longitude))
             db.session.add(patient)
             db.session.commit()
             flash('The patient was successfully added')
