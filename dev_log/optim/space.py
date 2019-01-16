@@ -1,15 +1,21 @@
 # -*- coding: utf-8 -*-
 
 # @author Romain Pascual
+# @author Maxime Dieudionne
 
 # @class Space
 
 
-import sys, os, math
+import os
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+import sys
+import math
 from point import Point
 from operator import attrgetter
+import numpy as np
+import googlemaps
+import key
 
 class Space :
     
