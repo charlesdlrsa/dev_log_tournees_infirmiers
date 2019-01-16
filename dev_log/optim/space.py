@@ -11,11 +11,14 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import sys
 import math
+import time
 from point import Point
 from operator import attrgetter
+from amplpy import AMPL, Environment
 import numpy as np
 import googlemaps
-import key
+from key import key
+googlekey = key
 
 class Space :
     
@@ -49,9 +52,10 @@ class Space :
     # -------------------------------------------------------------------------
     # -- CREATION 
     # -------------------------------------------------------------------------
-    def buildSpaceFromDict(self, patients):
+    def buildSpaceFromDB(self, office, patients):
         """
-        Build a 2D space from a given dictionnary of patients.
+        Build a 2D space from a given dictionnary of patients and the realted office.
+        @param office: position of the office(latitude, longitude)
         @param patients: a dict of the patients to be seen.
             k = patient_id
             v = position (latitude, longitude)
@@ -61,10 +65,54 @@ class Space :
         self.nb_points = 0
         self.points = []
 
+        # add office
+        self.nb_points +=1
+        self.points.append(Point(0, office[0], office[1]))
+
         # process patients
         for patient_id, patient_position in patients.items():
             self.nb_points += 1
             self.points.append(Point(patient_id,patient_position[0], patient_position[1]))
+
+    # -------------------------------------------------------------------------
+    
+    # -------------------------------------------------------------------------
+    # -- Getter 
+    # -------------------------------------------------------------------------
+
+    def getPointsByID(self, id):
+        """
+        Return the point in the space having the given id if exists, None otherwise.
+        """
+        for p in self.points:
+            if p.getID() == id:
+                return p
+        return None
+    
+    def getListPointsByID(self, listIds):
+        """
+        Return the list of points in the space having the given ids, can be empty.
+        """
+        l = []
+        self.sortByID()
+        listIds.sort()
+        i_list = 0
+        i_points = 0
+        n = len(listIds)
+
+        while i_list < n and i_points < self.nb_points:
+            if listIds[i_list] == self.points_by_id[i_points].getID():
+                l.append(self.points[i_points])
+                i_list += 1
+                i_points += 1
+            elif listIds[i_list] < self.points_by_id[i_points].getID():
+                i_list += 1
+            else:
+                i_points += 1
+        
+        del self.points_by_id
+
+        return l
         
     # -------------------------------------------------------------------------
     
@@ -85,6 +133,13 @@ class Space :
         """
         self.points_by_lat = self.points.copy()
         self.points_by_lat.sort(key=attrgetter("latitude"))
+
+    def sortByID(self):
+        """
+        Sort the points in the space according to their id.
+        """
+        self.points_by_id = self.points.copy()
+        self.points_by_id.sort(key=attrgetter("id"))
            
     def lexSort(self):
         """
@@ -110,7 +165,7 @@ class Space :
     
     def getKmDistance(self):
         """
-        Compute the matrix of distance between the points
+        Compute the matrix of distance between the points using distance as the crow flies.
         """
         dist = [[0 for k in range(self.nb_points)] for k in range(self.nb_points)]
         for i in range(self.nb_points):
@@ -118,6 +173,27 @@ class Space :
                 dist[i][j] = self.points[i].distanceKmTo(self.points[j])
         return dist
 
+    def getGoogleTravelTimes(self, addresses, mode):
+        """
+        Compute the matrix of time to travel (in seconds) between the points googlemaps 
+        in either driving or walking mode.
+
+        doc gmaps
+
+        :param mode: Specifies the mode of transport to use when calculating
+            directions. Valid values are "driving", "walking", "transit" or
+            "bicycling".
+        :type mode: string
+        """
+        gmaps = googlemaps.Client(key=googlekey)
+        length = len(addresses)
+        liste_coordonnees = [(addresses[i].getLatitude(),addresses[i].getLongitude()) for i in range(length)]
+        distance = gmaps.distance_matrix(liste_coordonnees, liste_coordonnees, mode)
+        mat_travel_times = np.zeros((length, length))
+        for i in range(length):
+            for j in range(length):
+                mat_travel_times[i][j] = distance['rows'][i]['elements'][j]['duration']['value']
+        return mat_travel_times
         
     # -------------------------------------------------------------------------
      
@@ -309,8 +385,8 @@ class Space :
         Compute the extremal distances using the two algorithms explained above.
         """
         if self.dmin is None or self.dmax is None:
-            p1, p2, dmin = Space.computeDmin(self)
-            p1, p2, dmax = Space.computeDmax(self)
+            _, _, dmin = Space.computeDmin(self)
+            _, _, dmax = Space.computeDmax(self)
             self.dmin, self.dmax = math.sqrt(dmin), math.sqrt(dmax)
             
             # freeing memory
@@ -329,6 +405,11 @@ class Space :
         """
         Compute the minimum number of cluster having a radius bounded by
         walkingThreshold, which is a distance in kilometers (=3.0 by default)
+
+        The office is set to be a center by default. 
+        NB: The office id has to be set to 0.
+
+        @return: the minimal number of clusters
         """
         dist = self.getKmDistance()
         with open("models/clustering.dat", "w") as clustering:
@@ -340,7 +421,7 @@ class Space :
             clustering.write("# nombre de sommets {}\n".format(self.nb_points))
             clustering.write("set V :=\n")
             for p in self.points:
-                clustering.write("\t{}\n".format(p.getPatientID()))
+                clustering.write("\t{}\n".format(p.getID()))
             clustering.write(";\n")
 
             clustering.write("\n")
@@ -348,17 +429,17 @@ class Space :
             clustering.write("# id_sommet1, id_sommet2, distance\n")
             clustering.write("param distance :=\n")
             for p in self.points:
-                p_ID = p.getPatientID()
+                p_ID = p.getID()
                 clustering.write("\t{} {} 0\n".format(p_ID, p_ID))
             for i in range(self.nb_points):
                 for j in range(i+1, self.nb_points):
-                    p_ID1 = self.points[i].getPatientID()
-                    p_ID2 = self.points[j].getPatientID()
+                    p_ID1 = self.points[i].getID()
+                    p_ID2 = self.points[j].getID()
                     clustering.write("\t{} {} {:.4f}\n".format(p_ID1, p_ID2, dist[i][j]))
                     clustering.write("\t{} {} {:.4f}\n".format(p_ID2, p_ID1, dist[i][j]))
             clustering.write(";\n")
 
-        from amplpy import AMPL, Environment
+        # set up ampl
         ampl = AMPL(Environment('ampl'))
 
         # Interpret the two files
@@ -373,11 +454,16 @@ class Space :
         
         return int(numberCenters.get().value())
 
-    def getCenters(self, k):
+    def getCentersID(self, k):
         """
         Cluster the space, using the k-median paradigm:
-            provide the set of $k$ vertices $\{c_1, \dots c_k\}$ minimizing
+            provide the set of $k$ vertices ${c_1, ... c_k}$ minimizing
                 sum_{v in V} min_i d_{c_i,v}
+
+        The office is set to be a center by default. 
+        NB: The office id has to be set to 0.
+
+        @return: the list of centers
         """
         with open("models/clustering.dat", "r") as clustering:
             with open("models/kmedian.dat", "w") as kmedian:
@@ -393,7 +479,7 @@ class Space :
                 for line in clustering.readlines():
                     kmedian.write(line)
 
-        from amplpy import AMPL, Environment
+        # set up ampl
         ampl = AMPL(Environment('ampl'))
 
         # Interpret the two files
@@ -412,8 +498,107 @@ class Space :
         for index, instance in centers:
             if instance.value():
                 listCenters.append(int(index))
+
+        return listCenters
+    
+    def getHamiltonianCycle(self, points, mode="driving", recompute=False):
+        """
+        Compute an hamiltonian path on the set of points.
+
+        It uses a google maps key. Note that mode should be one of
+            -"driving", 
+            -"walking", 
+            - (and "bicycling" but it is not taken into account at the moment)
         
-        print(listCenters)
+        @param points: should be a subset of self.points
+        """
+        if recompute:
+            travel_times = self.getGoogleTravelTimes(points, mode)
+            n = len(points)
+
+            if n == 1:
+                total_time = 0
+                print("One point :", total_time)
+            
+            if n == 2:
+                total_time = travel_times[0][1] + travel_times[1][0]
+                print("two points:", total_time)
+                """
+                if n == 3:
+                    total_time = min(
+                        (travel_times[0][1] + travel_times[1][2] + travel_times[2][0]),
+                        (travel_times[0][2] + travel_times[2][1] + travel_times[1][0])
+                        )
+                    print("three points:", total_time)
+                """
+            else:
+                """
+                For the solver to work, the points has to be numbered from 1 to n
+                """
+
+                with open("models/travellingSalesman.dat", "w") as hamiltonian:
+                    hamiltonian.write("# nombre de sommets {}\n".format(n))
+                    hamiltonian.write("set V :=\n")
+                    for k in range(1, n+1):
+                        hamiltonian.write("\t{}\n".format(k))
+                    hamiltonian.write(";\n")
+
+                    hamiltonian.write("\n")
+
+                    hamiltonian.write("# id_sommet1, id_sommet2, travelling time\n")
+                    hamiltonian.write("param: A: time :=\n")
+                    for i in range(n):
+                        for j in range(i+1, n):
+                            hamiltonian.write("\t{} {} {}\n".format(i+1, j+1, travel_times[i][j]))
+                            hamiltonian.write("\t{} {} {}\n".format(j+1, i+1, travel_times[j][i]))
+                    hamiltonian.write(";\n")
+
+                # set up ampl
+                ampl = AMPL(Environment('ampl'))
+
+                # Interpret the two files
+                ampl.read('models/travellingSalesman.mod')
+                ampl.readData('models/Model4.dat')
+
+                # Solve
+                ampl.solve()
+
+                # Get objective entity by AMPL name
+                total_time = ampl.getObjective('total_time')
+                
+                print("Objective value :", total_time.value())
+    
+
+        else:
+
+            # set up ampl
+            ampl = AMPL(Environment('ampl'))
+            
+            #model4
+            btm4 = time.time()
+
+            # Interpret the two files
+            ampl.read('models/travellingSalesman.mod')
+            ampl.readData('models/travellingSalesman.dat')
+
+            # Solve
+            ampl.solve()
+
+            # Get objective entity by AMPL name
+            total_time_m4 = ampl.getObjective("total_time").value()
+            
+            etm4 = time.time()
+
+            print("travellingSalesman - score: {}, time{}.".format(total_time_m4, etm4 - btm4))
+
+            #regenerate the path
+            x = ampl.getVariable("x")
+
+            n = len(points)
+
+            for i in range(1, n+1):
+                for j in range(i+1, n+1):
+                    print(x[i,j].value())
 
 if __name__ == "__main__":
     from random import random, seed
@@ -430,13 +615,17 @@ if __name__ == "__main__":
     latRef = latMin
     latRange = latMax - latMin
 
+    office = [latRef + random() * latRange, lonRef + random() * lonRange]
+
     patientDict = dict()
     for k in range(20):
         lon = lonRef + random() * lonRange
         lat = latRef + random() * latRange
-        patientDict[k] = (lat,lon)
+        patientDict[k+1] = (lat,lon)
 
     s = Space()
-    s.buildSpaceFromDict(patientDict)
-    k = s.getNumberOfCluster()
-    s.getCenters(k)
+    s.buildSpaceFromDB(office, patientDict)
+    k = s.getNumberOfCluster(walkingThreshold=2.0)
+    centers = s.getCentersID(k)
+    points = s.getListPointsByID(centers)
+    s.getHamiltonianCycle(points)

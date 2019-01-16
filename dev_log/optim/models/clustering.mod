@@ -5,21 +5,29 @@ set V;
 param distance{V, V};
 param d;
 
-# variable de décision
+# decision variable
 var center{V}, binary;
 
-# variable de clustering
-var nearestCenter{V cross V}, binary;
+# office if a center
+param office = 0;
+subject to officeIsCenter:
+	center[office] = 1.0;
 
+# clustering variable
+var closestCenter{V cross V}, binary;
+
+# the closest center has to be a center
 subject to isCenter{v in V, c in V}:
-	nearestCenter[v,c] <= center[c];
+	closestCenter[v,c] <= center[c];
 	
+# every point should be in a cluster
 subject to hasCenter{v in V}:
-	sum{c in V} nearestCenter[v,c] = 1;
+	sum{c in V} closestCenter[v,c] = 1;
 
+# the radius of a cluster has to be smaller than the thresold distance
 subject to maxDistance{v in V, c in V}:
-	distance[v,c] * nearestCenter[v,c] <= d;
+	distance[v,c] * closestCenter[v,c] <= d;
 
-# minimising number of centers
+# minimising the number of centers
 minimize numberCenters:
 	sum{v in V} center[v];

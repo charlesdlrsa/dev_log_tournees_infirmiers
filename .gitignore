@@ -135,3 +135,7 @@ scriptAppointment.py
 
 # fuse
 .fuse*
+
+# googlekey
+dev_log/key.py
+dev_log/optim/key.py
