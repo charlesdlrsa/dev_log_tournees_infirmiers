@@ -6,18 +6,7 @@
 # @class Space
 
 """
-Input:
-{
-"start" : "hh:mm",
-"end" : "hh:mm",
-'nurse_id' : ["id1", "id2", ...],
-"office_lat" : "lat",
-"office_lon" = "lon",
-"appointments" = [{"app_id" = "id", "app_lat" = "lat", "app_lon" = "lon", "app_length":"mm"}
-                    ...
-                    {}}]
-...
-}
+ISSUE : if we have one big cluster that a nurse can not cover by him(her)self.
 
 Output:
 [{"nurse_id":"id", "app_id":"id", "hour":"hh:mm"}]
@@ -69,8 +58,54 @@ class Space :
     # -------------------------------------------------------------------------
     
     # -------------------------------------------------------------------------
+    # -- PARSE 
+    # -------------------------------------------------------------------------
+
+    def buildSpaceFromDic(self, dataDict):
+        """
+        Build a 2D space from a given dictionnary describing the data.
+        @param dataDict: json like dictionnary describing the data:
+            - "start" : "hh:mm"
+                starting time, format is two digits for hour, two points and two digits for minutes
+            - "end" : "hh:mm"
+                endging time, format is two digits for hour, two points and two digits for minutes
+            -'nurse_id' : ["id1", "id2", ...]
+                list of nurse ids in string format
+            - "office_lat" : "lat"
+                office latitude in string format
+            - "office_lon" : "lon"
+                office longitude in string format
+            - "appointments" : list[dict]
+                list of nested json like dictionnaries describing the appointments.
+                one dictionnary is described as follows:
+                    - "app_id" : "id"
+                        appointment id in string format
+                    - "app_lat" : "lat"
+                        appointment latitude in string format
+                    - "app_lon" : "lon"
+                        appointment longitude in string format
+                    - "app_length" : "mm"
+                        duration of care performed at the given appointment in minutes
+        """
+        self.start = [int(x) for x in dataDict["start"].split(":")]
+        self.end = [int(x) for x in dataDict["end"].split(":")]
+        self.nurse_ids = [int(x) for x in dataDict["nurse_id"]]
+        self.points = [Point(id=0, lat=float(dataDict["office_lat"]), lon=float(dataDict["office_lon"]))]
+        self.nb_points = 1
+        self.care_duration = dict()
+        for app in dataDict["appointments"]:
+            self.points.append(Point(id=int(app["app_id"]), lat=float(app["app_lat"]), lon=float(app["app_lon"])))
+            self.nb_points += 1
+            self.care_duration[int(app["app_id"])] = 60 * int(app["app_length"])
+
+
+
+    # -------------------------------------------------------------------------
+    
+    # -------------------------------------------------------------------------
     # -- CREATION 
     # -------------------------------------------------------------------------
+
     def buildSpaceFromDB(self, office, patients):
         """
         Build a 2D space from a given dictionnary of patients and the realted office.
@@ -663,6 +698,56 @@ class Space :
 
             path, travel_time = self.regenerateCyclingPath(points, x, travel_times)
             return [p.getID() for p in path], travel_time
+
+    def splitAmongNurse(self, clusters_times):
+        """
+        Split the clusters between the various nurses.
+        """
+
+        
+        with open("models/vrp.dat", "w") as vrp:
+            
+            # TODO: Write data
+            # TODO: Write LP
+
+            vrp.write(";\n")
+
+        # set up ampl
+        ampl = AMPL(Environment('ampl'))
+
+        # Interpret the two files
+        ampl.read('models/vrp.mod')
+        ampl.readData('models/vrp.dat')
+
+        # Solve
+        ampl.solve()
+
+        # Get objective entity by AMPL name
+        return
+
+
+    def solve(self):
+        """
+
+        """
+        k = self.getNumberOfCluster()
+        centers, clusters = self.clusterSpace(k)
+
+        cluster_time = dict()
+
+        for c in centers:
+            walking_points = self.getListPointsByID(clusters[c])
+            walking_path, walking_time = self.getHamiltonianCycle(walking_points, mode="walking")
+            walking_time += sum(self.care_duration[app_id] for app_id in walking_path)
+            clusters[c] = walking_path
+            cluster_time[c] = walking_time
+
+        appointment_distribution = self.splitAmongNurse(cluster_time)
+
+        # TODO: mettre en forme la sortie.
+
+        return
+
 
 
 if __name__ == "__main__":
