@@ -1,6 +1,6 @@
 from flask import Blueprint, request, render_template, flash, redirect, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
-import re
+import re, json
 from sqlalchemy.sql import or_
 from dev_log import db
 from dev_log.models import Nurse, Care
@@ -108,10 +108,11 @@ def add_nurse():
         address = request.form['address']
         office = request.form['office']
         care = Care.query.all()
-        cares = ""
+        cares = []
         for c in care:
             if request.form.get(str(c.id)) is not None:
-                cares += "{}-".format(c.id)
+                cares.append(c.id)
+        cares = json.dumps(cares)
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
         error = None
 
@@ -145,6 +146,6 @@ def add_nurse():
         flash(error)
 
     cares = db.session.query(Care).all()
-    print(cares)
+    # print(cares)
     return render_template('add_nurse.html', cares=cares)
 

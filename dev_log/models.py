@@ -84,7 +84,7 @@ class Nurse(BasePerson):
         nullable=False)
 
     cares = db.Column(
-        db.String(50),
+        db.String(50)
     )
 
     def __init__(self, last_name, first_name, email, password, phone, address, office, cares):

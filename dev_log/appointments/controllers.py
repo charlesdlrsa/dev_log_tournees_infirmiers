@@ -158,6 +158,7 @@ def check_availability(date, halfday, care_id):
 
     nb_nurses = db.session.query(Nurse).count()
     nb_specific_nurses = Nurse.query.filter(Nurse.cares.contains(care_id)).count()
+    print(nb_specific_nurses)
 
     if nb_appointments >= nb_nurses * 4:
         return False
