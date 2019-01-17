@@ -73,6 +73,7 @@ def add_appointment():
         day = int(request.args["day"])
         week = int(request.args["week"])
         year = int(request.args["year"])
+        halfday=request.args["halfday"]
         time = iso_to_gregorian(year, week, day)
         time = time.strftime('%Y-%m-%d')
     else:
@@ -120,7 +121,7 @@ def add_appointment():
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
     cares = db.session.query(Care).all()
 
-    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares, time=time)
+    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares, time=time,halfday=halfday)
 
 
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
