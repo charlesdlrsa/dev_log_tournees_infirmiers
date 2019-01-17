@@ -1,9 +1,8 @@
 import googlemaps
-from werkzeug.security import generate_password_hash
-
+from werkzeug.security import check_password_hash, generate_password_hash
 from dev_log import db
 from dev_log.key import key
-
+import datetime
 
 class Base(db.Model):
     __abstract__ = True
@@ -280,5 +279,8 @@ def init_db():
     db.session.add(Care(description="Pansement", duration=60))
     db.session.add(Care(description="Piqûre", duration=30))
     db.session.add(Care(description="Post opératoire", duration=20))
+    ## Appointment : nurse_id, patient_id, date, care_id
+    for pID in range(1,7):
+        db.session.add(Appointment(nurse_id=1,patient_id=pID,date=datetime.date(2018,1,22),care_id=1))
     db.session.commit()
     lg.warning('Database initialized!')
