@@ -78,6 +78,7 @@ def add_appointment():
         time = time.strftime('%Y-%m-%d')
     else:
         time = None
+        halfday=None
 
     if request.method == 'POST':
         patient = request.form['patient'].split(' - ')
