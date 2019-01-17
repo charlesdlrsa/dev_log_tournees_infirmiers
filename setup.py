@@ -19,6 +19,7 @@ xlrd
 xlsxwriter
 flask_sqlalchemy==2.3.2
 flask
+googlemaps
 """
 # numpy==1.14.3
 
