@@ -82,14 +82,8 @@ def add_appointment():
 
     if request.method == 'POST':
         patient = request.form['patient'].split(' - ')
-        nurse = request.form['nurse'].split(' - ')
         patient_id = db.session.query(Patient).filter(Patient.first_name == patient[1]).filter(
             Patient.last_name == patient[0]).first().id
-
-        # en principe à enlever car l'attribution se fait avec l'optimiseur
-        nurse_id = db.session.query(Nurse).filter(Nurse.first_name == nurse[1]).filter(
-            Nurse.last_name == nurse[0]).first().id
-
         date = datetime.datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         halfday = request.form['halfday']
         care = Care.query.filter(Care.description == request.form['care']).first().id
@@ -111,7 +105,7 @@ def add_appointment():
                 date)
         else:
             # storing the new appointment information in the db
-            appointment = Appointment(nurse_id, patient_id, date, care, halfday)
+            appointment = Appointment(patient_id, date, care, halfday)
             db.session.add(appointment)
             db.session.commit()
             flash('The appointment was successfully added')

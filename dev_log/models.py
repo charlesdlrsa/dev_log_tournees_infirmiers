@@ -4,6 +4,7 @@ from dev_log import db
 from dev_log.key import key
 import datetime
 
+
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(
@@ -109,11 +110,6 @@ class Appointment(Base):
         nullable=False,
         unique=False)
 
-    nurse_id = db.Column(
-        db.Integer,
-        db.ForeignKey('nurse.nurse_id'),
-        unique=False)
-
     care_id = db.Column(
         db.Integer,
         db.ForeignKey('care.care_id'),
@@ -132,16 +128,11 @@ class Appointment(Base):
         "Patient",
         backref="patient")
 
-    nurse = db.relationship(
-        "Nurse",
-        backref="nurse")
-
     care = db.relationship(
         "Care",
         backref="care")
 
-    def __init__(self, nurse_id, patient_id, date, care_id, halfday=None):
-        self.nurse_id = nurse_id
+    def __init__(self, patient_id, date, care_id, halfday=None):
         self.patient_id = patient_id
         self.date = date
         self.halfday = halfday
@@ -157,6 +148,11 @@ class Schedule(Base):
         nullable=False
     )
 
+    nurse_id = db.Column(
+        db.Integer,
+        db.ForeignKey('nurse.nurse_id'),
+        unique=False)
+
     hour = db.Column(
         db.DateTime
     )
@@ -166,8 +162,13 @@ class Schedule(Base):
         backref="appointment"
     )
 
-    def __init__(self, hour):
+    nurse = db.relationship(
+        "Nurse",
+        backref="nurse")
+
+    def __init__(self, hour, nurse_id):
         self.hour = hour
+        self.nurse_id = nurse_id
 
 
 class Care(Base):
@@ -281,6 +282,6 @@ def init_db():
     db.session.add(Care(description="Post opératoire", duration=20))
     ## Appointment : nurse_id, patient_id, date, care_id
     for pID in range(1,7):
-        db.session.add(Appointment(nurse_id=1,patient_id=pID,date=datetime.date(2018,1,22),care_id=1))
+        db.session.add(Appointment(patient_id=pID,date=datetime.date(2018,1,22),care_id=1))
     db.session.commit()
     lg.warning('Database initialized!')
