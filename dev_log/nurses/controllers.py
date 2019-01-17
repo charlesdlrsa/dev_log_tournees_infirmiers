@@ -1,12 +1,11 @@
 from flask import Blueprint, request, render_template, flash, redirect, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
-import re, json
+import re
 from sqlalchemy.sql import or_
 from dev_log import db
 from dev_log.models import Nurse, Care
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
-import numpy
 
 nurses = Blueprint('nurses', __name__, url_prefix='/nurses')
 
