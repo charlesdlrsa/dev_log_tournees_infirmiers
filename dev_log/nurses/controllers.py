@@ -6,7 +6,6 @@ from dev_log import db
 from dev_log.models import Nurse, Care
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
-import numpy
 
 nurses = Blueprint('nurses', __name__, url_prefix='/nurses')
 
@@ -116,7 +115,7 @@ def add_nurse():
         address = request.form['address']
         office = request.form['office']
         care = Care.query.all()
-        cares = ""
+        cares = []
         for c in care:
             if request.form.get(str(c.id)) is not None:
                 cares += "-{}-".format(c.id)

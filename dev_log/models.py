@@ -83,7 +83,7 @@ class Nurse(BasePerson):
         nullable=False)
 
     cares = db.Column(
-        db.String(50),
+        db.String(50)
     )
 
     def __init__(self, last_name, first_name, email, password, phone, address, office, cares):
@@ -146,6 +146,28 @@ class Appointment(Base):
         self.date = date
         self.halfday = halfday
         self.care_id = care_id
+
+
+class Schedule(Base):
+    id = db.Column(
+        'appointment_id',
+        db.Integer,
+        db.ForeignKey('appointment.appointment_id'),
+        primary_key=True,
+        nullable=False
+    )
+
+    hour = db.Column(
+        db.DateTime
+    )
+
+    appointment = db.relationship(
+        "Appointment",
+        backref="appointment"
+    )
+
+    def __init__(self, hour):
+        self.hour = hour
 
 
 class Care(Base):
@@ -255,9 +277,8 @@ def init_db():
     db.session.add(Patient(last_name="Cassedanne", first_name="Louis", email="louis.cassedanne@hotmail.fr",
                            address="20 Rue du Dr Roux 91370 Verrières-le-Buisson", phone="0674695898"))
     db.session.add(Care(description="Pansement", duration=60))
-    db.session.add(Care(description="Piqûre", duration=60))
-    db.session.add(Care(description="Post opératoire", duration=60))
-
+    db.session.add(Care(description="Piqûre", duration=30))
+    db.session.add(Care(description="Post opératoire", duration=20))
     ## Appointment : nurse_id, patient_id, date, care_id
     for pID in range(1,7):
         db.session.add(Appointment(nurse_id=1,patient_id=pID,date=datetime.date(2018,1,22),care_id=1))
