@@ -149,6 +149,28 @@ class Appointment(Base):
         self.care_id = care_id
 
 
+class Schedule(Base):
+    id = db.Column(
+        'appointment_id',
+        db.Integer,
+        db.ForeignKey('appointment.appointment_id'),
+        primary_key=True,
+        nullable=False
+    )
+
+    hour = db.Column(
+        db.DateTime
+    )
+
+    appointment = db.relationship(
+        "Appointment",
+        backref="appointment"
+    )
+
+    def __init__(self, hour):
+        self.hour = hour
+
+
 class Care(Base):
     id = db.Column(
         'care_id',
@@ -256,7 +278,7 @@ def init_db():
     db.session.add(Patient(last_name="Cassedanne", first_name="Louis", email="louis.cassedanne@hotmail.fr",
                            address="20 Rue du Dr Roux 91370 Verrières-le-Buisson", phone="0674695898"))
     db.session.add(Care(description="Pansement", duration=60))
-    db.session.add(Care(description="Piqûre", duration=60))
-    db.session.add(Care(description="Post opératoire", duration=60))
+    db.session.add(Care(description="Piqûre", duration=30))
+    db.session.add(Care(description="Post opératoire", duration=20))
     db.session.commit()
     lg.warning('Database initialized!')
