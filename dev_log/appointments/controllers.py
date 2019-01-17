@@ -50,8 +50,8 @@ def home():
     care_id = 1
     for day in availabilities:
         date = iso_to_gregorian(year, week, i)
-        day.append(check_availability(date=date, halfday="morning", care_id=care_id))
-        day.append(check_availability(date=date, halfday="morning", care_id=care_id))
+        day.append(check_availability(date=date, halfday="Morning", care_id=care_id))
+        day.append(check_availability(date=date, halfday="Afternoon", care_id=care_id))
         i += 1
 
     start_week = iso_to_gregorian(year, week, 1)
@@ -59,7 +59,7 @@ def home():
     start_week = str(start_week.day) + '/' + str(start_week.month)
     end_week = str(end_week.day) + '/' + str(end_week.month)
 
-    return render_template("appointments_copy.html", availabilities=availabilities, start_week=start_week,
+    return render_template("appointments.html", availabilities=availabilities, start_week=start_week,
                            end_week=end_week, year=year, week=week)
 
 
@@ -151,18 +151,16 @@ def search_appointments(research):
 
 
 def check_availability(date, halfday, care_id):
-
     nb_appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).count()
-    nb_specific_appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday,
-                                                        Appointment.care_id == care_id).count()
-
     nb_nurses = db.session.query(Nurse).count()
-    nb_specific_nurses = Nurse.query.filter(Nurse.cares.contains(care_id)).count()
-    print(nb_specific_nurses)
 
     if nb_appointments >= nb_nurses * 4:
         return False
     else:
+        nb_specific_appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday,
+                                                            Appointment.care_id == care_id).count()
+        nb_specific_nurses = Nurse.query.filter(Nurse.cares.contains("-{}-".format(care_id))).count()
+        print(nb_specific_nurses)
         if nb_specific_appointments >= nb_specific_nurses * 4:
             return False
         else:

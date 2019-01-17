@@ -233,16 +233,16 @@ def init_db():
                           email="doctissimo@hotmail.fr", password=password))
     db.session.add(Nurse(last_name="Cabaret", first_name="Laurent", email="laurent.cabaret@hotmail.fr",
                          phone="0699458758", password=password, address="35 rue Bobigny", office="Paris",
-                         cares="1"))
+                         cares="-1-"))
     db.session.add(Nurse(last_name="Poli", first_name="Jean-Philippe", email="jpp@hotmail.fr",
                          phone="0699458758", password=password, address="48 rue Clovis", office="Paris",
-                         cares="1"))
+                         cares="-1-2-"))
     db.session.add(Nurse(last_name="Hudelot", first_name="Celine", email="celine.hudelot@hotmail.fr",
                          phone="0699469858", password=password, address="76 rue Paul André", office="Paris",
-                         cares="1"))
+                         cares="-1-2-3-"))
     db.session.add(Nurse(last_name="Detriche", first_name="Jean-Marie", email="jeanmarie.detriche@hotmail.fr",
                          phone="0694699858", password=password, address="24 rue Terrence", office="Paris",
-                         cares="1"))
+                         cares="-1-2-"))
     db.session.add(Patient(last_name="De la roche", first_name="Charles", email="charles.dlrsa@hotmail.fr",
                            address="40 rue Victor Hugo 91300 Massy", phone="0699497758"))
     db.session.add(Patient(last_name="Mallard", first_name="Alix", email="alix.mallard@hotmail.fr",
