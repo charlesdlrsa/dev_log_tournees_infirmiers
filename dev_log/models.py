@@ -2,7 +2,7 @@ import googlemaps
 from werkzeug.security import check_password_hash, generate_password_hash
 from dev_log import db
 from dev_log.key import key
-import datetime
+import datetime, random
 
 
 class Base(db.Model):
@@ -281,7 +281,9 @@ def init_db():
     db.session.add(Care(description="Piqûre", duration=30))
     db.session.add(Care(description="Post opératoire", duration=20))
     ## Appointment : nurse_id, patient_id, date, care_id
+    halfday = ["morning", "afternoon"]
     for pID in range(1,7):
-        db.session.add(Appointment(patient_id=pID,date=datetime.date(2018,1,22),care_id=1))
+        db.session.add(Appointment(patient_id=pID,date=datetime.date(2018,1,22),care_id=random.randint(1,3),
+                                   halfday=random.choice(halfday)))
     db.session.commit()
     lg.warning('Database initialized!')
