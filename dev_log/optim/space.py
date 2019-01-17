@@ -5,6 +5,24 @@
 
 # @class Space
 
+"""
+Input:
+{
+"start" : "hh:mm",
+"end" : "hh:mm",
+'nurse_id' : ["id1", "id2", ...],
+"office_lat" : "lat",
+"office_lon" = "lon",
+"appointments" = [{"app_id" = "id", "app_lat" = "lat", "app_lon" = "lon", "app_length":"mm"}
+                    ...
+                    {}}]
+...
+}
+
+Output:
+[{"nurse_id":"id", "app_id":"id", "hour":"hh:mm"}]
+
+"""
 
 import os
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -426,10 +444,10 @@ class Space :
     # -------------------------------------------------------------------------
     # -- PROCESS
     # -------------------------------------------------------------------------
-    def getNumberOfCluster(self, walkingThreshold=3.0):
+    def getNumberOfCluster(self, walkingThreshold=1.0):
         """
         Compute the minimum number of cluster having a radius bounded by
-        walkingThreshold, which is a distance in kilometers (=3.0 by default)
+        walkingThreshold, which is a distance in kilometers (=1.0 by default)
 
         The office is set to be a center by default. 
         NB: The office id has to be set to 0.
