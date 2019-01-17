@@ -1,5 +1,7 @@
-from dev_log import db
+import googlemaps
 from werkzeug.security import check_password_hash, generate_password_hash
+from dev_log import db
+from dev_log.key import key
 import datetime
 
 class Base(db.Model):
@@ -49,19 +51,19 @@ class Patient(BasePerson):
         db.Float
     )
 
-    def __init__(self, last_name, first_name, email, address, phone, latitude = None, longitude = None):
+    def __init__(self, last_name, first_name, email, address, phone, latitude=None, longitude=None):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
         self.address = address
         self.phone = phone
-    #     Patient.geolocation(key)
-    #
-    # def geolocation(self, key):
-    #     gmaps = googlemaps.Client(key=str(key))
-    #     distance = gmaps.geocode(self.address)[0]['geometry']['location']
-    #     self.latitude = distance['lat']
-    #     self.longitude = distance['lng']
+        Patient.geolocation(self, key)
+
+    def geolocation(self, key):
+        gmaps = googlemaps.Client(key=str(key))
+        distance = gmaps.geocode(self.address)[0]['geometry']['location']
+        self.latitude = distance['lat']
+        self.longitude = distance['lng']
 
 
 class Nurse(BasePerson):
@@ -80,10 +82,11 @@ class Nurse(BasePerson):
         db.String(20),
         nullable=False)
 
-    # competences = db.Column(db.String(50))
+    cares = db.Column(
+        db.String(50),
+    )
 
-    def __init__(self, last_name, first_name, email, password,
-                 phone, address, office, cares=None):
+    def __init__(self, last_name, first_name, email, password, phone, address, office, cares):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
@@ -92,7 +95,6 @@ class Nurse(BasePerson):
         self.address = address
         self.office = office
         self.cares = cares
-        # self.competences = competences
 
 
 class Appointment(Base):
@@ -122,6 +124,10 @@ class Appointment(Base):
         db.Date,
         nullable=False)
 
+    halfday = db.Column(
+        db.String
+    )
+
     patient = db.relationship(
         "Patient",
         backref="patient")
@@ -134,10 +140,11 @@ class Appointment(Base):
         "Care",
         backref="care")
 
-    def __init__(self, nurse_id, patient_id, date, care_id):
+    def __init__(self, nurse_id, patient_id, date, care_id, halfday=None):
         self.nurse_id = nurse_id
         self.patient_id = patient_id
         self.date = date
+        self.halfday = halfday
         self.care_id = care_id
 
 
@@ -221,28 +228,32 @@ def init_db():
     db.drop_all()
     db.create_all()
     password = generate_password_hash("password")
-    db.session.add(Office(name="Doctissimo", phone="0647859648", address="38 rue Lecourbe",
+    db.session.add(Office(name="Doctissimo", phone="0647859648", address="2 Rue Christophe Colomb, 91300 Massy",
                           email="doctissimo@hotmail.fr", password=password))
     db.session.add(Nurse(last_name="Cabaret", first_name="Laurent", email="laurent.cabaret@hotmail.fr",
-                         phone="0699458758", password=password, address="35 rue Bobigny", office="Paris"))
-    db.session.add(Nurse(last_name="Poly", first_name="Jean-Philippe", email="jpp@hotmail.fr",
-                         phone="0699458758", password=password, address="48 rue Clovis", office="Paris"))
-    db.session.add(Nurse(last_name="Hulot", first_name="Celine", email="celine.hulot@hotmail.fr",
-                         phone="0699469858", password=password, address="76 rue Paul André", office="Paris"))
+                         phone="0699458758", password=password, address="35 rue Bobigny", office="Paris",
+                         cares="-1-"))
+    db.session.add(Nurse(last_name="Poli", first_name="Jean-Philippe", email="jpp@hotmail.fr",
+                         phone="0699458758", password=password, address="48 rue Clovis", office="Paris",
+                         cares="-1-2-"))
+    db.session.add(Nurse(last_name="Hudelot", first_name="Celine", email="celine.hudelot@hotmail.fr",
+                         phone="0699469858", password=password, address="76 rue Paul André", office="Paris",
+                         cares="-1-2-3-"))
     db.session.add(Nurse(last_name="Detriche", first_name="Jean-Marie", email="jeanmarie.detriche@hotmail.fr",
-                         phone="0694699858", password=password, address="24 rue Terrence", office="Paris"))
+                         phone="0694699858", password=password, address="24 rue Terrence", office="Paris",
+                         cares="-1-2-"))
     db.session.add(Patient(last_name="De la roche", first_name="Charles", email="charles.dlrsa@hotmail.fr",
-                           address="40 rue Victor Hugo", phone="0699497758"))
+                           address="40 rue Victor Hugo 91300 Massy", phone="0699497758"))
     db.session.add(Patient(last_name="Mallard", first_name="Alix", email="alix.mallard@hotmail.fr",
-                           address="25 rue Pasteur", phone="0699265758"))
+                           address="25 rue Pasteur 91300 Massy", phone="0699265758"))
     db.session.add(Patient(last_name="Dieudonné", first_name="Maxime", email="maxime.dieudo@hotmail.fr",
-                           address="79 rue Vinci", phone="0649697758"))
+                           address="79 rue Léonard de Vinci 92160 Antony", phone="0649697758"))
     db.session.add(Patient(last_name="Pascual", first_name="Romain", email="romain.pascual@hotmail.fr",
-                           address="178 rue Sadi Carnot", phone="0678697758"))
+                           address="1 Rue du Canal, 91160 Longjumeau", phone="0678697758"))
     db.session.add(Patient(last_name="Leveque", first_name="Hippolyte", email="hippolyte.leveque@hotmail.fr",
-                           address="41 rue Boulard", phone="0674697758"))
+                           address="13 Rue Blaise Pascal, 91120 Palaiseau", phone="0674697758"))
     db.session.add(Patient(last_name="Cassedanne", first_name="Louis", email="louis.cassedanne@hotmail.fr",
-                           address="325 rue Lecourbe", phone="0674695898"))
+                           address="20 Rue du Dr Roux 91370 Verrières-le-Buisson", phone="0674695898"))
     db.session.add(Care(description="Pansement", duration=60))
     db.session.add(Care(description="Piqûre", duration=60))
     db.session.add(Care(description="Post opératoire", duration=60))
