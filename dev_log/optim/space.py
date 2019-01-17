@@ -12,6 +12,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 import sys
 import math
 import time
+import re
 from point import Point
 from operator import attrgetter
 from amplpy import AMPL, Environment
@@ -77,7 +78,7 @@ class Space :
     # -------------------------------------------------------------------------
     
     # -------------------------------------------------------------------------
-    # -- Getter 
+    # -- Finders 
     # -------------------------------------------------------------------------
 
     def getPointsByID(self, id):
@@ -95,17 +96,17 @@ class Space :
         """
         l = []
         self.sortByID()
-        listIds.sort()
+        lID = sorted(listIds)
         i_list = 0
         i_points = 0
-        n = len(listIds)
+        n = len(lID)
 
         while i_list < n and i_points < self.nb_points:
-            if listIds[i_list] == self.points_by_id[i_points].getID():
+            if lID[i_list] == self.points_by_id[i_points].getID():
                 l.append(self.points[i_points])
                 i_list += 1
                 i_points += 1
-            elif listIds[i_list] < self.points_by_id[i_points].getID():
+            elif lID[i_list] < self.points_by_id[i_points].getID():
                 i_list += 1
             else:
                 i_points += 1
@@ -113,6 +114,30 @@ class Space :
         del self.points_by_id
 
         return l
+
+    def regenerateCyclingPath(self, listPoints, amplMatPath, travel_times):
+        """
+        Given a list of points and the transition matrix, rebuild the path.
+        @param listPoints: list of points (id, lat, lon) such that its order is the same as
+        the index in amplMatPath
+        @param amplMatPath: transition matrix (returned by ampl) describing the path 
+        (zero, one matrix) such that:
+            amplMatPath[i,j] = 1 iff the path goes from listPoint[i] to listPoint[j]
+        """
+
+        n = len(listPoints)
+        i = 0
+        j = -1
+        path = [listPoints[i]]
+        travel_time = 0
+        while j != 0:
+            for k in range(n):
+                if i != k and amplMatPath[i+1,k+1].value():
+                    j = k
+            path.append(listPoints[i])
+            travel_time += travel_times[i][j]
+            i = j
+        return path, travel_time
         
     # -------------------------------------------------------------------------
     
@@ -454,7 +479,7 @@ class Space :
         
         return int(numberCenters.get().value())
 
-    def getCentersID(self, k):
+    def clusterSpace(self, k):
         """
         Cluster the space, using the k-median paradigm:
             provide the set of $k$ vertices ${c_1, ... c_k}$ minimizing
@@ -463,7 +488,10 @@ class Space :
         The office is set to be a center by default. 
         NB: The office id has to be set to 0.
 
-        @return: the list of centers
+        @return: the list of centers and a dict representing the clusters
+        The dictionnary representing the cluster has the format:
+            - key = center
+            - value = list of the points in the cluster (always starting with the center)
         """
         with open("models/clustering.dat", "r") as clustering:
             with open("models/kmedian.dat", "w") as kmedian:
@@ -499,11 +527,22 @@ class Space :
             if instance.value():
                 listCenters.append(int(index))
 
-        return listCenters
+        clusters = dict()
+        for c in listCenters:
+            clusters[c] = [c]
+
+        # access the variable
+        closestCenter = ampl.getVariable('closestCenter')
+        for index, instance in closestCenter:
+            if int(index[0]) not in listCenters and instance.value():
+                clusters[int(index[1])].append(int(index[0]))
+        
+        return listCenters, clusters
+
     
-    def getHamiltonianCycle(self, points, mode="driving", recompute=False):
+    def getHamiltonianCycle(self, points, mode="driving", recompute=True):
         """
-        Compute an hamiltonian path on the set of points.
+        Compute an hamiltonian cycle on the set of points.
 
         It uses a google maps key. Note that mode should be one of
             -"driving", 
@@ -513,60 +552,58 @@ class Space :
         @param points: should be a subset of self.points
         """
         if recompute:
-            travel_times = self.getGoogleTravelTimes(points, mode)
+
             n = len(points)
 
             if n == 1:
-                total_time = 0
-                print("One point :", total_time)
+                path, travel_time = points, 0
             
-            if n == 2:
-                total_time = travel_times[0][1] + travel_times[1][0]
-                print("two points:", total_time)
-                """
-                if n == 3:
-                    total_time = min(
-                        (travel_times[0][1] + travel_times[1][2] + travel_times[2][0]),
-                        (travel_times[0][2] + travel_times[2][1] + travel_times[1][0])
-                        )
-                    print("three points:", total_time)
-                """
             else:
-                """
-                For the solver to work, the points has to be numbered from 1 to n
-                """
+                travel_times = self.getGoogleTravelTimes(points, mode)
+            
+                if n == 2:
+                    path, travel_time = [points[0], points[1], points[0]], travel_times[0][1] + travel_times[1][0]
 
-                with open("models/travellingSalesman.dat", "w") as hamiltonian:
-                    hamiltonian.write("# nombre de sommets {}\n".format(n))
-                    hamiltonian.write("set V :=\n")
-                    for k in range(1, n+1):
-                        hamiltonian.write("\t{}\n".format(k))
-                    hamiltonian.write(";\n")
+                else:
+                    """
+                    For the solver to work, the points has to be numbered from 1 to n
+                    """
 
-                    hamiltonian.write("\n")
+                    with open("models/travellingSalesman.dat", "w") as hamiltonian:
+                        hamiltonian.write("# nombre de sommets {}\n".format(n))
+                        hamiltonian.write("set V :=\n")
+                        for k in range(1, n+1):
+                            hamiltonian.write("\t{}\n".format(k))
+                        hamiltonian.write(";\n")
 
-                    hamiltonian.write("# id_sommet1, id_sommet2, travelling time\n")
-                    hamiltonian.write("param: A: time :=\n")
-                    for i in range(n):
-                        for j in range(i+1, n):
-                            hamiltonian.write("\t{} {} {}\n".format(i+1, j+1, travel_times[i][j]))
-                            hamiltonian.write("\t{} {} {}\n".format(j+1, i+1, travel_times[j][i]))
-                    hamiltonian.write(";\n")
+                        hamiltonian.write("\n")
 
-                # set up ampl
-                ampl = AMPL(Environment('ampl'))
+                        hamiltonian.write("# id_sommet1, id_sommet2, travelling time\n")
+                        hamiltonian.write("param: A: time :=\n")
+                        for i in range(n):
+                            for j in range(i+1, n):
+                                hamiltonian.write("\t{} {} {}\n".format(i+1, j+1, travel_times[i][j]))
+                                hamiltonian.write("\t{} {} {}\n".format(j+1, i+1, travel_times[j][i]))
+                        hamiltonian.write(";\n")
 
-                # Interpret the two files
-                ampl.read('models/travellingSalesman.mod')
-                ampl.readData('models/Model4.dat')
+                    # set up ampl
+                    ampl = AMPL(Environment('ampl'))
 
-                # Solve
-                ampl.solve()
+                    # Interpret the two files
+                    ampl.read('models/travellingSalesman.mod')
+                    ampl.readData('models/travellingSalesman.dat')
 
-                # Get objective entity by AMPL name
-                total_time = ampl.getObjective('total_time')
-                
-                print("Objective value :", total_time.value())
+                    # Solve
+                    ampl.solve()
+
+                    # Get objective entity by AMPL name
+                    total_time = ampl.getObjective('total_time')
+                    
+                    #regenerate the path
+                    x = ampl.getVariable("x")
+
+                    path, travel_time = self.regenerateCyclingPath(points, x, travel_times)
+            return [p.getID() for p in path], travel_time
     
 
         else:
@@ -589,16 +626,26 @@ class Space :
             
             etm4 = time.time()
 
-            print("travellingSalesman - score: {}, time{}.".format(total_time_m4, etm4 - btm4))
+            print("travellingSalesman - score: {}, time {}.".format(total_time_m4, etm4 - btm4))
 
             #regenerate the path
             x = ampl.getVariable("x")
 
-            n = len(points)
+            travel_times = []
+            with open("times.txt", "r") as times:
+                for line in times.readlines():
+                    t = []
+                    l = re.findall('[0-9]*',line)
+                    for c in l:
+                        try:
+                            t.append(int(c))
+                        except ValueError:
+                            pass
+                    travel_times.append(t)
 
-            for i in range(1, n+1):
-                for j in range(i+1, n+1):
-                    print(x[i,j].value())
+            path, travel_time = self.regenerateCyclingPath(points, x, travel_times)
+            return [p.getID() for p in path], travel_time
+
 
 if __name__ == "__main__":
     from random import random, seed
@@ -626,6 +673,19 @@ if __name__ == "__main__":
     s = Space()
     s.buildSpaceFromDB(office, patientDict)
     k = s.getNumberOfCluster(walkingThreshold=2.0)
-    centers = s.getCentersID(k)
+    centers, clusters = s.clusterSpace(k)
     points = s.getListPointsByID(centers)
-    s.getHamiltonianCycle(points)
+    driving_path, driving_time = s.getHamiltonianCycle(points)
+
+    global_path = []
+    total_time = driving_time
+
+    for index_center in driving_path[:-1]:
+        walking_points = s.getListPointsByID(clusters[index_center])
+        walking_path, walking_time = s.getHamiltonianCycle(walking_points, mode="walking")
+        global_path += walking_path
+        total_time += walking_time
+    global_path.append(driving_path[-1])
+
+    print(total_time)
+
