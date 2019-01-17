@@ -2,7 +2,7 @@ from flask import Blueprint, request, render_template, flash, g, session, redire
 from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from dev_log import db
-from dev_log.models import Nurse, Office
+from dev_log.models import Nurse, Office, init_db
 import functools
 
 auth = Blueprint('auth', __name__)
@@ -59,6 +59,8 @@ def login():
     View of the login page, handles the users connections
     :return:
     """
+    if request.method == 'GET':
+        init_db()
     if request.method == 'POST':
         user_type = request.form['user-type']
         email = request.form['email']
