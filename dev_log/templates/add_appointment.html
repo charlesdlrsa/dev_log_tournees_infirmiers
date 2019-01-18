@@ -39,13 +39,18 @@
 
             <div class="form-group">
 
-                <select id="inputpatient" class="form-control" placeholder="patient" required="required" name="patient">
-                  <option selected>Choose Patient</option>
-
+                <select id="inputpatient" class="form-control" placeholder="patient" required="required" name="patient" value="{{research}}">
+                  <option>Choose Patient</option>
                   {% for patient in patients %}
+                  {% if patient.last_name + ' - ' + patient.first_name == research %}
+                  <option selected>
+                  {{research}}
+                  </option>
+                  {% else %}
                   <option>
                   {{patient.last_name}} - {{patient.first_name}}
                   </option>
+                  {% endif %}
                   {% endfor %}
                 </select>
             </div>

@@ -43,23 +43,23 @@
     <!-- Sidebar -->
     <ul class="sidebar navbar-nav", id="myDIV">
         <li class="nav-item active" id="global_planning">
-            <a class="nav-link" href="{{url_for('planning.home')}}">
+            <a class="nav-link" href="{{url_for('planning.home')}}" id="global_planning_link">
                 <i class="far fa-calendar-alt"></i>
                 <span>Global Planning</span>
             </a>
         </li>
         <li class="nav-item" id="patients">
-            <a class="nav-link" href="{{url_for('patients.home')}}">
+            <a class="nav-link" href="{{url_for('patients.home')}}" id="patients_link">
                 <i class="fas fa-users"></i>
                 <span>Patients</span></a>
         </li>
         <li class="nav-item" id="nurses">
-            <a class="nav-link" href="{{url_for('nurses.home')}}">
+            <a class="nav-link" href="{{url_for('nurses.home')}}" id="patients_link">
                 <i class="fas fa-user-md"></i>
                 <span>Nurses</span></a>
         </li>
-        <li class="nav-item" id="appoointments">
-            <a class="nav-link" href="{{url_for('appointments.home')}}">
+        <li class="nav-item" id="appointments">
+            <a class="nav-link" href="{{url_for('appointments.home')}}" id="appointments_link">
                 <i class="fas fa-address-card"></i>
                 <span>Appointments</span></a>
         </li>
@@ -120,18 +120,46 @@
 </html>
 
 <script>
+
+
+var ref = window.location.href
+if (ref.includes('appointments')){
+  var current = document.getElementsByClassName("active");
+  current[0].className = current[0].className.replace(" active", "");
+  var right=document.getElementById('appointments');
+  right.className += " active";
+}
+else if (ref.includes('patients')){
+  var current = document.getElementsByClassName("active");
+  current[0].className = current[0].className.replace(" active", "");
+  var right=document.getElementById('patients');
+  right.className += " active";
+}
+else if (ref.includes('nurses')){
+  var current = document.getElementsByClassName("active");
+  current[0].className = current[0].className.replace(" active", "");
+  var right=document.getElementById('nurses');
+  right.className += " active";
+}
+else {
+  var current = document.getElementsByClassName("active");
+  current[0].className = current[0].className.replace(" active", "");
+  var right=document.getElementById('global_planning');
+  right.className += " active";
+}
+
 // Get the container element
-var btnContainer = document.getElementById("myDIV");
+//var btnContainer = document.getElementById("myDIV");
 
 // Get all buttons with class="nav-item" inside the container
-var btns = btnContainer.getElementsByClassName("nav-item");
+//var btns = btnContainer.getElementsByClassName("nav-link");
 
 // Loop through the buttons and add the active class to the current/clicked button
-for (var i = 0; i < btns.length; i++) {
-  btns[i].addEventListener("click", function() {
-    var current = document.getElementsByClassName("active");
-    current[0].className = current[0].className.replace(" active", "");
-    this.className += " active";
-  });
-}
+// for (var i = 0; i < btns.length; i++) {
+//   btns[i].addEventListener("click", function() {
+//     var current = document.getElementsByClassName("active");
+//     current[0].className = current[0].className.replace(" active", "");
+//     this.className += " active";
+//   });
+// }
 </script>
