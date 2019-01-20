@@ -143,7 +143,6 @@ class Schedule(Base):
     id = db.Column(
         'appointment_id',
         db.Integer,
-        db.ForeignKey('appointment.appointment_id'),
         primary_key=True,
         nullable=False
     )
@@ -154,13 +153,13 @@ class Schedule(Base):
         unique=False)
 
     hour = db.Column(
-        db.DateTime
+        db.Time
     )
 
-    appointment = db.relationship(
-        "Appointment",
-        backref="appointment"
-    )
+    # appointment = db.relationship(
+    #     "Appointment",
+    #     backref="appointment"
+    # )
 
     nurse = db.relationship(
         "Nurse",
@@ -282,8 +281,9 @@ def init_db():
     db.session.add(Care(description="Post opératoire", duration=20))
     ## Appointment : nurse_id, patient_id, date, care_id
     halfday = ["morning", "afternoon"]
-    for pID in range(1,7):
-        db.session.add(Appointment(patient_id=pID,date=datetime.date(2018,1,22),care_id=random.randint(1,3),
-                                   halfday=random.choice(halfday)))
+    for pID in range(1, 7):
+        db.session.add(Appointment(patient_id=pID, date=datetime.date(2018, 1, 28), care_id=random.randint(1, 3),
+                                   halfday=halfday[pID % 2]))
+        db.session.add(Schedule(hour=datetime.time(8+pID%2*6+pID-1), nurse_id=random.randint(1,4)))
     db.session.commit()
     lg.warning('Database initialized!')
