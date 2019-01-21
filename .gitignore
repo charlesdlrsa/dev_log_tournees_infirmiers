@@ -129,5 +129,14 @@ nohup.out
 # database
 *.db
 
-# google key
+# google maps key
 dev_log/key.py
+dev_log/optim/key.py
+
+# optim
+*.dat
+scriptAppointment.py
+
+# fuse
+.fuse*
+

@@ -39,42 +39,61 @@
 
             <div class="form-group">
 
-                <select id="inputpatient" class="form-control" placeholder="patient" required="required" name="patient">
-                  <option selected>Choose Patient</option>
-
+                <select id="inputpatient" class="form-control" placeholder="patient" required="required" name="patient" value="{{research}}">
+                  <option>Choose Patient</option>
                   {% for patient in patients %}
+                  {% if patient.last_name + ' - ' + patient.first_name == research %}
+                  <option selected>
+                  {{research}}
+                  </option>
+                  {% else %}
                   <option>
                   {{patient.last_name}} - {{patient.first_name}}
                   </option>
+                  {% endif %}
                   {% endfor %}
                 </select>
             </div>
+
+
+
             <div class="form-group">
 
-                <select id="inputpatient" class="form-control" placeholder="nurse" required="required" name="nurse">
-                  <option selected>Choose Nurse</option>
+                <select id="inputcare" class="form-control" placeholder="nurse" required="required" name="care">
+                  <option selected>Select care</option>
 
-                  {% for nurse in nurses %}
+                  {% for care in cares %}
                   <option>
-                  {{nurse.last_name}} - {{nurse.first_name}}
+                  {{ care.description }}
                   </option>
                   {% endfor %}
                 </select>
             </div>
-
-
             <div class="form-group">
               <div class="form-label-group">
-                <input type="text" id="care" class="form-control" placeholder="care" required="required" name="care">
-                <label for="care">Care</label>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="date" id="date" class="form-control" placeholder="date" required="required" name="date">
+                <input type="date" id="date" class="form-control" placeholder="date" required="required" name="date" value="{{time}}">
                 <label for="date">Date</label>
               </div>
             </div>
+                <div class="form-group">
+
+                <select id="inputhalfday" class="form-control" required="required" name="halfday" value="{{halfday}}">
+                  <option>Choose halfday</option>
+
+                  {% for i in ['morning', 'afternoon'] %}
+                  {% if i==halfday %}
+                  <option selected>
+                  {{i}}
+                  </option>
+                  {% else %}
+                  <option>
+                  {{i}}
+                  </option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+            </div>
+
 
             <button class="btn btn-primary btn-block" type="submit">Add Appointment</button>
           </form>

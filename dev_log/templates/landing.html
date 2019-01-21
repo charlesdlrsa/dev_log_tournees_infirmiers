@@ -16,11 +16,14 @@
       </h1>
       <div class='flex-row'>
         <div class="d-flex justify-content-between">
-          <a href="{{url_for('home.index')}}"  class="btn btn-secondary btn-sm active"
+          <a href="{{url_for('planning.home',week=week-1,year=year)}}"  class="btn btn-secondary btn-sm active"
             >Previous Week</a>
-          <a href="{{ url_for('home.index')}}" class="btn btn-secondary btn-sm active"
+          <a href="{{ url_for('planning.home',week=week+1,year=year)}}" class="btn btn-secondary btn-sm active"
             >Next Week</a>
         </div>
+
+
+
       </div>
     </div>
 

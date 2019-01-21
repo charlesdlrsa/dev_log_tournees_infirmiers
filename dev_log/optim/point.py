@@ -11,23 +11,27 @@ class Point :
     Point in the euclidien space.
             
     Attributes:
-        patient_id: patient id of wanting an appointment
+        id: patient id of wanting an appointment
         longitude: longitude of the point in the euclidien space
         latitude: latitude of the point in the euclidien space
     """
+
+    ## Earth Radius
+    R = 6373.0
+
     
     def __init__(
             self,
-            patient_id = 0,
+            id = 0,
             latitude = 0, # y axis
             longitude = 0): # x axis
         
-        self.patient_id = patient_id
+        self.id = id
         self.longitude = longitude
         self.latitude = latitude
         
-    def getPatientID(self):
-        return self.patient_id
+    def getID(self):
+        return self.id
     
     def getLongitude(self):
         return self.longitude
@@ -51,6 +55,24 @@ class Point :
             return 
         return math.sqrt((self.longitude - other.getLongitude())**2 +(self.latitude - other.getLatitude())**2)
     
+    def distanceKmTo(self, other):
+        """
+        Compute the distance in kilometers between two points
+        """
+        lon1 = math.radians(self.longitude)
+        lon2 = math.radians(other.longitude)
+        dlon = lon2 - lon1
+        lat1 = math.radians(self.latitude)
+        lat2 = math.radians(other.latitude)
+        dlat = lat2 - lat1
+
+        
+        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+        return Point.R * c
+        
+
     def sameLocation(self, other):
         """
         Determine if two points are at the same location (faster than testing d ==0)
@@ -70,22 +92,22 @@ class Point :
         """
         if not isinstance(other,Point):
             return False
-        return (self.patient_id == other.getPatientID() and self.longitude == other.getLongitude()) \
+        return (self.id == other.getID() and self.longitude == other.getLongitude()) \
                 and self.latitude == other.getLatitude()
     
     def __hash__(self):
         """
         Hash function on the points so they can be stored in sets, dictionnaries, ...
         """
-        return hash((self.patient_id, self.longitude, self.latitude))
+        return hash((self.id, self.longitude, self.latitude))
     
     def __repr__(self):
-        return "Point[patient id: {}, longitude {}, latitude {}]".format(
-                self.patient_id, self.longitude, self.latitude)
+        return "Point[id: {}, longitude {}, latitude {}]".format(
+                self.id, self.longitude, self.latitude)
 
     def __str__(self):
-        return "[patient id: {}, longitude {}, latitude {}]".format(
-                self.patient_id, self.longitude, self.latitude)
+        return "[id: {}, longitude {}, latitude {}]".format(
+                self.id, self.longitude, self.latitude)
 
 
     # -------------------------------------------------------------------------
