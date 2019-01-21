@@ -12,8 +12,10 @@ account = Blueprint('account', __name__, url_prefix='/account')
 @account.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    print(session.get('office_id'))
-    print(session.get('nurse_id'))
+    if session.get('office_id') is None:
+        id = session['nurse_id']
+    else:
+        id = session['office_id']
     if request.method == "POST":
         if session.get('office_id') is None:
             id = session['nurse_id']
@@ -63,22 +65,23 @@ def add_absence():
         #     absence = Absence(nurse_id=id, date=date, halfday=halfday)
         #     db.session.add(absence)
         # else: #période
-        if request.args.get('period'):
-            start_date = datetime.datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
-            end_date = datetime.datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
-            days_in_period = []
-            if start_date <= end_date:
-                for n in range((end_date - start_date).days + 1):
-                    days_in_period.append(start_date + datetime.timedelta(n))
-            else:
-                for n in range((start_date - end_date).days + 1):
-                    days_in_period.append(start_date - datetime.timedelta(n))
-            for d in days_in_period:
-                for halfday in ['Morning', 'Afternoon']:
-                    absence = Absence(nurse_id=id, date=d, halfday=halfday)
-                    db.session.add(absence)
-                    flash("This absence has been added")
-            return redirect(url_for('account.home'))
+        #if request.args.get('period'):
+        start_date = datetime.datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
+        end_date = datetime.datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
+        days_in_period = []
+        if start_date <= end_date:
+            for n in range((end_date - start_date).days + 1):
+                days_in_period.append(start_date + datetime.timedelta(n))
+        else:
+            for n in range((start_date - end_date).days + 1):
+                days_in_period.append(start_date - datetime.timedelta(n))
+        for d in days_in_period:
+            for halfday in ['Morning', 'Afternoon']:
+                absence = Absence(nurse_id=id, date=d, halfday=halfday)
+                db.session.add(absence)
+                db.session.commit()
+            flash("This absence has been added")
+        return redirect(url_for('account.home'))
     nurse = db.session.query(Nurse).filter(Nurse.id == id)[0]
     return render_template('add_vacation.html', nurse=nurse)
 
