@@ -267,7 +267,7 @@ class Absence(Base):
 
     nurse = db.relationship(
         "Nurse",
-        backref="nurse")
+        backref="nurse_absence")
 
     def __init__(self, nurse_id, date, halfday):
         self.nurse_id = nurse_id
