@@ -2,7 +2,7 @@ from flask import Blueprint, request, render_template, flash, redirect, url_for,
 from werkzeug.security import check_password_hash, generate_password_hash
 from dev_log import db
 import datetime
-from dev_log.models import Absence, Office
+from dev_log.models import Absence, Office, Nurse
 from dev_log.auth.controllers import login_required
 from dev_log.nurses.controllers import edit_nurse
 
@@ -54,7 +54,8 @@ def edit_account(id):
 
 @account.route('/absence', methods=['GET', 'POST'])
 @login_required
-def add_absence(id):
+def add_absence():
+    id = session['nurse_id']
     if request.method == "POST":
         # if True: #demie journée
         #     date = request.form['date']
@@ -76,7 +77,10 @@ def add_absence(id):
                 for halfday in ['Morning', 'Afternoon']:
                     absence = Absence(nurse_id=id, date=d, halfday=halfday)
                     db.session.add(absence)
-    return render_template('add_vacation.html')
+                    flash("This absence has been added")
+            return redirect(url_for('account.home'))
+    nurse = db.session.query(Nurse).filter(Nurse.id == id)[0]
+    return render_template('add_vacation.html', nurse=nurse)
 
 # def absence():
 #     id = 1
