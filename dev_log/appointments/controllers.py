@@ -3,7 +3,7 @@ from sqlalchemy.sql import or_
 from datetime import datetime
 from dev_log.utils.calendar import *
 from dev_log import db
-from dev_log.models import Appointment, Patient, Nurse, Care
+from dev_log.models import Appointment, Patient, Nurse, Care, Office
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 # from dev_log.opti.space import solve_boolean
@@ -89,23 +89,24 @@ def home():
     patients = db.session.query(Patient).order_by(Patient.last_name).all()
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
     cares = db.session.query(Care).order_by(Care.description).all()
+    appointments_obj = db.session.query(Appointment).order_by(Appointment.date).all()
+    office = db.session.query(Office).all()
 
     availabilities = [[] for k in range(7)]
     i = 1
     for day in availabilities:
         date = iso_to_gregorian(year, week, i)
-        # day.append(new_check_availability(halfday="morning", data))
-        # day.append(new_check_availability(halfday="afternoon", data))
-        day.append(check_availability(date=date, halfday="morning", care_id=care_id))
-        day.append(check_availability(date=date, halfday="afternoon", care_id=care_id))
+        day.append(new_check_availability(date=date,nurses=nurses,cares=cares,
+                                          appointments=appointments_obj,
+                                          office=office,halfday="morning"))
+        day.append(new_check_availability(date=date,nurses=nurses,cares=cares,
+                                          appointments=appointments_obj,
+                                          office=office,halfday="afternoon"))
+        # day.append(check_availability(date=date, halfday="morning", care_id=care_id))
+        # day.append(check_availability(date=date, halfday="afternoon", care_id=care_id))
         i += 1
 
-    print('start week : {}'.format(start_week))
-    print('end week : {}'.format(end_week))
     print('availabilities : {}'.format(availabilities))
-    print('year : {}'.format(year))
-    print('week : {}'.format(week))
-    availabilities = [[False, False], [True, True], [True, True], [True, True], [True, True], [True, True], [True, True]]
     return render_template("appointments.html", availabilities=availabilities, start_week=start_week,
                            end_week=end_week, year=year, week=week,patients=patients,
                            appointments=appointments,research=research,nurses=nurses,
@@ -215,8 +216,19 @@ def check_availability(date, halfday, care_id):
         else:
             return True
 
-def new_check_availability(data):
-    response = solve_boolean(data)
+def new_check_availability(date,nurses,cares,appointments,office,halfday):
+    print('RUNNING new_check_availability !!')
+    print(date)
+    data = {}
+    data["nurse_ids"] = [nurse.id for nurse in nurses]
+    data["office_lat"] = "1"# office.lat
+    data["office_lon"] = "2"# office.lon
+
+    for app in appointments:
+        pass
+
+    # response = solve_boolean(data)
+    response = True
     return response
 
 def check_appointments_patient(date,halfday,patient):
