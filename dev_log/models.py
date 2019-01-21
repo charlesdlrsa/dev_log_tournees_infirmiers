@@ -245,6 +245,36 @@ class AssociationOfficeNurse(Base):
     office = db.relationship("Office")
 
 
+class Absence(Base):
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        nullable=False
+    )
+
+    nurse_id = db.Column(
+        db.Integer,
+        db.ForeignKey('nurse.nurse_id'),
+        unique=False)
+
+    date = db.Column(
+        db.Date,
+        nullable=False)
+
+    halfday = db.Column(
+        db.String
+    )
+
+    nurse = db.relationship(
+        "Nurse",
+        backref="nurse")
+
+    def __init__(self, nurse_id, date, halfday):
+        self.nurse_id = nurse_id
+        self.date =date
+        self.halfday = halfday
+
+
 def init_db():
     import logging as lg
     db.drop_all()
@@ -264,7 +294,7 @@ def init_db():
     db.session.add(Nurse(last_name="Detriche", first_name="Jean-Marie", email="jeanmarie.detriche@hotmail.fr",
                          phone="0694699858", password=password, address="24 rue Terrence", office="Paris",
                          cares="-1-2-"))
-    db.session.add(Patient(last_name="De la roche", first_name="Charles", email="charles.dlrsa@hotmail.fr",
+    db.session.add(Patient(last_name="De la Roche", first_name="Charles", email="charles.dlrsa@hotmail.fr",
                            address="40 rue Victor Hugo 91300 Massy", phone="0699497758"))
     db.session.add(Patient(last_name="Mallard", first_name="Alix", email="alix.mallard@hotmail.fr",
                            address="25 rue Pasteur 91300 Massy", phone="0699265758"))
