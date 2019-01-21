@@ -6,6 +6,7 @@ from dev_log import db
 from dev_log.models import Appointment, Patient, Nurse, Care
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
+# from dev_log.opti.space import solve_boolean
 
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
@@ -16,24 +17,26 @@ appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 def home():
     if request.method == "POST":
         if "research" in request.form.keys():
-            research = request.form['research']
-        elif "patient" in request.form.keys():
-            research=request.form['patient']
+            if request.form['research'] != "Choose Patient":
+                research = request.form['research']
+            else:
+                research=None
         else:
             research=None
+        if "care_research" in request.form.keys():
+            if request.form["care_research"] != "Choose Care":
+                care_research = request.form["care_research"]
+            else:
+                care_research=None
+
+        else:
+            care_research=None
         # if "research_nurse" in request.form.keys():
         #     research_nurse=request.form["research_nurse"]
         # else:
         #     research_nurse=None
-        return redirect(url_for('appointments.home', research=research))
+        return redirect(url_for('appointments.home', research=research,care_research=care_research))
         #return redirect(url_for('appointments.home', research=research,research_nurse=research_nurse))
-
-    # appointments = dict()
-    # for i in range(1, 8):
-    #     appointments[i] = []
-    # appointments_list = db.session.query(Appointment).order_by(Appointment.date).all()
-    # for appointment in appointments_list:
-    #     appointments[appointment.date.weekday()].append(appointment)
 
     if "week" in request.args:
         week = int(request.args['week'])
@@ -48,20 +51,6 @@ def home():
         current_date = datetime.datetime.now()
         week = current_date.isocalendar()[1]
         year = current_date.isocalendar()[0]
-
-
-    # if "research_nurse" in request.args:
-    #     research_nurse = request.args["research_nurse"]
-    #     nurse=request.args["research_nurse"]
-    #     nurse=nurse.split(' - ')
-    #     appointments = [[] for k in range(7)]
-    #     i=1
-    #     for day in appointments:
-    #         date = iso_to_gregorian(year, week, i)
-    #         day.append(check_appointments_nurse(date=date, halfday="morning", nurse=nurse))
-    #         day.append(check_appointments_nurse(date=date, halfday="afternoon", nurse=nurse))
-    #         i+= 1
-    #     research=None
 
     if "research" in request.args:
         research=request.args["research"]
@@ -79,14 +68,19 @@ def home():
         appointments = [[None,None] for k in range(7)]
         research=None
 
-    availabilities = [[] for k in range(7)]
-    i = 1
-    care_id = 1
-    for day in availabilities:
-        date = iso_to_gregorian(year, week, i)
-        day.append(check_availability(date=date, halfday="morning", care_id=care_id))
-        day.append(check_availability(date=date, halfday="afternoon", care_id=care_id))
-        i += 1
+    start_week = iso_to_gregorian(year, week, 1)
+    end_week = iso_to_gregorian(year, week, 7)
+    start_week = str(start_week.day) + '/' + str(start_week.month)
+    end_week = str(end_week.day) + '/' + str(end_week.month)
+    patients = db.session.query(Patient).order_by(Patient.last_name).all()
+    nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
+
+    if "care_research" in request.args:
+        care_research = request.args["care_research"]
+        care_id = db.session.query(Care).filter(Care.description == request.args["care_research"]).first().id
+    else:
+        care_id = 1
+        care_research = None
 
     start_week = iso_to_gregorian(year, week, 1)
     end_week = iso_to_gregorian(year, week, 7)
@@ -94,13 +88,28 @@ def home():
     end_week = str(end_week.day) + '/' + str(end_week.month)
     patients = db.session.query(Patient).order_by(Patient.last_name).all()
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
+    cares = db.session.query(Care).order_by(Care.description).all()
+
+    availabilities = [[] for k in range(7)]
+    i = 1
+    for day in availabilities:
+        date = iso_to_gregorian(year, week, i)
+        # day.append(new_check_availability(halfday="morning", data))
+        # day.append(new_check_availability(halfday="afternoon", data))
+        day.append(check_availability(date=date, halfday="morning", care_id=care_id))
+        day.append(check_availability(date=date, halfday="afternoon", care_id=care_id))
+        i += 1
+
+    print('start week : {}'.format(start_week))
+    print('end week : {}'.format(end_week))
+    print('availabilities : {}'.format(availabilities))
+    print('year : {}'.format(year))
+    print('week : {}'.format(week))
+    availabilities = [[False, False], [True, True], [True, True], [True, True], [True, True], [True, True], [True, True]]
     return render_template("appointments.html", availabilities=availabilities, start_week=start_week,
                            end_week=end_week, year=year, week=week,patients=patients,
-                           appointments=appointments,research=research,nurses=nurses)
-    # return render_template("appointments.html", availabilities=availabilities, start_week=start_week,
-    #                        end_week=end_week, year=year, week=week,patients=patients,
-    #                        appointments=appointments,research=research,nurses=nurses,
-    #                        research_nurse=research_nurse)
+                           appointments=appointments,research=research,nurses=nurses,
+                           cares=cares, care_research=care_research)
 
 
 @appointments.route('/add_appointment', methods=['GET', 'POST'])
@@ -205,6 +214,10 @@ def check_availability(date, halfday, care_id):
             return False
         else:
             return True
+
+def new_check_availability(data):
+    response = solve_boolean(data)
+    return response
 
 def check_appointments_patient(date,halfday,patient):
     """Checks existing appointment on this halfday for this patient and returns associated care"""

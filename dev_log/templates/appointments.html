@@ -4,21 +4,7 @@
 <div class="container-fluid">
 
     <!-- Page Content -->
-  <div class="row">
-    <div class="col-md-4 col-md-offset-3">
-        <form method='post' class="search-form">
-            <div class="form-group has-feedback">
-            <label for="search" class="sr-only">Search appointment with patient or nurse name</label>
-            <input type="text" class="form-control" name="research" id="search" placeholder="search">
-              <span class="glyphicon glyphicon-search form-control-feedback"></span>
-          </div>
-        </form>
-    </div>
-    <div class="col-lg-8 col-lg-8">
-      <a href="{{ url_for('appointments.add_appointment')}}" class="btn btn-secondary btn-md active"
-        role="button">New appointment</a>
-    </div>
-  </div>
+
   <div class="card-body">
   <div class="table-responsive">
     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -36,7 +22,7 @@
                   <div class="d-flex justify-content-between">
 
                     <div class="form-label-group">
-                      <a href="{{url_for('appointments.home',week=week-1,year=year,research=research)}}"  class="btn btn-secondary btn-sm active"
+                      <a href="{{url_for('appointments.home',week=week-1,year=year,research=research,care_research=care_research)}}"  class="btn btn-secondary btn-sm active"
                       role=button >Previous Week</a>
                     </div>
                     <form method="post">
@@ -57,10 +43,27 @@
                           {% endfor %}
                         </select>
                     </div>
+                    <div class="form-group">
+
+                        <select id="inputcare" class="form-control" placeholder="care" required="required" name="care_research" onchange="this.form.submit()" value="{{care_research}}" >
+                          <option>Choose Care</option>
+                          {% for care in cares %}
+                          {% if care.description == care_research %}
+                          <option selected>
+                          {{care_research}}
+                          </option>
+                          {% else %}
+                          <option>
+                          {{care.description}}
+                          </option>
+                          {% endif %}
+                          {% endfor %}
+                        </select>
+                    </div>
                     </form>
 
                     <div class="form-label-group">
-                      <a href="{{ url_for('appointments.home',week=week+1,year=year,research=research)}}" class="btn btn-secondary btn-sm active"
+                      <a href="{{ url_for('appointments.home',week=week+1,year=year,research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
                         role=button>Next Week</a>
                     </div>
 
