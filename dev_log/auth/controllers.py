@@ -2,7 +2,7 @@ from flask import Blueprint, request, render_template, flash, g, session, redire
 from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from dev_log import db
-from dev_log.models import Nurse, Office
+from dev_log.models import Nurse, Office, init_db
 import functools
 
 auth = Blueprint('auth', __name__)
@@ -59,6 +59,8 @@ def login():
     View of the login page, handles the users connections
     :return:
     """
+    if request.method == 'GET':
+        init_db()
     if request.method == 'POST':
         user_type = request.form['user-type']
         email = request.form['email']
@@ -74,6 +76,7 @@ def login():
             if error is None:
                 # storing user information in the object "session"
                 session.clear()
+                session['user_type'] = 'nurse'
                 session['nurse_id'] = nurse.id
                 session['nurse_last_name'] = nurse.last_name
                 session['nurse_first_name'] = nurse.first_name
@@ -100,6 +103,7 @@ def login():
             if error is None:
                 # storing user information in the object "session"
                 session.clear()
+                session['user_type'] = 'admin'
                 session['office_id'] = office.id
                 session['office_name'] = office.name
                 flash('Hi %s, welcome back to Our Application!'

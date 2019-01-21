@@ -5,6 +5,13 @@ from dev_log.key import key
 import datetime, random
 
 
+def geolocation(classe, key):
+    gmaps = googlemaps.Client(key=str(key))
+    distance = gmaps.geocode(classe.address)[0]['geometry']['location']
+    classe.latitude = distance['lat']
+    classe.longitude = distance['lng']
+
+
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(
@@ -67,13 +74,7 @@ class Patient(BasePerson):
         self.digicode = digicode
         self.additional_postal_information = additional_postal_information
         self.phone = phone
-        Patient.geolocation(self, key)
-
-    def geolocation(self, key):
-        gmaps = googlemaps.Client(key=str(key))
-        distance = gmaps.geocode(self.address)[0]['geometry']['location']
-        self.latitude = distance['lat']
-        self.longitude = distance['lng']
+        geolocation(self, key)
 
 
 class Nurse(BasePerson):
@@ -225,14 +226,23 @@ class Office(Base):
         db.String(20),
         nullable=False)
 
+    latitude = db.Column(
+        db.Float
+    )
+
+    longitude = db.Column(
+        db.Float
+    )
+
     nurses = db.relationship("AssociationOfficeNurse")
 
-    def __init__(self, name, address, email, phone, password):
+    def __init__(self, name, address, email, phone, password, latitude=None, longitude=None):
         self.name = name
         self.address = address
         self.email = email
         self.phone = phone
         self.password = password
+        geolocation(self, key)
 
 
 # Many to Many relation
@@ -252,6 +262,36 @@ class AssociationOfficeNurse(Base):
     nurse = db.relationship("Nurse")
 
     office = db.relationship("Office")
+
+
+class Absence(Base):
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        nullable=False
+    )
+
+    nurse_id = db.Column(
+        db.Integer,
+        db.ForeignKey('nurse.nurse_id'),
+        unique=False)
+
+    date = db.Column(
+        db.Date,
+        nullable=False)
+
+    halfday = db.Column(
+        db.String
+    )
+
+    nurse = db.relationship(
+        "Nurse",
+        backref="nurse_absence")
+
+    def __init__(self, nurse_id, date, halfday):
+        self.nurse_id = nurse_id
+        self.date =date
+        self.halfday = halfday
 
 
 def init_db():
@@ -295,9 +335,9 @@ def init_db():
     db.session.add(Care(description="Piqûre", duration=30))
     db.session.add(Care(description="Post opératoire", duration=20))
     ## Appointment : nurse_id, patient_id, date, care_id
-    halfday = ["morning", "afternoon"]
+    halfday = ["Morning", "Afternoon"]
     for pID in range(1, 7):
-        db.session.add(Appointment(patient_id=pID, date=datetime.date(2018, 1, 28), care_id=random.randint(1, 3),
+        db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 1, 28), care_id=random.randint(1, 3),
                                    halfday=halfday[pID % 2]))
         db.session.add(Schedule(hour=datetime.time(8+pID%2*6+pID-1), nurse_id=random.randint(1,4)))
     db.session.commit()

@@ -68,7 +68,6 @@ def search_nurses(research):
 
 @nurses.route('/edit/<int:nurse_id>', methods=['GET', 'POST'])
 def edit_nurse(nurse_id):
-    print(nurse_id)
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
