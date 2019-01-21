@@ -89,18 +89,15 @@ def home():
     patients = db.session.query(Patient).order_by(Patient.last_name).all()
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
     cares = db.session.query(Care).order_by(Care.description).all()
-    appointments_obj = db.session.query(Appointment).order_by(Appointment.date).all()
     office = db.session.query(Office).all()
 
     availabilities = [[] for k in range(7)]
     i = 1
     for day in availabilities:
         date = iso_to_gregorian(year, week, i)
-        day.append(new_check_availability(date=date,nurses=nurses,cares=cares,
-                                          appointments=appointments_obj,
+        day.append(check_availability(date=date,nurses=nurses,cares=cares,
                                           office=office,halfday="morning"))
-        day.append(new_check_availability(date=date,nurses=nurses,cares=cares,
-                                          appointments=appointments_obj,
+        day.append(check_availability(date=date,nurses=nurses,cares=cares,
                                           office=office,halfday="afternoon"))
         # day.append(check_availability(date=date, halfday="morning", care_id=care_id))
         # day.append(check_availability(date=date, halfday="afternoon", care_id=care_id))
@@ -200,33 +197,47 @@ def search_appointments(research):
     return redirect(url_for('appointment.home'))
 
 
-def check_availability(date, halfday, care_id):
-    nb_appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).count()
-    nb_nurses = db.session.query(Nurse).count()
+# def check_availability(date, halfday, care_id):
+#     nb_appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).count()
+#     nb_nurses = db.session.query(Nurse).count()
+#
+#     if nb_appointments >= nb_nurses * 4:
+#         return False
+#     else:
+#         nb_specific_appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday,
+#                                                             Appointment.care_id == care_id).count()
+#         nb_specific_nurses = Nurse.query.filter(Nurse.cares.contains("-{}-".format(care_id))).count()
+#
+#         if nb_specific_appointments >= nb_specific_nurses * 4:
+#             return False
+#         else:
+#             return True
 
-    if nb_appointments >= nb_nurses * 4:
-        return False
-    else:
-        nb_specific_appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday,
-                                                            Appointment.care_id == care_id).count()
-        nb_specific_nurses = Nurse.query.filter(Nurse.cares.contains("-{}-".format(care_id))).count()
-
-        if nb_specific_appointments >= nb_specific_nurses * 4:
-            return False
-        else:
-            return True
-
-def new_check_availability(date,nurses,cares,appointments,office,halfday):
-    print('RUNNING new_check_availability !!')
-    print(date)
+def check_availability(date,nurses,cares,office,halfday):
     data = {}
-    data["nurse_ids"] = [nurse.id for nurse in nurses]
-    data["office_lat"] = "1"# office.lat
-    data["office_lon"] = "2"# office.lon
+    data["nurse_ids"] = [str(nurse.id) for nurse in nurses]
+    data["office_lat"] = str(office[0].latitude)
+    data["office_lon"] = str(office[0].longitude)
+    if halfday == "morning":
+        data["start"] = "08:00"
+        data["end"] = "12:30"
+    if halfday == "afternoon":
+        data["start"] = "13:30"
+        data["end"] = "18:00"
 
+    appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).all()
+    print(appointments)
+    data["appointments"] = []
     for app in appointments:
-        pass
-
+        patient = db.session.query(Patient).filter(Patient.id == app.patient_id).all()
+        care = db.session.query(Care).filter(Care.id == app.care_id).all()
+        app_data = {}
+        app_data["app_id"] = str(app.id)
+        app_data["app_lat"] = str(patient[0].latitude)
+        app_data["app_lon"] = str(patient[0].longitude)
+        app_data["app_length"] = str(care[0].duration)
+        data["appointments"].append(app_data)
+    print(data)
     # response = solve_boolean(data)
     response = True
     return response
