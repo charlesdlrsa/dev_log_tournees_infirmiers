@@ -59,13 +59,19 @@
 
             <div class="form-group">
 
-                <select id="inputcare" class="form-control" placeholder="nurse" required="required" name="care">
-                  <option selected>Select care</option>
+                <select id="inputcare" class="form-control" placeholder="care" required="required" name="care" value="{{care_research}}">
+                  <option>Select care</option>
 
                   {% for care in cares %}
+                  {% if care.description == care_research %}
+                  <option selected>
+                  {{ care.description }}
+                  </option>
+                  {% else %}
                   <option>
                   {{ care.description }}
                   </option>
+                  {% endif %}
                   {% endfor %}
                 </select>
             </div>

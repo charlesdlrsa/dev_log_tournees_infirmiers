@@ -21,10 +21,7 @@
 
                   <div class="d-flex justify-content-between">
 
-                    <div class="form-label-group">
-                      <a href="{{url_for('appointments.home',week=week-1,year=year,research=research,care_research=care_research)}}"  class="btn btn-secondary btn-sm active"
-                      role=button >Previous Week</a>
-                    </div>
+
                     <form method="post">
                     <div class="form-group">
 
@@ -60,12 +57,10 @@
                           {% endfor %}
                         </select>
                     </div>
-                    </form>
-
-                    <div class="form-label-group">
-                      <a href="{{ url_for('appointments.home',week=week+1,year=year,research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-                        role=button>Next Week</a>
+                    <div class="form-group">
+                      <input type="date" id="date" class="form-control" placeholder="date" required="required" name="date" onchange="this.form.submit()" value="{{time}}">
                     </div>
+                    </form>
 
                   </div>
 
@@ -96,7 +91,7 @@
           {% else %}
 
           <td> <div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=1,week=week,year=year,halfday='morning',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=1,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div></td>
           {% endif %}
@@ -108,7 +103,7 @@
           {% else %}
 
           <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=2,week=week,year=year,halfday='morning',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=2,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div> </td>
           {% endif %}
@@ -120,7 +115,7 @@
           {% else %}
 
           <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=3,week=week,year=year,halfday='morning',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=3,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div> </td>
           {% endif %}
@@ -133,7 +128,7 @@
           {% else %}
 
           <td> <div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=4,week=week,year=year,halfday='morning',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=4,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div></td>
           {% endif %}
@@ -145,7 +140,7 @@
           {% else %}
 
           <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=5,week=week,year=year,halfday='morning',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=5,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div> </td>
           {% endif %}
@@ -157,7 +152,7 @@
           {% else %}
 
           <td> <div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=6,week=week,year=year,halfday='morning',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=6,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div></td>
           {% endif %}
@@ -169,7 +164,7 @@
           {% else %}
 
           <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=7,week=week,year=year,halfday='morning',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=7,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div> </td>
           {% endif %}
@@ -184,7 +179,7 @@
           {% else %}
 
           <td> <div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=1,week=week,year=year,halfday='afternoon',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=1,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div></td>
           {% endif %}
@@ -196,7 +191,7 @@
           {% else %}
 
           <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=2,week=week,year=year,halfday='afternoon',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=2,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div> </td>
           {% endif %}
@@ -208,7 +203,7 @@
           {% else %}
 
           <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=3,week=week,year=year,halfday='afternoon',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=3,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div> </td>
           {% endif %}
@@ -220,7 +215,7 @@
           {% else %}
 
           <td> <div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=4,week=week,year=year,halfday='afternoon',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=4,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div></td>
           {% endif %}
@@ -232,7 +227,7 @@
           {% else %}
 
           <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=5,week=week,year=year,halfday='afternoon',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=5,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div> </td>
           {% endif %}
@@ -244,7 +239,7 @@
           {% else %}
 
           <td> <div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=6,week=week,year=year,halfday='afternoon',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=6,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div></td>
           {% endif %}
@@ -256,7 +251,7 @@
           {% else %}
 
           <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=7,week=week,year=year,halfday='afternoon',research=research)}}" class="btn btn-secondary btn-sm active"
+            <a href="{{ url_for('appointments.add_appointment',day=7,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
               role="button">New </a>
           </div> </td>
           {% endif %}

@@ -54,6 +54,7 @@ def edit_account(id):
 
 @account.route('/absence', methods=['GET', 'POST'])
 @login_required
+<<<<<<< HEAD
 def add_absence(id):
     if request.method == "POST":
         # if True: #demie journée
@@ -77,3 +78,8 @@ def add_absence(id):
                     absence = Absence(nurse_id=id, date=d, halfday=halfday)
                     db.session.add(absence)
     return render_template('add_vacation.html')
+
+# def absence():
+#     id = 1
+#     nurse = db.session.query(Nurse).filter(Nurse.id == id)[0]
+#     return render_template('add_vacation.html', nurse=nurse)
