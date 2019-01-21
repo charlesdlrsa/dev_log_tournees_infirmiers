@@ -37,13 +37,6 @@ def home():
         return redirect(url_for('appointments.home', research=research,care_research=care_research))
         #return redirect(url_for('appointments.home', research=research,research_nurse=research_nurse))
 
-    # appointments = dict()
-    # for i in range(1, 8):
-    #     appointments[i] = []
-    # appointments_list = db.session.query(Appointment).order_by(Appointment.date).all()
-    # for appointment in appointments_list:
-    #     appointments[appointment.date.weekday()].append(appointment)
-
     if "week" in request.args:
         week = int(request.args['week'])
         year = int(request.args['year'])
@@ -57,20 +50,6 @@ def home():
         current_date = datetime.datetime.now()
         week = current_date.isocalendar()[1]
         year = current_date.isocalendar()[0]
-
-
-    # if "research_nurse" in request.args:
-    #     research_nurse = request.args["research_nurse"]
-    #     nurse=request.args["research_nurse"]
-    #     nurse=nurse.split(' - ')
-    #     appointments = [[] for k in range(7)]
-    #     i=1
-    #     for day in appointments:
-    #         date = iso_to_gregorian(year, week, i)
-    #         day.append(check_appointments_nurse(date=date, halfday="morning", nurse=nurse))
-    #         day.append(check_appointments_nurse(date=date, halfday="afternoon", nurse=nurse))
-    #         i+= 1
-    #     research=None
 
     if "research" in request.args:
         research=request.args["research"]
@@ -113,10 +92,6 @@ def home():
                            end_week=end_week, year=year, week=week,patients=patients,
                            appointments=appointments,research=research,nurses=nurses,
                            cares=cares, care_research=care_research)
-    # return render_template("appointments.html", availabilities=availabilities, start_week=start_week,
-    #                        end_week=end_week, year=year, week=week,patients=patients,
-    #                        appointments=appointments,research=research,nurses=nurses,
-    #                        research_nurse=research_nurse)
 
 
 @appointments.route('/add_appointment', methods=['GET', 'POST'])
