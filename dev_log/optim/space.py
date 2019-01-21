@@ -6,11 +6,22 @@
 # @class Space
 
 """
+
+TODO: 
+    assignNurse
+    solve
+    LP pour split les nurses
+    mettre en forme les sorties
+    functions solve_boolean(data) and solve_complete(data)
+    GoogleMaps gestion des exceptions
+    clean le code
+
+
 function naming:
 solve_boolean(data)
 solve_complete(data)
 
-ISSUE : if we have one big cluster that a nurse can not cover by him(her)self.
+ISSUE : if we have one big cluster that a nurse can not cover by him(her)self. -> done
 
 Output:
 [{"nurse_id":"id", "app_id":"id", "hour":"hh:mm"}]
@@ -793,9 +804,6 @@ class Space :
 
                     # Solve
                     ampl.solve()
-
-                    # Get objective entity by AMPL name
-                    total_time = ampl.getObjective('total_time')
                     
                     #regenerate the path
                     x = ampl.getVariable("x")
@@ -844,7 +852,7 @@ class Space :
             path, travel_time = self.regenerateCyclingPath(points, x, travel_times)
             return [p.getID() for p in path], travel_time
 
-    def splitAmongNurse(self, clusters_times):
+    def splitAmongNurse(self):
         """
         Split the clusters between the various nurses.
         """
@@ -868,7 +876,7 @@ class Space :
         ampl.solve()
 
         # Get objective entity by AMPL name
-        return
+        return None
 
 
     def solve(self):
@@ -902,13 +910,16 @@ class Space :
                 toRecluster.append(c)
         while(len(toRecluster) > 0):   
             self.recluster(toRecluster)
+            toRecluster = []
+            for c,t in self.clusterTime.items():
+                if t >=  0.5 * self.duration:
+                    toRecluster.append(c)
 
-
-        appointment_distribution = self.splitAmongNurse(cluster_time)
+        #appointment_distribution = self.splitAmongNurse()
 
         # TODO: mettre en forme la sortie.
 
-        return
+        return None
 
 
 
@@ -944,16 +955,15 @@ if __name__ == "__main__":
     s.clusterTime[0] = time//4
     s.recluster([0])
     quit()
-    k = s.getNumberOfCluster()
-    centers, clusters = s.clusterSpace(k)
-    points = s.getListPointsByID(centers)
+    s.getNumberOfCluster()
+    points = s.getListPointsByID(s.clusters.keys())
     driving_path, driving_time = s.getHamiltonianCycle(points)
 
     global_path = []
     total_time = driving_time
 
     for index_center in driving_path[:-1]:
-        walking_points = s.getListPointsByID(clusters[index_center])
+        walking_points = s.getListPointsByID(s.clusters[index_center])
         walking_path, walking_time = s.getHamiltonianCycle(walking_points, mode="walking")
         global_path += walking_path
         total_time += walking_time
