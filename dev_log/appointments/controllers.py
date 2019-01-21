@@ -16,16 +16,25 @@ appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 def home():
     if request.method == "POST":
         if "research" in request.form.keys():
-            research = request.form['research']
-        elif "patient" in request.form.keys():
-            research=request.form['patient']
+            if request.form['research'] != "Choose Patient":
+                research = request.form['research']
+            else:
+                research=None
         else:
             research=None
+        if "care_research" in request.form.keys():
+            if request.form["care_research"] != "Choose Care":
+                care_research = request.form["care_research"]
+            else:
+                care_research=None
+
+        else:
+            care_research=None
         # if "research_nurse" in request.form.keys():
         #     research_nurse=request.form["research_nurse"]
         # else:
         #     research_nurse=None
-        return redirect(url_for('appointments.home', research=research))
+        return redirect(url_for('appointments.home', research=research,care_research=care_research))
         #return redirect(url_for('appointments.home', research=research,research_nurse=research_nurse))
 
     # appointments = dict()
@@ -81,7 +90,12 @@ def home():
 
     availabilities = [[] for k in range(7)]
     i = 1
-    care_id = 1
+    if "care_research" in request.args:
+        care_research = request.args["care_research"]
+        care_id = db.session.query(Care).filter(Care.description == request.args["care_research"]).first().id
+    else:
+        care_id = 1
+        care_research = None
     for day in availabilities:
         date = iso_to_gregorian(year, week, i)
         day.append(check_availability(date=date, halfday="morning", care_id=care_id))
@@ -94,9 +108,11 @@ def home():
     end_week = str(end_week.day) + '/' + str(end_week.month)
     patients = db.session.query(Patient).order_by(Patient.last_name).all()
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
+    cares = db.session.query(Care).order_by(Care.description).all()
     return render_template("appointments.html", availabilities=availabilities, start_week=start_week,
                            end_week=end_week, year=year, week=week,patients=patients,
-                           appointments=appointments,research=research,nurses=nurses)
+                           appointments=appointments,research=research,nurses=nurses,
+                           cares=cares, care_research=care_research)
     # return render_template("appointments.html", availabilities=availabilities, start_week=start_week,
     #                        end_week=end_week, year=year, week=week,patients=patients,
     #                        appointments=appointments,research=research,nurses=nurses,
