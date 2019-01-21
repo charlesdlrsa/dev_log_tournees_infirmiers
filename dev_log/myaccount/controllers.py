@@ -73,4 +73,6 @@ def edit_account(id):
 @account.route('/absence', methods=['GET', 'POST'])
 @login_required
 def absence():
-    pass
+    id = 1
+    nurse = db.session.query(Nurse).filter(Nurse.id == id)[0]
+    return render_template('add_vacation.html', nurse=nurse)
