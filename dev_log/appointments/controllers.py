@@ -6,6 +6,7 @@ from dev_log import db
 from dev_log.models import Appointment, Patient, Nurse, Care
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
+# from dev_log.opti.space import solve_boolean
 
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
@@ -67,19 +68,19 @@ def home():
         appointments = [[None,None] for k in range(7)]
         research=None
 
-    availabilities = [[] for k in range(7)]
-    i = 1
+    start_week = iso_to_gregorian(year, week, 1)
+    end_week = iso_to_gregorian(year, week, 7)
+    start_week = str(start_week.day) + '/' + str(start_week.month)
+    end_week = str(end_week.day) + '/' + str(end_week.month)
+    patients = db.session.query(Patient).order_by(Patient.last_name).all()
+    nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
+
     if "care_research" in request.args:
         care_research = request.args["care_research"]
         care_id = db.session.query(Care).filter(Care.description == request.args["care_research"]).first().id
     else:
         care_id = 1
         care_research = None
-    for day in availabilities:
-        date = iso_to_gregorian(year, week, i)
-        day.append(check_availability(date=date, halfday="morning", care_id=care_id))
-        day.append(check_availability(date=date, halfday="afternoon", care_id=care_id))
-        i += 1
 
     start_week = iso_to_gregorian(year, week, 1)
     end_week = iso_to_gregorian(year, week, 7)
@@ -88,6 +89,23 @@ def home():
     patients = db.session.query(Patient).order_by(Patient.last_name).all()
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
     cares = db.session.query(Care).order_by(Care.description).all()
+
+    availabilities = [[] for k in range(7)]
+    i = 1
+    for day in availabilities:
+        date = iso_to_gregorian(year, week, i)
+        # day.append(new_check_availability(halfday="morning", data))
+        # day.append(new_check_availability(halfday="afternoon", data))
+        day.append(check_availability(date=date, halfday="morning", care_id=care_id))
+        day.append(check_availability(date=date, halfday="afternoon", care_id=care_id))
+        i += 1
+
+    print('start week : {}'.format(start_week))
+    print('end week : {}'.format(end_week))
+    print('availabilities : {}'.format(availabilities))
+    print('year : {}'.format(year))
+    print('week : {}'.format(week))
+    availabilities = [[False, False], [True, True], [True, True], [True, True], [True, True], [True, True], [True, True]]
     return render_template("appointments.html", availabilities=availabilities, start_week=start_week,
                            end_week=end_week, year=year, week=week,patients=patients,
                            appointments=appointments,research=research,nurses=nurses,
@@ -196,6 +214,10 @@ def check_availability(date, halfday, care_id):
             return False
         else:
             return True
+
+def new_check_availability(data):
+    response = solve_boolean(data)
+    return response
 
 def check_appointments_patient(date,halfday,patient):
     """Checks existing appointment on this halfday for this patient and returns associated care"""
