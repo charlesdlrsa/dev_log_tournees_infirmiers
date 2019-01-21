@@ -54,7 +54,6 @@ def edit_account(id):
 
 @account.route('/absence', methods=['GET', 'POST'])
 @login_required
-<<<<<<< HEAD
 def add_absence(id):
     if request.method == "POST":
         # if True: #demie journée
