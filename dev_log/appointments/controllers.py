@@ -28,29 +28,39 @@ def home():
                 care_research = request.form["care_research"]
             else:
                 care_research=None
-
         else:
             care_research=None
+        if "date" in request.form.keys():
+            date = datetime.datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+        else:
+            date=None
         # if "research_nurse" in request.form.keys():
         #     research_nurse=request.form["research_nurse"]
         # else:
         #     research_nurse=None
-        return redirect(url_for('appointments.home', research=research,care_research=care_research))
+        return redirect(url_for('appointments.home', research=research,care_research=care_research,date=date))
         #return redirect(url_for('appointments.home', research=research,research_nurse=research_nurse))
 
-    if "week" in request.args:
-        week = int(request.args['week'])
-        year = int(request.args['year'])
-        if week == 0:
-            week = 52
-            year = year-1
-        elif week == 53:
-            week = 1
-            year = year+1
+    day=1
+    # if "week" in request.args:
+    #     week = int(request.args['week'])
+    #     year = int(request.args['year'])
+    #     if week == 0:
+    #         week = 52
+    #         year = year-1
+    #     elif week == 53:
+    #         week = 1
+    #         year = year+1
+    #     time = iso_to_gregorian(year, week, day)
+    #     time = time.strftime('%Y-%m-%d')
+    if "date" in request.args:
+        current_date = datetime.datetime.strptime(request.args['date'], '%Y-%m-%d').date()
     else:
         current_date = datetime.datetime.now()
-        week = current_date.isocalendar()[1]
-        year = current_date.isocalendar()[0]
+    week = current_date.isocalendar()[1]
+    year = current_date.isocalendar()[0]
+    time = iso_to_gregorian(year, week, day)
+    time = time.strftime('%Y-%m-%d')
 
     if "research" in request.args:
         research=request.args["research"]
@@ -107,7 +117,7 @@ def home():
     return render_template("appointments.html", availabilities=availabilities, start_week=start_week,
                            end_week=end_week, year=year, week=week,patients=patients,
                            appointments=appointments,research=research,nurses=nurses,
-                           cares=cares, care_research=care_research)
+                           cares=cares,care_research=care_research,time=time)
 
 
 @appointments.route('/add_appointment', methods=['GET', 'POST'])
@@ -120,6 +130,10 @@ def add_appointment():
         research=request.args["research"]
     else:
         research=None
+    if "care_research" in request.args:
+        care_research=request.args["care_research"]
+    else:
+        care_research=None
     if "week" in request.args:
         day = int(request.args["day"])
         week = int(request.args["week"])
@@ -167,7 +181,7 @@ def add_appointment():
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
     cares = db.session.query(Care).all()
 
-    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares, time=time,halfday=halfday,research=research)
+    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares, time=time,halfday=halfday,research=research,care_research=care_research)
 
 
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
