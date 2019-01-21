@@ -76,7 +76,6 @@ def login():
             if error is None:
                 # storing user information in the object "session"
                 session.clear()
-                session['user_type'] = 'nurse'
                 session['nurse_id'] = nurse.id
                 session['nurse_last_name'] = nurse.last_name
                 session['nurse_first_name'] = nurse.first_name
@@ -103,7 +102,6 @@ def login():
             if error is None:
                 # storing user information in the object "session"
                 session.clear()
-                session['user_type'] = 'admin'
                 session['office_id'] = office.id
                 session['office_name'] = office.name
                 flash('Hi %s, welcome back to Our Application!'

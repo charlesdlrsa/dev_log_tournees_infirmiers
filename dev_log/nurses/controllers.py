@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, flash, redirect, url_for
+from flask import Blueprint, request, render_template, flash, redirect, url_for, session
 from werkzeug.security import check_password_hash, generate_password_hash
 import re
 from sqlalchemy.sql import or_
@@ -94,7 +94,11 @@ def edit_nurse(nurse_id):
                         address=address))
         db.session.commit()
         flash("The nurse's information have been updated")
-        return redirect(url_for('nurses.home'))
+        if session['nurse_id'] is None:
+            return redirect(url_for('nurses.home'))
+        else:
+            return redirect(url_for('account.home'))
+
 
     nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
     cares = db.session.query(Care).all()
