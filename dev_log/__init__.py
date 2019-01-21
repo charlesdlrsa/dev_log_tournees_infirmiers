@@ -34,6 +34,9 @@ app.register_blueprint(patients)
 from dev_log.appointments.controllers import appointments
 app.register_blueprint(appointments)
 
+from dev_log.myaccount.controllers import account
+app.register_blueprint(account)
+
 db.create_all()
 
 # For CSS

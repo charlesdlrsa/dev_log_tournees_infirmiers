@@ -5,6 +5,13 @@ from dev_log.key import key
 import datetime, random
 
 
+def geolocation(classe, key):
+    gmaps = googlemaps.Client(key=str(key))
+    distance = gmaps.geocode(classe.address)[0]['geometry']['location']
+    classe.latitude = distance['lat']
+    classe.longitude = distance['lng']
+
+
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(
@@ -58,13 +65,7 @@ class Patient(BasePerson):
         self.email = email
         self.address = address
         self.phone = phone
-        Patient.geolocation(self, key)
-
-    def geolocation(self, key):
-        gmaps = googlemaps.Client(key=str(key))
-        distance = gmaps.geocode(self.address)[0]['geometry']['location']
-        self.latitude = distance['lat']
-        self.longitude = distance['lng']
+        geolocation(self, key)
 
 
 class Nurse(BasePerson):
@@ -216,14 +217,23 @@ class Office(Base):
         db.String(20),
         nullable=False)
 
+    latitude = db.Column(
+        db.Float
+    )
+
+    longitude = db.Column(
+        db.Float
+    )
+
     nurses = db.relationship("AssociationOfficeNurse")
 
-    def __init__(self, name, address, email, phone, password):
+    def __init__(self, name, address, email, phone, password, latitude=None, longitude=None):
         self.name = name
         self.address = address
         self.email = email
         self.phone = phone
         self.password = password
+        geolocation(self, key)
 
 
 # Many to Many relation
