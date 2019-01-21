@@ -280,9 +280,9 @@ def init_db():
     db.session.add(Care(description="Piqûre", duration=30))
     db.session.add(Care(description="Post opératoire", duration=20))
     ## Appointment : nurse_id, patient_id, date, care_id
-    halfday = ["morning", "afternoon"]
+    halfday = ["Morning", "Afternoon"]
     for pID in range(1, 7):
-        db.session.add(Appointment(patient_id=pID, date=datetime.date(2018, 1, 28), care_id=random.randint(1, 3),
+        db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 1, 28), care_id=random.randint(1, 3),
                                    halfday=halfday[pID % 2]))
         db.session.add(Schedule(hour=datetime.time(8+pID%2*6+pID-1), nurse_id=random.randint(1,4)))
     db.session.commit()
