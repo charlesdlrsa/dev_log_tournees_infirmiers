@@ -151,6 +151,7 @@ def add_appointment():
             # storing the new appointment information in the db
             appointment = Appointment(patient_id, date, care, halfday)
             db.session.add(appointment)
+
             db.session.commit()
             flash('The appointment was successfully added')
             return redirect(url_for('appointments.home'))
