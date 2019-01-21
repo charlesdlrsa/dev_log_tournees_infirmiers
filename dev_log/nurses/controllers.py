@@ -6,6 +6,8 @@ from dev_log import db
 from dev_log.models import Nurse, Care
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
+from dev_log.key import key
+
 
 nurses = Blueprint('nurses', __name__, url_prefix='/nurses')
 
@@ -66,12 +68,11 @@ def search_nurses(research):
 
 @nurses.route('/edit/<int:nurse_id>', methods=['GET', 'POST'])
 def edit_nurse(nurse_id):
-    print(nurse_id)
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
-        phone = request.form['phone']
+        phone = request.form['phone_number']
         password = request.form['password']
         address = request.form['address']
         office = request.form['office']
@@ -96,8 +97,9 @@ def edit_nurse(nurse_id):
         return redirect(url_for('nurses.home'))
 
     nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+    cares = db.session.query(Care).all()
 
-    return render_template("edit_nurse.html", nurse=nurse)
+    return render_template("edit_nurse.html", cares=cares, nurse=nurse)
 
 
 @nurses.route('/add_nurse', methods=['GET', 'POST'])

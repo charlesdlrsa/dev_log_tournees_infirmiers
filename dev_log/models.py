@@ -5,6 +5,13 @@ from dev_log.key import key
 import datetime, random
 
 
+def geolocation(classe, key):
+    gmaps = googlemaps.Client(key=str(key))
+    distance = gmaps.geocode(classe.address)[0]['geometry']['location']
+    classe.latitude = distance['lat']
+    classe.longitude = distance['lng']
+
+
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(
@@ -44,6 +51,12 @@ class Patient(BasePerson):
         primary_key=True,
         nullable=False)
 
+    digicode = db.Column(
+        db.Integer)
+
+    additional_postal_information = db.Column(
+        db.String(50))
+
     latitude = db.Column(
         db.Float
     )
@@ -52,19 +65,16 @@ class Patient(BasePerson):
         db.Float
     )
 
-    def __init__(self, last_name, first_name, email, address, phone, latitude=None, longitude=None):
+    def __init__(self, last_name, first_name, email, address, phone, digicode, additional_postal_information,
+                 latitude=None, longitude=None):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
         self.address = address
+        self.digicode = digicode
+        self.additional_postal_information = additional_postal_information
         self.phone = phone
-        Patient.geolocation(self, key)
-
-    def geolocation(self, key):
-        gmaps = googlemaps.Client(key=str(key))
-        distance = gmaps.geocode(self.address)[0]['geometry']['location']
-        self.latitude = distance['lat']
-        self.longitude = distance['lng']
+        geolocation(self, key)
 
 
 class Nurse(BasePerson):
@@ -216,14 +226,23 @@ class Office(Base):
         db.String(20),
         nullable=False)
 
+    latitude = db.Column(
+        db.Float
+    )
+
+    longitude = db.Column(
+        db.Float
+    )
+
     nurses = db.relationship("AssociationOfficeNurse")
 
-    def __init__(self, name, address, email, phone, password):
+    def __init__(self, name, address, email, phone, password, latitude=None, longitude=None):
         self.name = name
         self.address = address
         self.email = email
         self.phone = phone
         self.password = password
+        geolocation(self, key)
 
 
 # Many to Many relation
@@ -243,6 +262,36 @@ class AssociationOfficeNurse(Base):
     nurse = db.relationship("Nurse")
 
     office = db.relationship("Office")
+
+
+class Absence(Base):
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        nullable=False
+    )
+
+    nurse_id = db.Column(
+        db.Integer,
+        db.ForeignKey('nurse.nurse_id'),
+        unique=False)
+
+    date = db.Column(
+        db.Date,
+        nullable=False)
+
+    halfday = db.Column(
+        db.String
+    )
+
+    nurse = db.relationship(
+        "Nurse",
+        backref="nurse_absence")
+
+    def __init__(self, nurse_id, date, halfday):
+        self.nurse_id = nurse_id
+        self.date =date
+        self.halfday = halfday
 
 
 def init_db():
@@ -265,17 +314,23 @@ def init_db():
                          phone="0694699858", password=password, address="24 rue Terrence", office="Paris",
                          cares="-1-2-"))
     db.session.add(Patient(last_name="De la roche", first_name="Charles", email="charles.dlrsa@hotmail.fr",
-                           address="40 rue Victor Hugo 91300 Massy", phone="0699497758"))
+                           address="40 rue Victor Hugo 91300 Massy", phone="0699497758", digicode="4B34",
+                           additional_postal_information="3eme gauche"))
     db.session.add(Patient(last_name="Mallard", first_name="Alix", email="alix.mallard@hotmail.fr",
-                           address="25 rue Pasteur 91300 Massy", phone="0699265758"))
+                           address="25 rue Pasteur 91300 Massy", phone="0699265758", digicode="4B34",
+                           additional_postal_information="RDC"))
     db.session.add(Patient(last_name="Dieudonné", first_name="Maxime", email="maxime.dieudo@hotmail.fr",
-                           address="79 rue Léonard de Vinci 92160 Antony", phone="0649697758"))
+                           address="79 rue Léonard de Vinci 92160 Antony", phone="0649697758", digicode="4B34",
+                           additional_postal_information="3eme gauche"))
     db.session.add(Patient(last_name="Pascual", first_name="Romain", email="romain.pascual@hotmail.fr",
-                           address="1 Rue du Canal, 91160 Longjumeau", phone="0678697758"))
+                           address="1 Rue du Canal, 91160 Longjumeau", phone="0678697758", digicode="4B34",
+                           additional_postal_information="5eme gauche"))
     db.session.add(Patient(last_name="Leveque", first_name="Hippolyte", email="hippolyte.leveque@hotmail.fr",
-                           address="13 Rue Blaise Pascal, 91120 Palaiseau", phone="0674697758"))
+                           address="13 Rue Blaise Pascal, 91120 Palaiseau", phone="0674697758", digicode="4B34",
+                           additional_postal_information="4eme droite"))
     db.session.add(Patient(last_name="Cassedanne", first_name="Louis", email="louis.cassedanne@hotmail.fr",
-                           address="20 Rue du Dr Roux 91370 Verrières-le-Buisson", phone="0674695898"))
+                           address="20 Rue du Dr Roux 91370 Verrières-le-Buisson", phone="0674695898", digicode="4B34",
+                           additional_postal_information="2eme gauche"))
     db.session.add(Care(description="Pansement", duration=60))
     db.session.add(Care(description="Piqûre", duration=30))
     db.session.add(Care(description="Post opératoire", duration=20))

@@ -57,14 +57,26 @@
             </div>
             <div class="form-group">
               <div class="form-label-group">
-                <input type="text" id="phone" class="form-control" placeholder="{{patient.phone}}" required="required" name="phone" value="{{patient.phone}}">
-                <label for="phone">Phone</label>
+                <input type="text" id="phone_number" class="form-control" pattern="(0|\\+33|0033)[1-9][0-9]{8}" required="required" name="phone_number" value="{{patient.phone}}">
+                <label for="phone_number">Phone Number</label>
               </div>
             </div>
             <div class="form-group">
               <div class="form-label-group">
                 <input type="address" id="address" class="form-control" placeholder="{{patient.address}}" required="required" name="address" value="{{patient.address}}">
-                <label for="address">Address</label>
+                <label for="address">Postal Address</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="form-label-group">
+                <input type="text" id="digicode" class="form-control" value="{{patient.digicode}}" name="digicode">
+                <label for="digicode">Digicode</label>
+              </div>
+            </div>
+            <div class="form-group">
+             <div class="form-label-group">
+              <input type="text" id="additional_postal_information" class="form-control" value="{{patient.additional_postal_information}}" name="additional_postal_information">
+              <label for="additional_postal_information">Additional postal information : floor, door...</label>
               </div>
             </div>
             <button class="btn btn-primary btn-block" type="submit">Edit</button>

@@ -73,19 +73,22 @@ def edit_patient(patient_id):
         first_name = request.form['first_name']
         email = request.form['email']
         address = request.form['address']
-        phone = request.form['phone']
+        phone = request.form['phone_number']
+        digicode = request.form['digicode']
+        additional_postal_information = request.form['additional_postal_information']
         db.session.query(Patient).filter(Patient.id == patient_id).\
             update(dict(last_name=last_name,
                    first_name=first_name,
                    email=email,
                    address=address,
-                   phone=phone))
+                   phone=phone,
+                    digicode=digicode,
+                    additional_postal_information=additional_postal_information))
         db.session.commit()
         flash("The patient's information have been updated")
         return redirect(url_for('patients.home'))
 
     patient = Patient.query.filter(Patient.id == patient_id).first()
-    print(patient.phone)
     return render_template("edit_patient.html", patient=patient)
 
 
@@ -96,6 +99,8 @@ def add_patient():
         first_name = request.form['first_name']
         email = request.form['email']
         address = request.form['address']
+        digicode = request.form['digicode']
+        additional_postal_information = request.form['additional_postal_information']
         phone = request.form['phone_number']
         error = None
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
@@ -116,7 +121,8 @@ def add_patient():
         else:
             # storing the new user information in the db
             patient = Patient(last_name=last_name, first_name=first_name,
-                              email=email, address=address, phone=phone)
+                              email=email, address=address, phone=phone, digicode=digicode,
+                              additional_postal_information=additional_postal_information)
             print("latitude : {}, longitude : {} ".format(patient.latitude, patient.longitude))
             db.session.add(patient)
             db.session.commit()
