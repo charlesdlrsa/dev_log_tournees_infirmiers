@@ -24,7 +24,7 @@ def home():
         else:
             return redirect(url_for('patients.search_patients', research=research))
 
-    patients = Patient.query.filter(Patient.office == session['office_name']).order_by(Patient.last_name)
+    patients = Patient.query.filter(Patient.office_id == session['office_name']).order_by(Patient.last_name)
 
     return render_template('patients.html', patients=patients)
 
@@ -48,11 +48,11 @@ def search_patients(research):
         first_name, last_name = research.split()[0], " ".join(research.split()[1:])
         patients = Patient.query.filter(or_(Patient.last_name.like('%' + last_name + '%'),
                                             Patient.first_name.like('%' + first_name + '%')),
-                                        Patient.office == session['office_name'])
+                                        Patient.office_id == session['office_name'])
     else:
         patients = Patient.query.filter(or_(Patient.last_name.like('%' + research + '%'),
                                             Patient.first_name.like('%' + research + '%')),
-                                        Patient.office == session['office_name'])
+                                        Patient.office_id == session['office_name'])
 
     if patients is None:
         error = "Please enter a lastname"
@@ -92,7 +92,7 @@ def add_patient():
             patient = Patient(last_name=last_name, first_name=first_name,
                               email=email, address=address, phone=phone, digicode=digicode,
                               additional_postal_information=additional_postal_information,
-                              office=session['office_name'])
+                              office_id=session['office_id'])
             print("latitude : {}, longitude : {} ".format(patient.latitude, patient.longitude))
             db.session.add(patient)
             db.session.commit()
@@ -138,7 +138,7 @@ def edit_patient(patient_id):
                        phone=phone,
                         digicode=digicode,
                         additional_postal_information=additional_postal_information,
-                        office=session['office_name']))
+                        office_id=session['office_id']))
             db.session.commit()
             flash("The patient's information have been updated")
             return redirect(url_for('patients.home'))

@@ -27,7 +27,7 @@ def home():
         else:
             return redirect(url_for('nurses.search_nurses', research=research))
 
-    nurses = Nurse.query.filter(Nurse.office == session['office_name']).order_by(Nurse.last_name)
+    nurses = Nurse.query.filter(Nurse.office_id == session['office_name']).order_by(Nurse.last_name)
     return render_template('nurses.html', nurses=nurses)
 
 
@@ -50,11 +50,11 @@ def search_nurses(research):
         first_name, last_name = research.split()[0], " ".join(research.split()[1:])
         nurses = Nurse.query.filter(or_(Nurse.last_name.like('%' + last_name + '%'),
                                         Nurse.first_name.like('%' + first_name + '%')),
-                                    Nurse.office == session['office_name'])
+                                    Nurse.office_id == session['office_name'])
     else:
         nurses = Nurse.query.filter(or_(Nurse.last_name.like('%' + research + '%'),
                                         Nurse.first_name.like('%' + research + '%')),
-                                    Nurse.office == session['office_name'])
+                                    Nurse.office_id == session['office_name'])
     if nurses is None:
         error = "Please enter a lastname"
         flash(error)
@@ -101,7 +101,7 @@ def add_nurse():
             # storing the new user information in the db
             password = generate_password_hash(password)
             nurse = Nurse(last_name=last_name, first_name=first_name, email=email, password=password,
-                          phone=phone, address=address, office=session['office_name'], cares=cares)
+                          phone=phone, address=address, office_id=session['office_id'], cares=cares)
             db.session.add(nurse)
             db.session.commit()
             flash('The nurse was successfully added')
@@ -155,7 +155,7 @@ def edit_nurse(nurse_id):
                             phone=phone,
                             password=password,
                             address=address,
-                            office=session['office_name'],
+                            office_id=session['office_id'],
                             cares=cares))
             db.session.commit()
             flash("The nurse's information have been updated")
