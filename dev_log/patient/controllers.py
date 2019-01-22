@@ -109,6 +109,7 @@ def add_patient():
 def edit_patient(patient_id):
 
     if request.method == "POST":
+        print(request.form)
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']

@@ -117,19 +117,22 @@ def add_nurse():
 @admin_required
 def edit_nurse(nurse_id):
     if request.method == "POST":
+        print(request.form)
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
         phone = request.form['phone_number']
         password = request.form['password']
         address = request.form['address']
+
         care = Care.query.all()
+        print(care)
         cares = ""
         for c in care:
             if request.form.get(str(c.id)) is not None:
                 cares += "-{}-".format(c.id)
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
-
+        print(cares)
         if not last_name:
             error = 'A lastname is required.'
         elif not first_name:
@@ -142,8 +145,6 @@ def edit_nurse(nurse_id):
             error = 'Phone is required.'
         elif not address:
             error = 'Please enter an address.'
-        elif Nurse.query.filter(Nurse.email == email).first() is not None:
-            error = 'The email "{}" is already used'.format(email)
 
         else:
             password = generate_password_hash(password)
