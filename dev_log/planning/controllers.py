@@ -12,20 +12,29 @@ planning = Blueprint('planning', __name__, url_prefix='/planning')
 @planning.route("/", methods=['GET', 'POST'])
 def home():
     if request.method == "POST":
-        init_db()
-    if "week" in request.args:
-        week=int(request.args['week'])
-        year=int(request.args['year'])
-        if week==0:
-            week=52
-            year=year-1
-        elif week==53:
-            week=1
-            year=year+1
+        if "date" in request.form.keys():
+            date = datetime.datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+        else:
+            date=None
+        return redirect(url_for('planning.home',date=date))
+    # if "week" in request.args:
+    #     week=int(request.args['week'])
+    #     year=int(request.args['year'])
+    #     if week==0:
+    #         week=52
+    #         year=year-1
+    #     elif week==53:
+    #         week=1
+    #         year=year+1
+    if "date" in request.args:
+        current_date = datetime.datetime.strptime(request.args['date'], '%Y-%m-%d').date()
     else:
         current_date = datetime.datetime.now()
-        week = current_date.isocalendar()[1]
-        year = current_date.isocalendar()[0]
+    day=1
+    week = current_date.isocalendar()[1]
+    year = current_date.isocalendar()[0]
+    time = iso_to_gregorian(year, week, day)
+    time = time.strftime('%Y-%m-%d')
     start_week=iso_to_gregorian(year,week,1)
     end_week=iso_to_gregorian(year,week,7)
     start_week = str(start_week.day) + '/' + str(start_week.month)
@@ -34,9 +43,15 @@ def home():
     start_week=start_week,
     end_week=end_week,
     year=year,
-    week=week)
+    week=week,
+    time=time)
 
 
+
+@planning.route("/init", methods=['GET', 'POST'])
+def reinit_db():
+    init_db()
+    return redirect(url_for("planning.home"))
 
 
 
