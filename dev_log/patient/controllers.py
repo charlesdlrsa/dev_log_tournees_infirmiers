@@ -24,12 +24,13 @@ def home():
         else:
             return redirect(url_for('patients.search_patients', research=research))
 
-    patients = db.session.query(Patient).order_by(Patient.last_name).all()
+    patients = Patient.query.filter(Patient.office == session['office_name']).order_by(Patient.last_name)
 
     return render_template('patients.html', patients=patients)
 
 
 @patients.route('/results/<research>', methods=['GET', 'POST'])
+@admin_required
 def search_patients(research):
     if request.method == "POST":
         new_research = request.form['research']
@@ -46,10 +47,12 @@ def search_patients(research):
     if len(research.split()) >= 2:
         first_name, last_name = research.split()[0], " ".join(research.split()[1:])
         patients = Patient.query.filter(or_(Patient.last_name.like('%' + last_name + '%'),
-                                        Patient.first_name.like('%' + first_name + '%')))
+                                            Patient.first_name.like('%' + first_name + '%')),
+                                        Patient.office == session['office_name'])
     else:
         patients = Patient.query.filter(or_(Patient.last_name.like('%' + research + '%'),
-                                        Patient.first_name.like('%' + research + '%')))
+                                            Patient.first_name.like('%' + research + '%')),
+                                        Patient.office == session['office_name'])
 
     if patients is None:
         error = "Please enter a lastname"
@@ -58,51 +61,17 @@ def search_patients(research):
     return render_template('patients.html', patients=patients)
 
 
-# @patients.route('/information/<int:patient_id>', methods=['GET, POST'])
-# def get_information_about_patient(patient_id):
-#     patient = Patient.query.filter(Patient.id == patient_id)
-#
-#     return render_template("patient_information.html", patient=patient)
-
-
-@patients.route('/edit/<int:patient_id>', methods=['GET', 'POST'])
-def edit_patient(patient_id):
-
-    if request.method == "POST":
-        last_name = request.form['last_name']
-        first_name = request.form['first_name']
-        email = request.form['email']
-        address = request.form['address']
-        phone = request.form['phone_number']
-        digicode = request.form['digicode']
-        additional_postal_information = request.form['additional_postal_information']
-        db.session.query(Patient).filter(Patient.id == patient_id).\
-            update(dict(last_name=last_name,
-                   first_name=first_name,
-                   email=email,
-                   address=address,
-                   phone=phone,
-                    digicode=digicode,
-                    additional_postal_information=additional_postal_information))
-        db.session.commit()
-        flash("The patient's information have been updated")
-        return redirect(url_for('patients.home'))
-
-    patient = Patient.query.filter(Patient.id == patient_id).first()
-    return render_template("edit_patient.html", patient=patient)
-
-
 @patients.route('/add_patient', methods=['GET', 'POST'])
+@admin_required
 def add_patient():
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
         address = request.form['address']
+        phone = request.form['phone_number']
         digicode = request.form['digicode']
         additional_postal_information = request.form['additional_postal_information']
-        phone = request.form['phone_number']
-        error = None
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
 
         if not last_name:
@@ -122,7 +91,8 @@ def add_patient():
             # storing the new user information in the db
             patient = Patient(last_name=last_name, first_name=first_name,
                               email=email, address=address, phone=phone, digicode=digicode,
-                              additional_postal_information=additional_postal_information)
+                              additional_postal_information=additional_postal_information,
+                              office=session['office_name'])
             print("latitude : {}, longitude : {} ".format(patient.latitude, patient.longitude))
             db.session.add(patient)
             db.session.commit()
@@ -132,6 +102,60 @@ def add_patient():
         flash(error)
 
     return render_template('add_patient.html')
+
+
+@patients.route('/edit/<int:patient_id>', methods=['GET', 'POST'])
+@admin_required
+def edit_patient(patient_id):
+
+    if request.method == "POST":
+        last_name = request.form['last_name']
+        first_name = request.form['first_name']
+        email = request.form['email']
+        address = request.form['address']
+        phone = request.form['phone_number']
+        digicode = request.form['digicode']
+        additional_postal_information = request.form['additional_postal_information']
+        regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
+
+        if not last_name:
+            error = 'A lastname is required.'
+        elif not first_name:
+            error = 'A firstname is required.'
+        elif re.search(regu_expr, email) is None:
+            error = 'Please enter a correct email address.'
+        elif not address:
+            error = 'Please enter an address.'
+        elif not phone:
+            error = 'Phone is required.'
+        else:
+            db.session.query(Patient).filter(Patient.id == patient_id).\
+                update(dict(last_name=last_name,
+                       first_name=first_name,
+                       email=email,
+                       address=address,
+                       phone=phone,
+                        digicode=digicode,
+                        additional_postal_information=additional_postal_information,
+                        office=session['office_name']))
+            db.session.commit()
+            flash("The patient's information have been updated")
+            return redirect(url_for('patients.home'))
+        flash(error)
+
+    patient = Patient.query.filter(Patient.id == patient_id).first()
+    return render_template("edit_patient.html", patient=patient)
+
+
+@patients.route('/delete_patient/<int:patient_id>')
+@admin_required
+def delete_patient(patient_id):
+    patient = Patient.query.get(patient_id)
+    db.session.delete(patient)
+    db.session.commit()
+    flash("The patient was successfully deleted.")
+
+    return redirect(url_for('patients.home'))
 
 
 

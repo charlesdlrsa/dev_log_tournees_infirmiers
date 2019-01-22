@@ -27,11 +27,12 @@ def home():
         else:
             return redirect(url_for('nurses.search_nurses', research=research))
 
-    nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
+    nurses = Nurse.query.filter(Nurse.office == session['office_name']).order_by(Nurse.last_name)
     return render_template('nurses.html', nurses=nurses)
 
 
 @nurses.route('/results/<research>', methods=['GET', 'POST'])
+@admin_required
 def search_nurses(research):
     if request.method == "POST":
         new_research = request.form['research']
@@ -48,62 +49,17 @@ def search_nurses(research):
     if len(research.split()) >= 2:
         first_name, last_name = research.split()[0], " ".join(research.split()[1:])
         nurses = Nurse.query.filter(or_(Nurse.last_name.like('%' + last_name + '%'),
-                                        Nurse.first_name.like('%' + first_name + '%')))
+                                        Nurse.first_name.like('%' + first_name + '%')),
+                                    Nurse.office == session['office_name'])
     else:
         nurses = Nurse.query.filter(or_(Nurse.last_name.like('%' + research + '%'),
-                                        Nurse.first_name.like('%' + research + '%')))
+                                        Nurse.first_name.like('%' + research + '%')),
+                                    Nurse.office == session['office_name'])
     if nurses is None:
         error = "Please enter a lastname"
         flash(error)
 
     return render_template('nurses.html', nurses=nurses)
-
-
-# @nurses.route('/information/<int:nurse_id>', methods=['GET, POST'])
-# def get_information_about_nurse(nurse_id):
-#     nurse = Nurse.query.filter(Nurse.id == nurse_id)
-#     print(nurse.last_name)
-#     return render_template("nurse_info.html", nurse=nurse)
-
-
-@nurses.route('/edit/<int:nurse_id>', methods=['GET', 'POST'])
-def edit_nurse(nurse_id):
-    if request.method == "POST":
-        last_name = request.form['last_name']
-        first_name = request.form['first_name']
-        email = request.form['email']
-        phone = request.form['phone_number']
-        password = request.form['password']
-        address = request.form['address']
-        office = request.form['office']
-        care = Care.query.all()
-        cares = ""
-        for c in care:
-            if request.form.get(str(c.id)) is not None:
-                cares += "-{}-".format(c.id)
-        regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
-        error = None
-
-        password = generate_password_hash(password)
-        db.session.query(Nurse).filter(Nurse.id == nurse_id). \
-            update(dict(last_name=last_name,
-                        first_name=first_name,
-                        email=email,
-                        phone=phone,
-                        password=password,
-                        address=address))
-        db.session.commit()
-        flash("The nurse's information have been updated")
-        if session['nurse_id'] is None:
-            return redirect(url_for('nurses.home'))
-        else:
-            return redirect(url_for('account.home'))
-
-
-    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
-    cares = db.session.query(Care).all()
-
-    return render_template("edit_nurse.html", cares=cares, nurse=nurse)
 
 
 @nurses.route('/add_nurse', methods=['GET', 'POST'])
@@ -119,14 +75,12 @@ def add_nurse():
         password = request.form['password']
         phone = request.form['phone_number']
         address = request.form['address']
-        office = request.form['office']
         care = Care.query.all()
-        cares = []
+        cares = ""
         for c in care:
             if request.form.get(str(c.id)) is not None:
                 cares += "-{}-".format(c.id)
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
-        error = None
 
         if not last_name:
             error = 'A lastname is required.'
@@ -140,16 +94,14 @@ def add_nurse():
             error = 'Phone is required.'
         elif not address:
             error = 'Please enter an address.'
-        elif not office:
-            error = 'Please enter an office.'
         elif Nurse.query.filter(Nurse.email == email).first() is not None:
             error = 'The email "{}" is already used'.format(email)
 
         else:
             # storing the new user information in the db
             password = generate_password_hash(password)
-            nurse = Nurse(last_name=last_name, first_name=first_name,
-                          email=email, password=password, phone=phone, address=address, office=office, cares=cares)
+            nurse = Nurse(last_name=last_name, first_name=first_name, email=email, password=password,
+                          phone=phone, address=address, office=session['office_name'], cares=cares)
             db.session.add(nurse)
             db.session.commit()
             flash('The nurse was successfully added')
@@ -159,4 +111,68 @@ def add_nurse():
 
     cares = db.session.query(Care).all()
     return render_template('add_nurse.html', cares=cares)
+
+
+@nurses.route('/edit/<int:nurse_id>', methods=['GET', 'POST'])
+@admin_required
+def edit_nurse(nurse_id):
+    if request.method == "POST":
+        last_name = request.form['last_name']
+        first_name = request.form['first_name']
+        email = request.form['email']
+        phone = request.form['phone_number']
+        password = request.form['password']
+        address = request.form['address']
+        care = Care.query.all()
+        cares = ""
+        for c in care:
+            if request.form.get(str(c.id)) is not None:
+                cares += "-{}-".format(c.id)
+        regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
+
+        if not last_name:
+            error = 'A lastname is required.'
+        elif not first_name:
+            error = 'A firstname is required.'
+        elif re.search(regu_expr, email) is None:
+            error = 'Please enter a correct email address.'
+        elif not password:
+            error = 'Password is required.'
+        elif not phone:
+            error = 'Phone is required.'
+        elif not address:
+            error = 'Please enter an address.'
+        elif Nurse.query.filter(Nurse.email == email).first() is not None:
+            error = 'The email "{}" is already used'.format(email)
+
+        else:
+            password = generate_password_hash(password)
+            db.session.query(Nurse).filter(Nurse.id == nurse_id). \
+                update(dict(last_name=last_name,
+                            first_name=first_name,
+                            email=email,
+                            phone=phone,
+                            password=password,
+                            address=address,
+                            office=session['office_name'],
+                            cares=cares))
+            db.session.commit()
+            flash("The nurse's information have been updated")
+            return redirect(url_for('nurses.home'))
+
+        flash(error)
+
+    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+    cares = db.session.query(Care).all()
+    return render_template("edit_nurse.html", cares=cares, nurse=nurse)
+
+
+@nurses.route('/delete_nurse/<int:nurse_id>')
+@admin_required
+def delete_nurse(nurse_id):
+    nurse = Nurse.query.get(nurse_id)
+    db.session.delete(nurse)
+    db.session.commit()
+    flash("The nurse was successfully deleted.")
+    return redirect(url_for('nurses.home'))
 

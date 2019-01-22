@@ -32,10 +32,11 @@
         <th>Last Name</th>
         <th>First Name</th>
         <th>Email</th>
-        <th>Phone</th>
-        <th>Adress</th>
-        <th>ID</th>
-        <th></th>
+        <th>Phone Number</th>
+        <th>Address</th>
+        <th>Office</th>
+        <th>Edit</th>
+        <th>Delete</th>
       </tr>
     </thead>
 
@@ -47,10 +48,12 @@
         <td> {{ patient.email }}</td>
         <td> {{ patient.phone }}</td>
         <td> {{ patient.address }}</td>
-        <td> {{ patient.id }}</td>
-
+        <td> {{ patient.office }}</td>
         <td> <a href="{{ url_for('patients.edit_patient',patient_id=patient.id)}}" class="btn btn-secondary btn-sm active"
           role="button">Edit</a>
+        </td>
+        <td> <a href="{{ url_for('patients.delete_patient',patient_id=patient.id)}}" class="btn btn-secondary btn-sm active"
+          role="button">Delete</a>
         </td>
       <tr>
       {% endfor %}

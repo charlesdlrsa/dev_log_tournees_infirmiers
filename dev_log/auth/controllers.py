@@ -131,7 +131,7 @@ def login_required(view):
     def wrapped_view(**kwargs):
         if session.get('nurse_id') is None \
                 and session.get('office_id') is None:
-            flash('You need to login to access this page.')
+            flash('You need to login as a nurse to access the precedent page.')
             return redirect(url_for('auth.login'))
 
         return view(**kwargs)
@@ -149,7 +149,7 @@ def admin_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if session.get('office_id') is None:
-            flash('You need to login as an administrator to access this page.')
+            flash('You need to login as an administrator to access the precedent page.')
             return redirect(url_for('auth.login'))
 
         return view(**kwargs)
