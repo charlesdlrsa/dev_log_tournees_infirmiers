@@ -66,8 +66,13 @@ class Patient(BasePerson):
     )
 
     office_id = db.Column(
-        db.String(20),
+        db.Integer,
+        db.ForeignKey('office.office_id'),
         nullable=False)
+
+    office = db.relationship(
+        "Office",
+        backref="office_patient")
 
     def __init__(self, last_name, first_name, email, address, phone, digicode, additional_postal_information,
                  office_id, latitude=None, longitude=None):
@@ -96,11 +101,16 @@ class Nurse(BasePerson):
 
     office_id = db.Column(
         db.Integer,
+        db.ForeignKey('office.office_id'),
         nullable=False)
 
     cares = db.Column(
         db.String(50)
     )
+
+    office = db.relationship(
+        "Office",
+        backref="office_nurse")
 
     def __init__(self, last_name, first_name, email, password, phone, address, office_id, cares):
         self.last_name = last_name

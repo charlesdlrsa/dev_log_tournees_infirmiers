@@ -24,7 +24,7 @@ def home():
         else:
             return redirect(url_for('patients.search_patients', research=research))
 
-    patients = Patient.query.filter(Patient.office_id == session['office_name']).order_by(Patient.last_name)
+    patients = Patient.query.filter(Patient.office_id == session['office_id']).order_by(Patient.last_name)
 
     return render_template('patients.html', patients=patients)
 
@@ -48,11 +48,11 @@ def search_patients(research):
         first_name, last_name = research.split()[0], " ".join(research.split()[1:])
         patients = Patient.query.filter(or_(Patient.last_name.like('%' + last_name + '%'),
                                             Patient.first_name.like('%' + first_name + '%')),
-                                        Patient.office_id == session['office_name'])
+                                        Patient.office_id == session['office_id'])
     else:
         patients = Patient.query.filter(or_(Patient.last_name.like('%' + research + '%'),
                                             Patient.first_name.like('%' + research + '%')),
-                                        Patient.office_id == session['office_name'])
+                                        Patient.office_id == session['office_id'])
 
     if patients is None:
         error = "Please enter a lastname"

@@ -8,7 +8,6 @@ from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 from dev_log.key import key
 
-
 nurses = Blueprint('nurses', __name__, url_prefix='/nurses')
 
 
@@ -27,7 +26,7 @@ def home():
         else:
             return redirect(url_for('nurses.search_nurses', research=research))
 
-    nurses = Nurse.query.filter(Nurse.office_id == session['office_name']).order_by(Nurse.last_name)
+    nurses = Nurse.query.filter(Nurse.office_id == session['office_id']).order_by(Nurse.last_name)
     return render_template('nurses.html', nurses=nurses)
 
 
@@ -50,11 +49,11 @@ def search_nurses(research):
         first_name, last_name = research.split()[0], " ".join(research.split()[1:])
         nurses = Nurse.query.filter(or_(Nurse.last_name.like('%' + last_name + '%'),
                                         Nurse.first_name.like('%' + first_name + '%')),
-                                    Nurse.office_id == session['office_name'])
+                                    Nurse.office_id == session['office_id'])
     else:
         nurses = Nurse.query.filter(or_(Nurse.last_name.like('%' + research + '%'),
                                         Nurse.first_name.like('%' + research + '%')),
-                                    Nurse.office_id == session['office_name'])
+                                    Nurse.office_id == session['office_id'])
     if nurses is None:
         error = "Please enter a lastname"
         flash(error)
@@ -176,4 +175,3 @@ def delete_nurse(nurse_id):
     db.session.commit()
     flash("The nurse was successfully deleted.")
     return redirect(url_for('nurses.home'))
-
