@@ -65,12 +65,17 @@ class Patient(BasePerson):
         db.Float
     )
 
-    office = db.Column(
-        db.String(20),
+    office_id = db.Column(
+        db.Integer,
+        db.ForeignKey('office.office_id'),
         nullable=False)
 
+    office = db.relationship(
+        "Office",
+        backref="office_patient")
+
     def __init__(self, last_name, first_name, email, address, phone, digicode, additional_postal_information,
-                 office, latitude=None, longitude=None):
+                 office_id, latitude=None, longitude=None):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
@@ -78,7 +83,7 @@ class Patient(BasePerson):
         self.digicode = digicode
         self.additional_postal_information = additional_postal_information
         self.phone = phone
-        self.office = office
+        self.office_id = office_id
         geolocation(self, key)
 
 
@@ -94,22 +99,27 @@ class Nurse(BasePerson):
         db.String(20),
         nullable=False)
 
-    office = db.Column(
-        db.String(20),
+    office_id = db.Column(
+        db.Integer,
+        db.ForeignKey('office.office_id'),
         nullable=False)
 
     cares = db.Column(
         db.String(50)
     )
 
-    def __init__(self, last_name, first_name, email, password, phone, address, office, cares):
+    office = db.relationship(
+        "Office",
+        backref="office_nurse")
+
+    def __init__(self, last_name, first_name, email, password, phone, address, office_id, cares):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
         self.phone = phone
         self.password = password
         self.address = address
-        self.office = office
+        self.office_id = office_id
         self.cares = cares
 
 
@@ -308,34 +318,34 @@ def init_db():
                           email="doctissimo@hotmail.fr", password=password))
     db.session.add(Nurse(last_name="Cabaret", first_name="Laurent", email="laurent.cabaret@hotmail.fr",
                          phone="0699458758", password=password, address="25 rue de la Ferronerie, 91430 Igny",
-                         office="Doctissimo", cares="-1-"))
+                         office_id=1, cares="-1-"))
     db.session.add(Nurse(last_name="Poli", first_name="Jean-Philippe", email="jpp@hotmail.fr",
                          phone="0699458758", password=password, address="2 rue de la Vieille Poste, 78350 Jouy-en-Josas",
-                         office="Doctissimo", cares="-1-2-"))
+                         office_id=1, cares="-1-2-"))
     db.session.add(Nurse(last_name="Hudelot", first_name="Celine", email="celine.hudelot@hotmail.fr",
                          phone="0699469858", password=password, address="20 rue de la Villacoublay, 78140 Vélizy",
-                         office="Doctissimo", cares="-1-2-3-"))
+                         office_id=1, cares="-1-2-3-"))
     db.session.add(Nurse(last_name="Detriche", first_name="Jean-Marie", email="jeanmarie.detriche@hotmail.fr",
                          phone="0694699858", password=password, address="45 avenue Saint Laurent, 91400 Orsay",
-                         office="Doctissimo", cares="-1-2-"))
+                         office_id=1, cares="-1-2-"))
     db.session.add(Patient(last_name="De la roche", first_name="Charles", email="charles.dlrsa@hotmail.fr",
                            address="40 rue Victor Hugo 91300 Massy", phone="0699497758", digicode="4B34",
-                           additional_postal_information="3eme gauche", office="Doctissimo"))
+                           additional_postal_information="3eme gauche", office_id=1))
     db.session.add(Patient(last_name="Mallard", first_name="Alix", email="alix.mallard@hotmail.fr",
                            address="25 rue Pasteur 91300 Massy", phone="0699265758", digicode="4B34",
-                           additional_postal_information="RDC", office="Doctissimo"))
+                           additional_postal_information="RDC", office_id=1))
     db.session.add(Patient(last_name="Dieudonné", first_name="Maxime", email="maxime.dieudo@hotmail.fr",
                            address="79 rue Léonard de Vinci 92160 Antony", phone="0649697758", digicode="4B34",
-                           additional_postal_information="3eme gauche", office="Doctissimo"))
+                           additional_postal_information="3eme gauche", office_id=1))
     db.session.add(Patient(last_name="Pascual", first_name="Romain", email="romain.pascual@hotmail.fr",
                            address="1 Rue du Canal, 91160 Longjumeau", phone="0678697758", digicode="4B34",
-                           additional_postal_information="5eme gauche", office="Doctissimo"))
+                           additional_postal_information="5eme gauche", office_id=1))
     db.session.add(Patient(last_name="Leveque", first_name="Hippolyte", email="hippolyte.leveque@hotmail.fr",
                            address="13 Rue Blaise Pascal, 91120 Palaiseau", phone="0674697758", digicode="4B34",
-                           additional_postal_information="4eme droite", office="Doctissimo"))
+                           additional_postal_information="4eme droite", office_id=1))
     db.session.add(Patient(last_name="Cassedanne", first_name="Louis", email="louis.cassedanne@hotmail.fr",
                            address="20 Rue du Dr Roux 91370 Verrières-le-Buisson", phone="0674695898", digicode="4B34",
-                           additional_postal_information="2eme gauche", office="Doctissimo"))
+                           additional_postal_information="2eme gauche", office_id=1))
     db.session.add(Care(description="Pansement", duration=60))
     db.session.add(Care(description="Piqûre", duration=30))
     db.session.add(Care(description="Post opératoire", duration=20))

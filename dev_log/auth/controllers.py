@@ -81,7 +81,7 @@ def login():
                 session['nurse_first_name'] = nurse.first_name
                 session['nurse_email'] = nurse.email
                 session['nurse_phone_number'] = nurse.phone
-                session['nurse_office'] = nurse.office
+                session['nurse_office_id'] = nurse.office_id
                 session['nurse_address'] = nurse.address
                 flash('Hi %s %s, welcome back to Our Application!'
                       % (nurse.first_name.capitalize(),

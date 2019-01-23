@@ -6,6 +6,7 @@ from dev_log import db
 from dev_log.models import Appointment, Patient, Nurse, Care, Office
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
+
 # from dev_log.opti.space import solve_boolean
 
 
@@ -20,28 +21,28 @@ def home():
             if request.form['research'] != "Choose Patient":
                 research = request.form['research']
             else:
-                research=None
+                research = None
         else:
-            research=None
+            research = None
         if "care_research" in request.form.keys():
             if request.form["care_research"] != "Choose Care":
                 care_research = request.form["care_research"]
             else:
-                care_research=None
+                care_research = None
         else:
-            care_research=None
+            care_research = None
         if "date" in request.form.keys():
             date = datetime.datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         else:
-            date=None
+            date = None
         # if "research_nurse" in request.form.keys():
         #     research_nurse=request.form["research_nurse"]
         # else:
         #     research_nurse=None
-        return redirect(url_for('appointments.home', research=research,care_research=care_research,date=date))
-        #return redirect(url_for('appointments.home', research=research,research_nurse=research_nurse))
+        return redirect(url_for('appointments.home', research=research, care_research=care_research, date=date))
+        # return redirect(url_for('appointments.home', research=research,research_nurse=research_nurse))
 
-    day=1
+    day = 1
     # if "week" in request.args:
     #     week = int(request.args['week'])
     #     year = int(request.args['year'])
@@ -63,20 +64,20 @@ def home():
     time = time.strftime('%Y-%m-%d')
 
     if "research" in request.args:
-        research=request.args["research"]
+        research = request.args["research"]
         patient = request.args["research"]
         patient = patient.split(' - ')
         appointments = [[] for k in range(7)]
-        i=1
+        i = 1
         for day in appointments:
             date = iso_to_gregorian(year, week, i)
-            day.append(check_appointments_patient(date=date, halfday="morning", patient=patient))
-            day.append(check_appointments_patient(date=date, halfday="afternoon", patient=patient))
-            i+= 1
+            day.append(check_appointments_patient(date=date, halfday="Morning", patient=patient))
+            day.append(check_appointments_patient(date=date, halfday="Afternoon", patient=patient))
+            i += 1
         # research_nurse=None
     else:
-        appointments = [[None,None] for k in range(7)]
-        research=None
+        appointments = [[None, None] for k in range(7)]
+        research = None
 
     start_week = iso_to_gregorian(year, week, 1)
     end_week = iso_to_gregorian(year, week, 7)
@@ -105,19 +106,19 @@ def home():
     i = 1
     for day in availabilities:
         date = iso_to_gregorian(year, week, i)
-        day.append(check_availability(date=date,nurses=nurses,cares=cares,
-                                          office=office,halfday="morning"))
-        day.append(check_availability(date=date,nurses=nurses,cares=cares,
-                                          office=office,halfday="afternoon"))
-        # day.append(check_availability(date=date, halfday="morning", care_id=care_id))
-        # day.append(check_availability(date=date, halfday="afternoon", care_id=care_id))
+        day.append(check_availability(date=date, nurses=nurses, cares=cares,
+                                      office=office, halfday="Morning"))
+        day.append(check_availability(date=date, nurses=nurses, cares=cares,
+                                      office=office, halfday="Afternoon"))
+        # day.append(check_availability(date=date, halfday="Morning", care_id=care_id))
+        # day.append(check_availability(date=date, halfday="Afternoon", care_id=care_id))
         i += 1
 
     print('availabilities : {}'.format(availabilities))
     return render_template("appointments.html", availabilities=availabilities, start_week=start_week,
-                           end_week=end_week, year=year, week=week,patients=patients,
-                           appointments=appointments,research=research,nurses=nurses,
-                           cares=cares,care_research=care_research,time=time)
+                           end_week=end_week, year=year, week=week, patients=patients,
+                           appointments=appointments, research=research, nurses=nurses,
+                           cares=cares, care_research=care_research, time=time)
 
 
 @appointments.route('/add_appointment', methods=['GET', 'POST'])
@@ -127,23 +128,23 @@ def add_appointment():
     :return:
     """
     if "research" in request.args:
-        research=request.args["research"]
+        research = request.args["research"]
     else:
-        research=None
+        research = None
     if "care_research" in request.args:
-        care_research=request.args["care_research"]
+        care_research = request.args["care_research"]
     else:
-        care_research=None
+        care_research = None
     if "week" in request.args:
         day = int(request.args["day"])
         week = int(request.args["week"])
         year = int(request.args["year"])
-        halfday=request.args["halfday"]
+        halfday = request.args["halfday"]
         time = iso_to_gregorian(year, week, day)
         time = time.strftime('%Y-%m-%d')
     else:
         time = None
-        halfday=None
+        halfday = None
 
     if request.method == 'POST':
         patient = request.form['patient'].split(' - ')
@@ -182,7 +183,8 @@ def add_appointment():
     nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
     cares = db.session.query(Care).all()
 
-    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares, time=time,halfday=halfday,research=research,care_research=care_research)
+    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares, time=time,
+                           halfday=halfday, research=research, care_research=care_research)
 
 
 @appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
@@ -228,15 +230,15 @@ def search_appointments(research):
 #         else:
 #             return True
 
-def check_availability(date,nurses,cares,office,halfday):
+def check_availability(date, nurses, cares, office, halfday):
     data = {}
     data["nurse_ids"] = [str(nurse.id) for nurse in nurses]
     data["office_lat"] = str(office[0].latitude)
     data["office_lon"] = str(office[0].longitude)
-    if halfday == "morning":
+    if halfday == "Morning":
         data["start"] = "08:00"
         data["end"] = "12:30"
-    if halfday == "afternoon":
+    if halfday == "Afternoon":
         data["start"] = "13:30"
         data["end"] = "18:00"
 
@@ -257,20 +259,20 @@ def check_availability(date,nurses,cares,office,halfday):
     response = True
     return response
 
-def check_appointments_patient(date,halfday,patient):
+
+def check_appointments_patient(date, halfday, patient):
     """Checks existing appointment on this halfday for this patient and returns associated care"""
 
     patient_id = db.session.query(Patient).filter(Patient.first_name == patient[1]).filter(
         Patient.last_name == patient[0]).first().id
     appointment = db.session.query(Appointment).filter(Appointment.date == date).filter(
-    Appointment.halfday == halfday).filter(Appointment.patient_id==patient_id).first()
+        Appointment.halfday == halfday).filter(Appointment.patient_id == patient_id).first()
     try:
         id = appointment.care_id
         answer = db.session.query(Care).filter(Care.id == id).first().description
     except:
         answer = None
     return answer
-
 
 # def check_appointments_nurse(date,halfday,nurse):
 #     """Checks existing appointment on this halfday for this patient and returns associated care"""
@@ -285,4 +287,3 @@ def check_appointments_patient(date,halfday,patient):
 #     except:
 #         answer = None
 #     return answer
-

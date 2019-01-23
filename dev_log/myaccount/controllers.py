@@ -14,6 +14,7 @@ account = Blueprint('account', __name__, url_prefix='/account')
 def home():
     if session.get('office_id') is None:
         id = session['nurse_id']
+        # créer l'objet nurse
     else:
         id = session['office_id']
 
