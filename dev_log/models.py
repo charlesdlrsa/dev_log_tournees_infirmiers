@@ -305,7 +305,7 @@ class Absence(Base):
 
     def __init__(self, nurse_id, date, halfday):
         self.nurse_id = nurse_id
-        self.date =date
+        self.date = date
         self.halfday = halfday
 
 
@@ -320,7 +320,8 @@ def init_db():
                          phone="0699458758", password=password, address="25 rue de la Ferronerie, 91430 Igny",
                          office_id=1, cares="-1-"))
     db.session.add(Nurse(last_name="Poli", first_name="Jean-Philippe", email="jpp@hotmail.fr",
-                         phone="0699458758", password=password, address="2 rue de la Vieille Poste, 78350 Jouy-en-Josas",
+                         phone="0699458758", password=password,
+                         address="2 rue de la Vieille Poste, 78350 Jouy-en-Josas",
                          office_id=1, cares="-1-2-"))
     db.session.add(Nurse(last_name="Hudelot", first_name="Celine", email="celine.hudelot@hotmail.fr",
                          phone="0699469858", password=password, address="20 rue de la Villacoublay, 78140 Vélizy",
@@ -354,6 +355,6 @@ def init_db():
     for pID in range(1, 7):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 1, 28), care_id=random.randint(1, 3),
                                    halfday=halfday[pID % 2]))
-        db.session.add(Schedule(hour=datetime.time(8+pID%2*6+pID-1), nurse_id=random.randint(1,4)))
+        db.session.add(Schedule(hour=datetime.time(8 + pID % 2 * 6 + pID - 1), nurse_id=random.randint(1, 4)))
     db.session.commit()
     lg.warning('Database initialized!')
