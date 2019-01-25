@@ -23,7 +23,7 @@ def home():
         return render_template('account.html', nurse=nurse)
     else:
         id = session['office_id']
-        office = Office.query.filter(Office.office_id == id).first()
+        office = Office.query.filter(Office.id == id).first()
         if request.method == "POST":
             return redirect(url_for('account.edit_account'))
         return render_template('account.html', office=office)
