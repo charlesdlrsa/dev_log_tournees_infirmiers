@@ -18,17 +18,16 @@ def home():
     else:
         id = session['office_id']
 
-
         if request.method == "POST":
-        if session.get('office_id') is None:
-            id = session['nurse_id']
-            if request.args (edit):
-                edit_nurse(id)
-            elif request.args (vacances):
-                return redirect(url_for('account.add_absence'))
-        else:
-            id = session['office_id']
-            return redirect(url_for('account.edit_account', id=id))
+            if session.get('office_id') is None:
+                id = session['nurse_id']
+                if request.args(edit):
+                    edit_nurse(id)
+                elif request.args(vacances):
+                    return redirect(url_for('account.add_absence'))
+            else:
+                id = session['office_id']
+                return redirect(url_for('account.edit_account', id=id))
     return render_template('account.html', id=id)
 
 
@@ -68,7 +67,7 @@ def add_absence():
         #     absence = Absence(nurse_id=id, date=date, halfday=halfday)
         #     db.session.add(absence)
         # else: #période
-        #if request.args.get('period'):
+        # if request.args.get('period'):
         start_date = datetime.datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
         end_date = datetime.datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
         days_in_period = []

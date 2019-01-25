@@ -305,7 +305,7 @@ class Absence(Base):
 
     def __init__(self, nurse_id, date, halfday):
         self.nurse_id = nurse_id
-        self.date =date
+        self.date = date
         self.halfday = halfday
 
 
