@@ -14,21 +14,19 @@ account = Blueprint('account', __name__, url_prefix='/account')
 def home():
     if session.get('office_id') is None:
         id = session['nurse_id']
-        # créer l'objet nurse
+        nurse = Nurse.query.filter(Nurse.id == id).first()
+        if request.method == "POST":
+            if request.args(edit):  # TODO
+                return redirect(url_for('account.edit_account'))
+            elif request.args(vacances):  # TODO
+                return redirect(url_for('account.add_absence'))
+        return render_template('account.html', nurse=nurse)
     else:
         id = session['office_id']
-
+        office = Office.query.filter(Office.id == id).first()
         if request.method == "POST":
-            if session.get('office_id') is None:
-                id = session['nurse_id']
-                if request.args(edit):
-                    edit_nurse(id)
-                elif request.args(vacances):
-                    return redirect(url_for('account.add_absence'))
-            else:
-                id = session['office_id']
-                return redirect(url_for('account.edit_account', id=id))
-    return render_template('account.html', id=id)
+            return redirect(url_for('account.edit_account'))
+        return render_template('account.html', office=office)
 
 
 @account.route('/edit', methods=['GET', 'POST'])
@@ -37,22 +35,7 @@ def edit_account(id):
     if session.get('nurse_id') is not None:
         edit_nurse(id)
     elif session.get('office_id') is not None:
-        name = request.form['name']
-        email = request.form['email']
-        phone = request.form['phone']
-        password = request.form['password']
-        address = request.form['address']
-
-        password = generate_password_hash(password)
-        db.session.query(Office).filter(Office.id == id). \
-            update(dict(name=name,
-                        email=email,
-                        phone=phone,
-                        password=password,
-                        address=address))
-        db.session.commit()
-        flash("The office's information have been updated")
-
+        edit_admin(id)
         return redirect(url_for('account.home'))
 
 
@@ -60,6 +43,7 @@ def edit_account(id):
 @login_required
 def add_absence():
     id = session['nurse_id']
+    nurse = Nurse.query.filter(Nurse.nurse_id == id).first()
     if request.method == "POST":
         # if True: #demie journée
         #     date = request.form['date']
@@ -87,7 +71,20 @@ def add_absence():
     nurse = db.session.query(Nurse).filter(Nurse.id == id)[0]
     return render_template('add_vacation.html', nurse=nurse)
 
-# def absence():
-#     id = 1
-#     nurse = db.session.query(Nurse).filter(Nurse.id == id)[0]
-#     return render_template('add_vacation.html', nurse=nurse)
+
+def edit_admin(id):
+    name = request.form['name']
+    email = request.form['email']
+    phone = request.form['phone']
+    password = request.form['password']
+    address = request.form['address']
+
+    password = generate_password_hash(password)
+    db.session.query(Office).filter(Office.id == id). \
+        update(dict(name=name,
+                    email=email,
+                    phone=phone,
+                    password=password,
+                    address=address))
+    db.session.commit()
+    flash("The office's information have been updated")

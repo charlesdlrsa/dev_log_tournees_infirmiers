@@ -20,7 +20,8 @@
 
     <!-- Custom styles for this template-->
     <link href="{{ url_for('static', filename='sb-admin.css')}}" rel="stylesheet">
-    <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.3/css/all.css' integrity='sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/' crossorigin='anonymous'>
+    <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.3/css/all.css'
+          integrity='sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/' crossorigin='anonymous'>
 
 
 </head>
@@ -30,16 +31,22 @@
 <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
     <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
-    <i class="fas fa-bars"></i>
+        <i class="fas fa-bars"></i>
     </button>
     <a class="navbar-brand mr-1" href="{{ url_for('planning.home') }}">DevLog </a>
 
     {% if session['office_id'] %}
-    <span style="align:right; color:#FEF42F"> {{ session['office_name'].capitalize() }} <i style="color:#FFFFFF" class="fa fa-user"></i> </span>
-    <a style="align:right; color:#FEF42F" href="{{ url_for('auth.logout') }}"> Log Out <i style="color:#FFFFFF" class="fa fa-sign-out-alt"></i> </a>
+    <span style="align:right; color:#FEF42F"> {{ session['office_name'].capitalize() }} <i style="color:#FFFFFF"
+                                                                                           class="fa fa-user"></i> </span>
+    <a style="align:right; color:#FEF42F" href="{{ url_for('auth.logout') }}"> Log Out <i style="color:#FFFFFF"
+                                                                                          class="fa fa-sign-out-alt"></i>
+    </a>
     {% elif session['nurse_id'] %}
-    <span style="align:right; color:#FEF42F"> {{ session['nurse_first_name'].capitalize() }} {{ session['nurse_last_name'].capitalize() }}  <i style="color:#FFFFFF" class="fa fa-user"></i> </span>
-    <a style="align:right; color:#FEF42F" href="{{ url_for('auth.logout') }}">Log Out <i style="color:#FFFFFF" class="fa fa-sign-out-alt"></i> </a>
+    <span style="align:right; color:#FEF42F"> {{ session['nurse_first_name'].capitalize() }} {{ session['nurse_last_name'].capitalize() }}  <i
+            style="color:#FFFFFF" class="fa fa-user"></i> </span>
+    <a style="align:right; color:#FEF42F" href="{{ url_for('auth.logout') }}">Log Out <i style="color:#FFFFFF"
+                                                                                         class="fa fa-sign-out-alt"></i>
+    </a>
     {% else %}
     {% endif %}
 
@@ -49,7 +56,7 @@
 <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="sidebar navbar-nav", id="myDIV">
+    <ul class="sidebar navbar-nav" , id="myDIV">
         <li class="nav-item active" id="global_planning">
             <a class="nav-link" href="{{url_for('planning.home')}}" id="global_planning_link">
                 <i class="far fa-calendar-alt"></i>
@@ -80,14 +87,12 @@
         </li>
 
 
-
-
     </ul>
 
     <div id="content-wrapper">
-      {% for message in get_flashed_messages() %}
-      <div class="flash">{{ message }}</div>
-      {% endfor %}
+        {% for message in get_flashed_messages() %}
+        <div class="flash">{{ message }}</div>
+        {% endfor %}
 
         {% block content %}{% endblock %}
         <!-- /.container-fluid -->
@@ -113,7 +118,8 @@
 </a>
 
 <!-- Logout Modal-->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -137,44 +143,44 @@
 <script>
 
 
-var ref = window.location.href
-if (ref.includes('appointments')){
-  var current = document.getElementsByClassName("active");
-  current[0].className = current[0].className.replace(" active", "");
-  var right=document.getElementById('appointments');
-  right.className += " active";
-}
-else if (ref.includes('patients')){
-  var current = document.getElementsByClassName("active");
-  current[0].className = current[0].className.replace(" active", "");
-  var right=document.getElementById('patients');
-  right.className += " active";
-}
-else if (ref.includes('nurses')){
-  var current = document.getElementsByClassName("active");
-  current[0].className = current[0].className.replace(" active", "");
-  var right=document.getElementById('nurses');
-  right.className += " active";
-}
-else {
-  var current = document.getElementsByClassName("active");
-  current[0].className = current[0].className.replace(" active", "");
-  var right=document.getElementById('global_planning');
-  right.className += " active";
-}
+    var ref = window.location.href
+    if (ref.includes('appointments')) {
+        var current = document.getElementsByClassName("active");
+        current[0].className = current[0].className.replace(" active", "");
+        var right = document.getElementById('appointments');
+        right.className += " active";
+    }
+    else if (ref.includes('patients')) {
+        var current = document.getElementsByClassName("active");
+        current[0].className = current[0].className.replace(" active", "");
+        var right = document.getElementById('patients');
+        right.className += " active";
+    }
+    else if (ref.includes('nurses')) {
+        var current = document.getElementsByClassName("active");
+        current[0].className = current[0].className.replace(" active", "");
+        var right = document.getElementById('nurses');
+        right.className += " active";
+    }
+    else {
+        var current = document.getElementsByClassName("active");
+        current[0].className = current[0].className.replace(" active", "");
+        var right = document.getElementById('global_planning');
+        right.className += " active";
+    }
 
-// Get the container element
-//var btnContainer = document.getElementById("myDIV");
+    // Get the container element
+    //var btnContainer = document.getElementById("myDIV");
 
-// Get all buttons with class="nav-item" inside the container
-//var btns = btnContainer.getElementsByClassName("nav-link");
+    // Get all buttons with class="nav-item" inside the container
+    //var btns = btnContainer.getElementsByClassName("nav-link");
 
-// Loop through the buttons and add the active class to the current/clicked button
-// for (var i = 0; i < btns.length; i++) {
-//   btns[i].addEventListener("click", function() {
-//     var current = document.getElementsByClassName("active");
-//     current[0].className = current[0].className.replace(" active", "");
-//     this.className += " active";
-//   });
-// }
+    // Loop through the buttons and add the active class to the current/clicked button
+    // for (var i = 0; i < btns.length; i++) {
+    //   btns[i].addEventListener("click", function() {
+    //     var current = document.getElementsByClassName("active");
+    //     current[0].className = current[0].className.replace(" active", "");
+    //     this.className += " active";
+    //   });
+    // }
 </script>

@@ -107,7 +107,6 @@ def add_patient():
 @patients.route('/edit/<int:patient_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_patient(patient_id):
-
     if request.method == "POST":
         print(request.form)
         last_name = request.form['last_name']
@@ -130,15 +129,15 @@ def edit_patient(patient_id):
         elif not phone:
             error = 'Phone is required.'
         else:
-            db.session.query(Patient).filter(Patient.id == patient_id).\
+            db.session.query(Patient).filter(Patient.id == patient_id). \
                 update(dict(last_name=last_name,
-                       first_name=first_name,
-                       email=email,
-                       address=address,
-                       phone=phone,
-                        digicode=digicode,
-                        additional_postal_information=additional_postal_information,
-                        office_id=session['office_id']))
+                            first_name=first_name,
+                            email=email,
+                            address=address,
+                            phone=phone,
+                            digicode=digicode,
+                            additional_postal_information=additional_postal_information,
+                            office_id=session['office_id']))
             db.session.commit()
             flash("The patient's information have been updated")
             return redirect(url_for('patients.home'))
@@ -157,6 +156,3 @@ def delete_patient(patient_id):
     flash("The patient was successfully deleted.")
 
     return redirect(url_for('patients.home'))
-
-
-
