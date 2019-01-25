@@ -17,7 +17,8 @@ def home():
     else:
         id = session['office_id']
 
-    if request.method == "POST":
+
+        if request.method == "POST":
         if session.get('office_id') is None:
             id = session['nurse_id']
             if request.args (edit):

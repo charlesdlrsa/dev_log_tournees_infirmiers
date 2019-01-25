@@ -151,13 +151,12 @@ def admin_required(view):
         if session.get('office_id') is None:
             flash('You need to login as an administrator to access the precedent page.')
             return redirect(url_for('auth.login'))
-
         return view(**kwargs)
 
     return wrapped_view
 
 
-@auth.route('/logout')
+@auth.route('/auth/logout')
 @login_required
 def logout():
     """
