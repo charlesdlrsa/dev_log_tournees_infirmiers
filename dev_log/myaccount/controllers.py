@@ -14,7 +14,7 @@ account = Blueprint('account', __name__, url_prefix='/account')
 def home():
     if session.get('office_id') is None:
         id = session['nurse_id']
-        nurse = Nurse.query.filter(Nurse.nurse_id == id).first()
+        nurse = Nurse.query.filter(Nurse.id == id).first()
         if request.method == "POST":
             if request.args(edit):  # TODO
                 return redirect(url_for('account.edit_account'))
