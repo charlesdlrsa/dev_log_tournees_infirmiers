@@ -7,6 +7,7 @@ import functools
 
 auth = Blueprint('auth', __name__)
 
+
 #
 # @auth.route('/register', methods=['GET', 'POST'])
 # def register():
