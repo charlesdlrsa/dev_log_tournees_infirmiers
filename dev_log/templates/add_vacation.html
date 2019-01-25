@@ -1,6 +1,6 @@
 <html lang="en">
 
-  <head>
+<head>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -19,90 +19,94 @@
     <!-- Custom styles for this template-->
     <link href="{{ url_for('static', filename='sb-admin.css')}}" rel="stylesheet">
 
-  </head>
+</head>
 
-  <body class="bg-dark">
+<body class="bg-dark">
 
-  {% for message in get_flashed_messages() %}
-  <div class="flash">{{ message }}</div>
-  {% endfor %}
+{% for message in get_flashed_messages() %}
+<div class="flash">{{ message }}</div>
+{% endfor %}
 
-    <div class="container">
-      <div class="card card-register mx-auto mt-5">
-          <div class="card-header">Set vacation - {{nurse.first_name}} {{nurse.last_name}}</div>
+<div class="container">
+    <div class="card card-register mx-auto mt-5">
+        <div class="card-header">Set vacation - {{nurse.first_name}} {{nurse.last_name}}</div>
         <div class="card-body">
             <form method="post">
-            <h4>Begins on :</h4>
-            <div class="form-row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <div class="form-label-group">
-                  <input type="date" id="date" class="form-control"                placeholder="date" required="required" name="date" value="{{time}}">
-                  <label for="date">Date</label>
-                </div>
-              </div>
-            </div>
-              <div class="col-md-6">
-                   <select id="inputhalfday" class="form-control"                   required="required" name="halfday" value="{{halfday}}">
-                     <option>Choose halfday</option>
+                <h4>Begins on :</h4>
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="date" id="start_date" class="form-control" placeholder="date" required="required"
+                                       name="start_date" value="{{time}}">
+                                <label for="date">Date</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <select id="inputhalfday" class="form-control" required="required" name="halfday"
+                                value="{{halfday}}">
+                            <option>Choose halfday</option>
 
-                     {% for i in ['morning', 'afternoon'] %}
-                     {% if i==halfday %}
-                     <option selected>
-                     {{i}}
-                     </option>
-                     {% else %}
-                     <option>
-                     {{i}}
-                     </option>
-                     {% endif %}
-                     {% endfor %}
-                   </select>
-              </div>
-            </div>
-            <br>
-            <h4>Ends on :</h4>
-            <div class="form-row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <div class="form-label-group">
-                    <input type="date" id="date" class="form-control"                placeholder="date" required="required" name="date" value="{{time}}">
-                    <label for="date">Date</label>
-                  </div>
+                            {% for i in ['Morning', 'Afternoon'] %}
+                            {% if i==halfday %}
+                            <option selected>
+                                {{i}}
+                            </option>
+                            {% else %}
+                            <option>
+                                {{i}}
+                            </option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
-              </div>
-              <div class="col-md-6">
-                   <select id="inputhalfday" class="form-control"                   required="required" name="halfday" value="{{halfday}}">
-                     <option>Choose halfday</option>
+                <br>
+                <h4>Ends on :</h4>
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="date" id="date" class="form-control" placeholder="date" required="required"
+                                       name="end_date" value="{{time}}">
+                                <label for="date">Date</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <select id="inputhalfday" class="form-control" required="required" name="halfday"
+                                value="{{halfday}}">
+                            <option>Choose halfday</option>
 
-                     {% for i in ['morning', 'afternoon'] %}
-                     {% if i==halfday %}
-                     <option selected>
-                     {{i}}
-                     </option>
-                     {% else %}
-                     <option>
-                     {{i}}
-                     </option>
-                     {% endif %}
-                     {% endfor %}
-                   </select>
-              </div>
-            </div>
-            <button class="btn btn-primary btn-block" type="submit">Submit vacation</button>
-          </form>
+                            {% for i in ['Morning', 'Afternoon'] %}
+                            {% if i==halfday %}
+                            <option selected>
+                                {{i}}
+                            </option>
+                            {% else %}
+                            <option>
+                                {{i}}
+                            </option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-block" type="submit">Submit vacation</button>
+            </form>
 
         </div>
-      </div>
     </div>
+</div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap core JavaScript-->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Core plugin JavaScript-->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<!-- Core plugin JavaScript-->
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
-  </body>
+</body>
 
 </html>

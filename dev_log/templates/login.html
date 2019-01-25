@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
+<head>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,72 +20,78 @@
     <!-- Custom styles for this template-->
     <link href="{{ url_for('static', filename='sb-admin.css')}}" rel="stylesheet">
 
-  </head>
+</head>
 
-  <body class="bg-dark">
+<body class="bg-dark">
 
-  {% for message in get_flashed_messages() %}
-  <div class="flash">{{ message }}</div>
-  {% endfor %}
+{% for message in get_flashed_messages() %}
+<div class="flash">{{ message }}</div>
+{% endfor %}
 
-    <div class="container">
-      <div class="card card-login mx-auto mt-5">
+<div class="container">
+    <div class="card card-login mx-auto mt-5">
         <div class="card-header">Login</div>
         <div class="card-body">
-          <form method="post">
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="user-type" id="inlineRadio1" value="nurse">
-              <label class="form-check-label" for="inlineRadio1">As Nurse</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="user-type" id="inlineRadio2" value="admin" checked>
-              <label class="form-check-label" for="inlineRadio2"> As Admin</label>
-            </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required="required" autofocus="autofocus" name="email">
-                <label for="inputEmail">Email address</label>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="required" name="password">
-                <label for="inputPassword">Password</label>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" value="remember-me">
-                  Remember Password
-                </label>
-              </div>
-            </div>
-            <button class="btn btn-primary btn-block" type="submit">Login</button>
+            <form method="post">
+                <p>To use this application, you need to login. <br>You must choose your user type and then enter your
+                    credentials. <br></p>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="user-type" id="inlineRadio1" value="nurse">
+                    <label class="form-check-label" for="inlineRadio1">As Nurse</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="user-type" id="inlineRadio2" value="admin"
+                           checked>
+                    <label class="form-check-label" for="inlineRadio2"> As Admin</label>
+                </div>
+                <div class="form-group"></div>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="email" id="inputEmail" class="form-control" placeholder="Email address"
+                               required="required" autofocus="autofocus" name="email">
+                        <label for="inputEmail">Email address</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="password" id="inputPassword" class="form-control" placeholder="Password"
+                               required="required" name="password">
+                        <label for="inputPassword">Password</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="remember-me">
+                            Remember Password
+                        </label>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-block" type="submit">Login</button>
 
-          </form>
-          <div class="text-center">
-            </br>
-            <a class="d-block small" href="forgot-password.html">Forgot Password?</a>
-          </div>
+            </form>
+            <div class="text-center">
+                </br>
+                <a class="d-block small" href="forgot-password.html">Forgot Password?</a>
+            </div>
         </div>
-      </div>
     </div>
+</div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap core JavaScript-->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Core plugin JavaScript-->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-    <script>
-      function redirect(){
-          var mail = document.getElementById("inputEmail").value;
-          var login = document.getElementById("inputPassword").value;
-          console.log(mail)
-          console.log(login)
-      }
-    </script>
-  </body>
+<!-- Core plugin JavaScript-->
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script>
+    function redirect() {
+        var mail = document.getElementById("inputEmail").value;
+        var login = document.getElementById("inputPassword").value;
+        console.log(mail)
+        console.log(login)
+    }
+</script>
+</body>
 
 </html>

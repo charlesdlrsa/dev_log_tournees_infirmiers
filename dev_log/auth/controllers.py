@@ -7,6 +7,7 @@ import functools
 
 auth = Blueprint('auth', __name__)
 
+
 #
 # @auth.route('/register', methods=['GET', 'POST'])
 # def register():
@@ -76,13 +77,12 @@ def login():
             if error is None:
                 # storing user information in the object "session"
                 session.clear()
-                session['user_type'] = 'nurse'
                 session['nurse_id'] = nurse.id
                 session['nurse_last_name'] = nurse.last_name
                 session['nurse_first_name'] = nurse.first_name
                 session['nurse_email'] = nurse.email
                 session['nurse_phone_number'] = nurse.phone
-                session['nurse_office'] = nurse.office
+                session['nurse_office_id'] = nurse.office_id
                 session['nurse_address'] = nurse.address
                 flash('Hi %s %s, welcome back to Our Application!'
                       % (nurse.first_name.capitalize(),
@@ -103,7 +103,6 @@ def login():
             if error is None:
                 # storing user information in the object "session"
                 session.clear()
-                session['user_type'] = 'admin'
                 session['office_id'] = office.id
                 session['office_name'] = office.name
                 flash('Hi %s, welcome back to Our Application!'
@@ -133,7 +132,7 @@ def login_required(view):
     def wrapped_view(**kwargs):
         if session.get('nurse_id') is None \
                 and session.get('office_id') is None:
-            flash('You need to login to access this page.')
+            flash('You need to login as a nurse to access the precedent page.')
             return redirect(url_for('auth.login'))
 
         return view(**kwargs)
@@ -151,7 +150,7 @@ def admin_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if session.get('office_id') is None:
-            flash('You need to login as an administrator to access this page.')
+            flash('You need to login as an administrator to access the precedent page.')
             return redirect(url_for('auth.login'))
 
         return view(**kwargs)
