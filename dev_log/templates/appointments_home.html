@@ -1,0 +1,69 @@
+{% extends 'base_template.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Content -->
+
+  <div class="card-body">
+  <div class="table-responsive">
+    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+      <div class="card-header">
+        <h1>Appointments
+        </h1>
+        <div class='flex-row'>
+
+            <form method="post">
+
+
+                  <div class="d-flex justify-content-between">
+
+
+                    <form method="post">
+                    <div class="form-group">
+
+                        <select id="inputpatient" class="form-control" placeholder="patient" required="required" name="research">
+                          <option>Choose Patient</option>
+                          {% for patient in patients %}
+                          <option>
+                          {{patient.last_name}} - {{patient.first_name}}
+                          </option>
+                          {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+
+                        <select id="inputcare" class="form-control" placeholder="care" required="required" name="care_research">
+                          <option>Choose Care</option>
+                          {% for care in cares %}
+                          <option>
+                          {{care.description}}
+                          </option>
+                          {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                      <input type="date" id="date" class="form-control" placeholder="date" required="required" name="date" value="{{time}}">
+                    </div>
+                    <div>
+                    <button class="btn btn-secondary btn-md" type="submit">Search</button>
+                    </div>
+                    </form>
+
+                  </div>
+
+
+                </form>
+
+        </div>
+      </div>
+
+
+    </table>
+  </div>
+  </div>
+
+
+</div>
+
+{% endblock%}

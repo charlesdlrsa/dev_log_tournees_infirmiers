@@ -29,27 +29,33 @@
 <body id="page-top">
 
 <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+  <div class="d-flex justify-content-between">
+      <div>
+        <a class="navbar-brand mr-1" href="{{ url_for('planning.home') }}">DevLog </a>
+      </div>
+      {% if session['office_id'] %}
+      <div>
+        <span> {{ session['office_name'].capitalize() }} <i style="color:#FFFFFF"
+                                                                                               class="fa fa-user"></i> </span>
 
-    <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
-        <i class="fas fa-bars"></i>
-    </button>
-    <a class="navbar-brand mr-1" href="{{ url_for('planning.home') }}">DevLog </a>
 
-    {% if session['office_id'] %}
-    <span style="align:right; color:#FEF42F"> {{ session['office_name'].capitalize() }} <i style="color:#FFFFFF"
-                                                                                           class="fa fa-user"></i> </span>
-    <a style="align:right; color:#FEF42F" href="{{ url_for('auth.logout') }}"> Log Out <i style="color:#FFFFFF"
-                                                                                          class="fa fa-sign-out-alt"></i>
-    </a>
-    {% elif session['nurse_id'] %}
-    <span style="align:right; color:#FEF42F"> {{ session['nurse_first_name'].capitalize() }} {{ session['nurse_last_name'].capitalize() }}  <i
-            style="color:#FFFFFF" class="fa fa-user"></i> </span>
-    <a style="align:right; color:#FEF42F" href="{{ url_for('auth.logout') }}">Log Out <i style="color:#FFFFFF"
-                                                                                         class="fa fa-sign-out-alt"></i>
-    </a>
-    {% else %}
-    {% endif %}
+        <a style="align:right; color:#FEF42F" href="{{ url_for('auth.logout') }}"> Log Out <i style="color:#FFFFFF"
+                                                                                              class="fa fa-sign-out-alt"></i>
 
+        </a>
+      </div>
+
+      {% elif session['nurse_id'] %}
+      <div>
+        <span> {{ session['nurse_first_name'].capitalize() }} {{ session['nurse_last_name'].capitalize() }}  <i
+                style="color:#FFFFFF" class="fa fa-user"></i> </span>
+        <a  href="{{ url_for('auth.logout') }}">Log Out <i style="color:#FFFFFF"
+                                                                                             class="fa fa-sign-out-alt"></i>
+        </a>
+      </div>
+      {% else %}
+      {% endif %}
+  </div>
 
 </nav>
 
