@@ -61,7 +61,8 @@ def login():
     :return:
     """
     if request.method == 'GET':
-        init_db()
+        pass
+        # init_db()
     if request.method == 'POST':
         user_type = request.form['user-type']
         email = request.form['email']

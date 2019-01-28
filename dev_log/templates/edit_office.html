@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SB Admin - Register</title>
+
+    <!-- Bootstrap core CSS-->
+    <link href="{{ url_for('static', filename='bootstrap.min.css')}}" rel="stylesheet">
+
+    <!-- Custom fonts for this template-->
+    <link href="{{ url_for('static', filename='all.min.css')}}" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template-->
+    <link href="{{ url_for('static', filename='sb-admin.css')}}" rel="stylesheet">
+
+  </head>
+
+  <body class="bg-dark">
+
+  {% for message in get_flashed_messages() %}
+  <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+    <div class="container">
+      <div class="card card-register mx-auto mt-5">
+        <div class="card-header">Edit Office</div>
+        <div class="card-body">
+            <form method="post">
+            <div class="form-group">
+              <div class="form-row">
+                <div class="col-md-6">
+                  <div class="form-label-group">
+                    <input type="text" id="name" class="form-control" placeholder="{{office.name}}" required="required" autofocus="autofocus" name="name" value="{{office.name}}" >
+                    <label for="name">Name</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="form-label-group">
+                <input type="email" id="email" class="form-control" placeholder="{{office.email}}" required="required" name="email" value="{{office.email}}" readonly>
+                <label for="email">Email</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="form-label-group">
+                <input type="text" id="phone_number" class="form-control" pattern="(0|\\+33|0033)[1-9][0-9]{8}" placeholder="{{office.phone}}" required="required" name="phone_number" value="{{office.phone}}">
+                <label for="phone_number">Phone</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="form-label-group">
+                <input type="password" id="password" class="form-control" placeholder="Enter a new password" name="password" required="required">
+                <label for="password">Password</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="form-label-group">
+                <input type="text" id="address" class="form-control" placeholder="Postal Address" value="{{office.address}}" required="required" name="address">
+                <label for="address">Postal address</label>
+              </div>
+            </div>
+            <div id="map"></div>
+            <button class="btn btn-primary btn-block" type="submit">Save changes</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <script>
+      function initMap() {
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 48.866667, lng: 2.333333},
+          zoom: 13
+        });
+
+        var input = document.getElementById('address');
+        var autocomplete = new google.maps.places.Autocomplete(input);
+
+        autocomplete.bindTo('bounds', map);
+        autocomplete.setFields(['address_components', 'geometry', 'icon', 'name']);
+
+        autocomplete.addListener('place_changed', function() {
+
+          var place = autocomplete.getPlace();
+          if (!place.geometry) {
+            window.alert("No details available for input: '" + place.name + "'");
+            return;
+          }
+
+          if (place.geometry.viewport) {
+            map.fitBounds(place.geometry.viewport);
+          } else {
+            map.setCenter(place.geometry.location);
+            map.setZoom(17);
+          }
+
+          var address = '';
+          if (place.address_components) {
+            address = [
+              (place.address_components[0] && place.address_components[0].short_name || ''),
+              (place.address_components[1] && place.address_components[1].short_name || ''),
+              (place.address_components[2] && place.address_components[2].short_name || '')
+            ].join(' ');
+          }
+        });
+
+      autocomplete.setTypes([])
+      }
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoozmkZ8_YSofc8Hb7nqnG3cWcJSlY6gQ&libraries=places&callback=initMap"
+            async defer></script>
+
+  </body>
+
+</html>

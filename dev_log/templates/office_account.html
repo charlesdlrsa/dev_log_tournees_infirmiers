@@ -1,0 +1,46 @@
+{% extends 'base_template.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Content -->
+   <div class="card-body">
+     <div class="table-responsive">
+       <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+
+         <div class="card-header">
+           <div class="row">
+             <h1> Office account </h1>
+         </div>
+         </div>
+
+         <thead>
+
+           <tr>
+             <th>Name</th>
+             <th>Email</th>
+             <th>Phone Number</th>
+             <th>Address</th>
+             <th>Edit</th>
+           </tr>
+         </thead>
+
+         <tbody>
+             <tr>
+               <td>{{ office.name }}</td>
+               <td> {{ office.email }}</td>
+               <td> {{ office.phone }}</td>
+               <td> {{ office.address }}</td>
+               <td> <a href="{{ url_for('account.edit_office_account',office_id=office.id)}}" class="btn btn-secondary btn-sm active"
+                 role="button">Edit</a>
+               </td>
+             <tr>
+
+
+
+         </tbody>
+       </table>
+     </div>
+   </div>
+</div>
+{% endblock %}

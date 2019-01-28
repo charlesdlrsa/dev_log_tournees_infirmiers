@@ -1,0 +1,56 @@
+{% extends 'base_template.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Content -->
+   <div class="card-body">
+     <div class="table-responsive">
+       <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+
+         <div class="card-header">
+           <div class="row">
+               <h1> {{nurse.first_name}} {{nurse.last_name}} </h1>
+         </div>
+         </div>
+
+         <thead>
+
+           <tr>
+             <th>Last Name</th>
+             <th>First Name</th>
+             <th>Handled cares</th>
+             <th>Email</th>
+             <th>Phone Number</th>
+             <th>Address</th>
+             <th>Office</th>
+             <th>Edit</th>
+             <th>Add vacation</th>
+           </tr>
+         </thead>
+
+         <tbody>
+             <tr>
+               <td>{{ nurse.last_name }}</td>
+               <td>{{ nurse.first_name }}</td>
+               <td>{{ nurse.cares }}</td>
+               <td>{{ nurse.email }}</td>
+               <td>{{ nurse.phone }}</td>
+               <td>{{ nurse.address }}</td>
+               <td>{{ nurse.office }}</td>
+               <td> <a href="{{ url_for('account.edit_nurse_account',nurse_id=nurse.id)}}" class="btn btn-secondary btn-sm active"
+                 role="button">Edit</a>
+               </td>
+               <td> <a href="{{ url_for('account.add_absence')}}" class="btn btn-secondary btn-sm active"
+                 role="button">Add vacation</a>
+               </td>
+             <tr>
+
+
+
+         </tbody>
+       </table>
+     </div>
+   </div>
+</div>
+{% endblock %}
