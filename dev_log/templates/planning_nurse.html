@@ -1,0 +1,72 @@
+{% extends 'base_template.html' %}
+{% block content %}
+
+<div style="float:left; width:40%; margin-left: 5%; margin-right: 5%;">
+    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+        <div class="card-header">
+          <div class="row">
+            <h3> Schedule of the {{date}}, {{halfday}} </h3>
+          </div>
+        </div>
+
+        <thead>
+        <tr>
+            <th>Patient Name</th>
+            <th>Care</th>
+            <th>Postal Address</th>
+            <th>Hour</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+            <td> Charles de la Roche </td>
+            <td> Piqûre </td>
+            <td> 75 rue Sadi Carnot, Vanves </td>
+            <td> 15h </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="map" style="height:80%; width:40%; float:right; margin-right: 5%;"></div>
+<script>
+
+var dep_lat = {{departure['lat']}};
+var dep_lng = {{departure['lng']}};
+var dep = {'lat': dep_lat, 'lng': dep_lng};
+var arr_lat = {{arrival['lat']}};
+var arr_lng = {{arrival['lng']}};
+var arr = {'lat': arr_lat, 'lng': arr_lng};
+var mode = '{{travel_mode}}';
+
+function initMap(departure=dep, arrival=arr, travel_mode=mode) {
+
+    var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: departure});
+
+    var directionsService = new google.maps.DirectionsService();
+    var directionsDisplay = new google.maps.DirectionsRenderer();
+
+    directionsDisplay.setMap(map);
+
+    var request = {
+    origin: departure,
+    destination: arrival,
+    travelMode: travel_mode,
+    };
+
+    directionsService.route(request, function(result, status) {
+        if (status == 'OK') {
+            directionsDisplay.setDirections(result);
+        }
+    });
+
+}
+
+</script>
+
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoozmkZ8_YSofc8Hb7nqnG3cWcJSlY6gQ&callback=initMap">
+</script>
+
+{% endblock %}
