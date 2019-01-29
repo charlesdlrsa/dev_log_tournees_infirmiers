@@ -6,8 +6,6 @@ import datetime
 from dev_log.models import Absence, Office, Nurse, Care
 from dev_log.auth.controllers import login_required, admin_required
 
-# from dev_log.nurses.controllers import edit_nurse
-
 account = Blueprint('account', __name__, url_prefix='/account')
 
 
@@ -125,15 +123,11 @@ def add_absence():
     id = session['nurse_id']
     nurse = Nurse.query.filter(Nurse.id == id).first()
     if request.method == "POST":
-        # if True: #demie journée
-        #     date = request.form['date']
-        #     halfday = request.form['halfday']
-        #     absence = Absence(nurse_id=id, date=date, halfday=halfday)
-        #     db.session.add(absence)
-        # else: #période
-        # if request.args.get('period'):
         start_date = datetime.datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
         end_date = datetime.datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
+        start_halfday = request.form['start_halfday']
+        end_halfday = request.form['end_halfday']
+
         days_in_period = []
         if start_date <= end_date:
             for n in range((end_date - start_date).days + 1):
@@ -141,30 +135,21 @@ def add_absence():
         else:
             for n in range((start_date - end_date).days + 1):
                 days_in_period.append(start_date - datetime.timedelta(n))
+        print(days_in_period)
         for d in days_in_period:
-            for halfday in ['Morning', 'Afternoon']:
-                absence = Absence(nurse_id=id, date=d, halfday=halfday)
-                db.session.add(absence)
-                db.session.commit()
-            flash("This absence has been added")
+            if d == start_date:
+                if start_halfday == 'Afternoon':
+                    db.session.add(Absence(nurse_id=id, date=d, halfday='Afternoon'))
+                    db.session.commit()
+            elif d == end_date:
+                if end_halfday == 'Morning':
+                    db.session.add(Absence(nurse_id=id, date=d, halfday='Morning'))
+                    db.session.commit()
+            else:
+                for halfday in ['Morning', 'Afternoon']:
+                    absence = Absence(nurse_id=id, date=d, halfday=halfday)
+                    db.session.add(absence)
+                    db.session.commit()
+        flash("This absence has been added")
         return redirect(url_for('account.home'))
-    nurse = db.session.query(Nurse).filter(Nurse.id == id)[0]
     return render_template('add_vacation.html', nurse=nurse)
-
-
-# def edit_admin(id):
-#     name = request.form['name']
-#     email = request.form['email']
-#     phone = request.form['phone']
-#     password = request.form['password']
-#     address = request.form['address']
-#
-#     password = generate_password_hash(password)
-#     db.session.query(Office).filter(Office.id == id). \
-#         update(dict(name=name,
-#                     email=email,
-#                     phone=phone,
-#                     password=password,
-#                     address=address))
-#     db.session.commit()
-#     flash("The office's information have been updated")
