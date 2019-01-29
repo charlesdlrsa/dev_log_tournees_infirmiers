@@ -15,7 +15,8 @@ def home():
     if session.get('office_id') is None:
         id = session['nurse_id']
         nurse = Nurse.query.filter(Nurse.id == id).first()
-        return render_template('nurse_account.html', nurse=nurse)
+        absences = Absence.query.filter(Absence.nurse_id == id).all()
+        return render_template('nurse_account.html', nurse=nurse, absences=absences)
     else:
         id = session['office_id']
         office = Office.query.filter(Office.id == id).first()
@@ -26,7 +27,6 @@ def home():
 @login_required
 def edit_nurse_account(nurse_id):
     if request.method == "POST":
-        print(request.form)
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
@@ -35,13 +35,11 @@ def edit_nurse_account(nurse_id):
         address = request.form['address']
 
         care = Care.query.all()
-        print(care)
         cares = ""
         for c in care:
             if request.form.get(str(c.id)) is not None:
                 cares += "-{}-".format(c.id)
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
-        print(cares)
         if not last_name:
             error = 'A lastname is required.'
         elif not first_name:
@@ -120,6 +118,7 @@ def edit_office_account(office_id):
 @account.route('/absence', methods=['GET', 'POST'])
 @login_required
 def add_absence():
+    # TODO : drop old absences
     id = session['nurse_id']
     nurse = Nurse.query.filter(Nurse.id == id).first()
     if request.method == "POST":
@@ -135,16 +134,13 @@ def add_absence():
         else:
             for n in range((start_date - end_date).days + 1):
                 days_in_period.append(start_date - datetime.timedelta(n))
-        print(days_in_period)
         for d in days_in_period:
-            if d == start_date:
-                if start_halfday == 'Afternoon':
-                    db.session.add(Absence(nurse_id=id, date=d, halfday='Afternoon'))
-                    db.session.commit()
-            elif d == end_date:
-                if end_halfday == 'Morning':
-                    db.session.add(Absence(nurse_id=id, date=d, halfday='Morning'))
-                    db.session.commit()
+            if d == start_date and start_halfday == 'Afternoon':
+                db.session.add(Absence(nurse_id=id, date=d, halfday='Afternoon'))
+                db.session.commit()
+            elif d == end_date and end_halfday == 'Morning':
+                db.session.add(Absence(nurse_id=id, date=d, halfday='Morning'))
+                db.session.commit()
             else:
                 for halfday in ['Morning', 'Afternoon']:
                     absence = Absence(nurse_id=id, date=d, halfday=halfday)
@@ -153,3 +149,14 @@ def add_absence():
         flash("This absence has been added")
         return redirect(url_for('account.home'))
     return render_template('add_vacation.html', nurse=nurse)
+
+
+@account.route('/delete_nurse/<int:absence_id>')
+@login_required
+def delete_absence(absence_id):
+    absence = Absence.query.get(absence_id)
+    db.session.delete(absence)
+    db.session.commit()
+    flash("The absence was successfully deleted.")
+    return redirect(url_for('account.home'))
+
