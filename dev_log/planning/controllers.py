@@ -1,6 +1,6 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 from dev_log.models import init_db
-from datetime import datetime, timedelta
+import datetime
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 from dev_log.utils.calendar import *
@@ -28,19 +28,12 @@ def home():
         else:
             return redirect(url_for('planning.get_nurse_planning', nurse_id=nurse_id, date=date, halfday=halfday))
 
-    current_date = datetime.datetime.now()
-    day = current_date.isocalendar()[2]
-    week = current_date.isocalendar()[1]
-    year = current_date.isocalendar()[0]
-    time = iso_to_gregorian(year, week, day)
-    time = time.strftime('%Y-%m-%d')
-
     if session.get('office_id'):
         nurses = Nurse.query.filter(Nurse.office_id == session['office_id'])
     else:
         nurses = Nurse.query.filter(Nurse.id == session['nurse_id'])
 
-    return render_template("planning_home.html", nurses=nurses, time=time)
+    return render_template("planning_home.html", nurses=nurses)
 
 
 @planning.route('/<int:nurse_id>/<date>/<halfday>', methods=['GET', 'POST'])

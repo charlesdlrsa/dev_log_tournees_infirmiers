@@ -1,0 +1,67 @@
+{% extends 'base_template.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Content -->
+
+  <div class="card-body">
+  <div class="table-responsive">
+    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+      <div class="card-header">
+        <h1>Availabilities from
+          {{date_start_week}}
+          to
+          {{date_end_week}}
+        </h1>
+      </div>
+
+      <thead>
+        <tr>
+          <th>Monday</th>
+          <th>Tuesday</th>
+          <th>Wednesday</th>
+          <th>Thursday</th>
+          <th>Friday</th>
+          <th>Saturday</th>
+          <th>Sunday</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+            {% for week_day in availabilities %}
+                {% if week_day['Morning'] == "A nurse is available" %}
+                      <td>
+                          <div class="col-lg-8 col-lg-8">
+                            <a href="" class="btn btn-secondary btn-sm active" role="button">New </a>
+                          </div>
+                      </td>
+                {% else %}
+                        <td class="table-success"> {{week_day['Morning']}} </td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+
+        <tr>
+            {% for week_day in availabilities %}
+                {% if week_day['Afternoon'] == "A nurse is available" %}
+                      <td>
+                          <div class="col-lg-8 col-lg-8">
+                            <a href="" class="btn btn-secondary btn-sm active" role="button">New </a>
+                          </div>
+                      </td>
+                {% else %}
+                        <td class="table-success"> {{week_day['Afternoon']}} </td>
+                {% endif%}
+            {% endfor %}
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+  </div>
+
+</div>
+
+{% endblock%}

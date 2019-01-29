@@ -148,7 +148,6 @@
 
 <script>
 
-
     var ref = window.location.href
     if (ref.includes('appointments')) {
         var current = document.getElementsByClassName("active");
@@ -166,6 +165,18 @@
         var current = document.getElementsByClassName("active");
         current[0].className = current[0].className.replace(" active", "");
         var right = document.getElementById('nurses');
+        right.className += " active";
+    }
+    else if (ref.includes('global_planning')) {
+        var current = document.getElementsByClassName("active");
+        current[0].className = current[0].className.replace(" active", "");
+        var right = document.getElementById('global_planning');
+        right.className += " active";
+    }
+    else if (ref.includes('account')) {
+        var current = document.getElementsByClassName("active");
+        current[0].className = current[0].className.replace(" active", "");
+        var right = document.getElementById('account');
         right.className += " active";
     }
     else {

@@ -9,6 +9,7 @@
 <div class="table-responsive">
   <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
     <div class="card-header">
+      <h1>Planning </h1>
       <div class='flex-row'>
         <div class="d-flex justify-content-between">
           <form method="post">
@@ -23,16 +24,16 @@
                 </select>
             </div>
             <div class="form-group">
-              <input type="date" id="date" class="form-control" placeholder="date" required="required" name="date" value="{{time}}" >
+              <input type="date" id="date" class="form-control" required="required" name="date">
             </div>
             <div class="form-group">
                 <select id="halfday" class="form-control" required="required" name="halfday">
-                  <option value="">Choose Halfday</option>
-                  <option> Morning </option>
-                  <option> Afternoon </option>
+                  <option value="" selected>Choose Halfday</option>
+                  <option value="Morning"> Morning </option>
+                  <option value="Afternoon"> Afternoon </option>
                 </select>
             </div>
-            <div class="form-group">
+            <div>
                 <button class="btn btn-primary btn-block" type="submit">View planning</button>
             </div>
           </form>
