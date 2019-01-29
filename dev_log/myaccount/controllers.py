@@ -5,6 +5,7 @@ from dev_log import db
 import datetime
 from dev_log.models import Absence, Office, Nurse, Care
 from dev_log.auth.controllers import login_required, admin_required
+
 # from dev_log.nurses.controllers import edit_nurse
 
 account = Blueprint('account', __name__, url_prefix='/account')
@@ -21,6 +22,7 @@ def home():
         id = session['office_id']
         office = Office.query.filter(Office.id == id).first()
         return render_template('office_account.html', office=office)
+
 
 @account.route('/edit/nurse/<int:nurse_id>', methods=['GET', 'POST'])
 @login_required

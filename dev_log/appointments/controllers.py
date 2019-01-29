@@ -32,7 +32,7 @@ def home():
                 care_research = request.form["care_research"]
             else:
                 care_research = None
-                error=True
+                error = True
         else:
             care_research = None
         if "date" in request.form.keys():
@@ -46,7 +46,6 @@ def home():
         else:
             return redirect(url_for('appointments.home', research=research, care_research=care_research, date=date))
 
-
     day = 1
     if "date" in request.args:
         current_date = datetime.datetime.strptime(request.args['date'], '%Y-%m-%d').date()
@@ -56,7 +55,7 @@ def home():
     year = current_date.isocalendar()[0]
     time = iso_to_gregorian(year, week, day)
     time = time.strftime('%Y-%m-%d')
-#    print(request.args)
+    #    print(request.args)
     if "research" in request.args:
         research = request.args["research"]
         patient = request.args["research"]
@@ -67,13 +66,13 @@ def home():
             date = iso_to_gregorian(year, week, i)
             day.append(check_appointments_patient(date=date, halfday="Morning", patient=patient))
             day.append(check_appointments_patient(date=date, halfday="Afternoon", patient=patient))
-            #print(day)
+            # print(day)
             i += 1
     else:
         appointments = [[None, None] for k in range(7)]
         research = None
 
-#    print(appointments)
+    #    print(appointments)
     start_week = iso_to_gregorian(year, week, 1)
     end_week = iso_to_gregorian(year, week, 7)
     start_week = str(start_week.day) + '/' + str(start_week.month)
@@ -98,13 +97,16 @@ def home():
     office = db.session.query(Office).all()
 
     if not ("care_research" in request.args and "research" in request.args and "date" in request.args):
-        return render_template('appointments_home.html',start_week=start_week,end_week=end_week,year=year,week=week,patients=patients,
-        nurses=nurses,cares=cares,time=time)
+        return render_template('appointments_home.html', start_week=start_week, end_week=end_week, year=year, week=week,
+                               patients=patients,
+                               nurses=nurses, cares=cares, time=time)
 
     availabilities = [[] for k in range(7)]
     i = 1
     for day in availabilities:
         date = iso_to_gregorian(year, week, i)
+        print(check_availability(date=date, nurses=nurses, cares=cares,
+                                      office=office, halfday="Morning"))
         day.append(check_availability(date=date, nurses=nurses, cares=cares,
                                       office=office, halfday="Morning"))
         day.append(check_availability(date=date, nurses=nurses, cares=cares,
@@ -112,7 +114,6 @@ def home():
         # day.append(check_availability(date=date, halfday="Morning", care_id=care_id))
         # day.append(check_availability(date=date, halfday="Afternoon", care_id=care_id))
         i += 1
-
 
     return render_template("appointments.html", availabilities=availabilities, start_week=start_week,
                            end_week=end_week, year=year, week=week, patients=patients,
@@ -244,7 +245,9 @@ def check_availability(date, nurses, cares, office, halfday):
     appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).all()
     data["appointments"] = []
     for app in appointments:
-        patient = db.session.query(Patient).filter(Patient.id == app.patient_id).all()
+        print(app)
+        patient = Patient.query.filter(Patient.id == app.patient_id).all()
+        print(patient[0].id)
         care = db.session.query(Care).filter(Care.id == app.care_id).all()
         app_data = {}
         app_data["app_id"] = str(app.id)
@@ -252,6 +255,7 @@ def check_availability(date, nurses, cares, office, halfday):
         app_data["app_lon"] = str(patient[0].longitude)
         app_data["app_length"] = str(care[0].duration)
         data["appointments"].append(app_data)
+        print(data)
     # response = solve_boolean(data)
     response = True
     return response
@@ -264,9 +268,9 @@ def check_appointments_patient(date, halfday, patient):
         Patient.last_name == patient[0]).first().id
 
     appointment = db.session.query(Appointment).filter(Appointment.date == date).filter(
-        Appointment.halfday == halfday.lower()).filter(Appointment.patient_id == patient_id).first()
+        Appointment.halfday == halfday).filter(Appointment.patient_id == patient_id).first()
 
-    #print(tester)
+    # print(tester)
     try:
         id = appointment.care_id
 
