@@ -350,6 +350,7 @@ def init_db():
     db.session.add(Care(description="Pansement", duration=60))
     db.session.add(Care(description="Piqûre", duration=30))
     db.session.add(Care(description="Post opératoire", duration=20))
+    db.session.add(Care(description="Injection", duration=25))
     ## Appointment : nurse_id, patient_id, date, care_id
     halfday = ["Morning", "Afternoon"]
     for pID in range(1, 7):
