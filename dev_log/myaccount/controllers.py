@@ -152,19 +152,19 @@ def add_absence():
     return render_template('add_vacation.html', nurse=nurse)
 
 
-def edit_admin(id):
-    name = request.form['name']
-    email = request.form['email']
-    phone = request.form['phone']
-    password = request.form['password']
-    address = request.form['address']
-
-    password = generate_password_hash(password)
-    db.session.query(Office).filter(Office.id == id). \
-        update(dict(name=name,
-                    email=email,
-                    phone=phone,
-                    password=password,
-                    address=address))
-    db.session.commit()
-    flash("The office's information have been updated")
+# def edit_admin(id):
+#     name = request.form['name']
+#     email = request.form['email']
+#     phone = request.form['phone']
+#     password = request.form['password']
+#     address = request.form['address']
+#
+#     password = generate_password_hash(password)
+#     db.session.query(Office).filter(Office.id == id). \
+#         update(dict(name=name,
+#                     email=email,
+#                     phone=phone,
+#                     password=password,
+#                     address=address))
+#     db.session.commit()
+#     flash("The office's information have been updated")
