@@ -16,7 +16,8 @@ def home():
         id = session['nurse_id']
         nurse = Nurse.query.filter(Nurse.id == id).first()
         absences = Absence.query.filter(Absence.nurse_id == id).all()
-        return render_template('nurse_account.html', nurse=nurse, absences=absences)
+        cares = Care.query.all()
+        return render_template('nurse_account.html', nurse=nurse, absences=absences, cares=cares)
     else:
         id = session['office_id']
         office = Office.query.filter(Office.id == id).first()
