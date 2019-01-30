@@ -14,7 +14,10 @@ planning = Blueprint('planning', __name__, url_prefix='/planning')
 @login_required
 def home():
     if request.method == "POST":
-        nurse_id = request.form['input_nurse']
+        if session.get('nurse_id') is not None:
+            nurse_id = session.get('nurse_id')
+        else:
+            nurse_id = request.form['input_nurse']
         date = request.form['date']
         halfday = request.form['halfday']
         error = None
@@ -31,7 +34,7 @@ def home():
     if session.get('office_id'):
         nurses = Nurse.query.filter(Nurse.office_id == session['office_id'])
     else:
-        nurses = Nurse.query.filter(Nurse.id == session['nurse_id'])
+        nurses = Nurse.query.filter(Nurse.id == session.get('nurse_id')).first()
 
     return render_template("planning_home.html", nurses=nurses)
 
@@ -39,7 +42,6 @@ def home():
 @planning.route('/<int:nurse_id>/<date>/<halfday>', methods=['GET', 'POST'])
 @login_required
 def get_nurse_planning(nurse_id, date, halfday):
-
     if request.method == "POST":
         pass
 
@@ -56,9 +58,3 @@ def get_nurse_planning(nurse_id, date, halfday):
 def reinit_db():
     init_db()
     return redirect(url_for("planning.home"))
-
-
-
-
-
-
