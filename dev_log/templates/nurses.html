@@ -56,7 +56,13 @@
             <tr>
               <td>{{ nurse.last_name }}</td>
               <td> {{ nurse.first_name }}</td>
-              <td> {{ nurse.cares }}</td>
+              <td>
+                {% for care in cares %}
+                {% if "-{}-".format(care.id) in nurse.cares %}
+                  - {{ care.description }} <br>
+                {% endif %}
+                {% endfor %}
+              </td>
               <td> {{ nurse.email }}</td>
               <td> {{ nurse.phone }}</td>
               <td> {{ nurse.address }}</td>

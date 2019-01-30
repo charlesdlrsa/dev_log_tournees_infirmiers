@@ -27,7 +27,8 @@ def home():
             return redirect(url_for('nurses.search_nurses', research=research))
 
     nurses = Nurse.query.filter(Nurse.office_id == session['office_id']).order_by(Nurse.last_name)
-    return render_template('nurses.html', nurses=nurses)
+    cares = db.session.query(Care).all()
+    return render_template('nurses.html', nurses=nurses, cares=cares)
 
 
 @nurses.route('/results/<research>', methods=['GET', 'POST'])
@@ -74,11 +75,11 @@ def add_nurse():
         password = request.form['password']
         phone = request.form['phone_number']
         address = request.form['address']
-        care = Care.query.all()
-        cares = ""
-        for c in care:
+        cares = Care.query.all()
+        checked_cares = ""
+        for c in cares:
             if request.form.get(str(c.id)) is not None:
-                cares += "-{}-".format(c.id)
+                checked_cares += "-{}-".format(c.id)
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
 
         if not last_name:
@@ -100,7 +101,7 @@ def add_nurse():
             # storing the new user information in the db
             password = generate_password_hash(password)
             nurse = Nurse(last_name=last_name, first_name=first_name, email=email, password=password,
-                          phone=phone, address=address, office_id=session['office_id'], cares=cares)
+                          phone=phone, address=address, office_id=session['office_id'], cares=checked_cares)
             db.session.add(nurse)
             db.session.commit()
             flash('The nurse was successfully added')
@@ -116,22 +117,19 @@ def add_nurse():
 @admin_required
 def edit_nurse(nurse_id):
     if request.method == "POST":
-        print(request.form)
         last_name = request.form['last_name']
         first_name = request.form['first_name']
         email = request.form['email']
         phone = request.form['phone_number']
         password = request.form['password']
         address = request.form['address']
-
-        care = Care.query.all()
-        print(care)
-        cares = ""
-        for c in care:
+        cares = Care.query.all()
+        checked_cares = ""
+        for c in cares:
             if request.form.get(str(c.id)) is not None:
-                cares += "-{}-".format(c.id)
+                checked_cares += "-{}-".format(c.id)
         regu_expr = r"^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*(\.[a-zA-Z]{2,6})$"
-        print(cares)
+
         if not last_name:
             error = 'A lastname is required.'
         elif not first_name:
@@ -155,7 +153,7 @@ def edit_nurse(nurse_id):
                             password=password,
                             address=address,
                             office_id=session['office_id'],
-                            cares=cares))
+                            cares=checked_cares))
             db.session.commit()
             flash("The nurse's information have been updated")
             return redirect(url_for('nurses.home'))
