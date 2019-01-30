@@ -121,7 +121,6 @@ def edit_nurse(nurse_id):
         first_name = request.form['first_name']
         email = request.form['email']
         phone = request.form['phone_number']
-        password = request.form['password']
         address = request.form['address']
         cares = Care.query.all()
         checked_cares = ""
@@ -136,15 +135,14 @@ def edit_nurse(nurse_id):
             error = 'A firstname is required.'
         elif re.search(regu_expr, email) is None:
             error = 'Please enter a correct email address.'
-        elif not password:
-            error = 'Password is required.'
         elif not phone:
             error = 'Phone is required.'
         elif not address:
             error = 'Please enter an address.'
 
         else:
-            password = generate_password_hash(password)
+            nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+            password = nurse.password
             db.session.query(Nurse).filter(Nurse.id == nurse_id). \
                 update(dict(last_name=last_name,
                             first_name=first_name,
