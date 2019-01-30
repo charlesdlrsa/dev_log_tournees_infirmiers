@@ -20,7 +20,7 @@ def get_dates_from_form(form_date_string):
     day = int(form_date_string[8:10])
     date_selected = datetime.date(year, month, day)
     day_date_selected = date_selected.weekday()
-    date_start_week = datetime.date(year, month, day) - datetime.timedelta(day_date_selected)
-    date_end_week = datetime.date(year, month, day) + datetime.timedelta(7)
+    date_start_week = date_selected - datetime.timedelta(day_date_selected)
+    date_end_week = date_start_week + datetime.timedelta(6)
 
     return date_selected, date_start_week, date_end_week

@@ -29,34 +29,22 @@
 <body id="page-top">
 
 <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
-  <div class="d-flex justify-content-between">
-      <div>
-        <a class="navbar-brand mr-1" href="{{ url_for('planning.home') }}">DevLog </a>
+    <div class="container-fluid">
+      <div class="navbar-header">
+            <a class="navbar-brand mr-1" href="{{ url_for('planning.home') }}">DevLog </a>
       </div>
       {% if session['office_id'] %}
-      <div>
-        <span> {{ session['office_name'].capitalize() }} <i style="color:#FFFFFF"
-                                                                                               class="fa fa-user"></i> </span>
-
-
-        <a style="align:right; color:#FEF42F" href="{{ url_for('auth.logout') }}"> Log Out <i style="color:#FFFFFF"
-                                                                                              class="fa fa-sign-out-alt"></i>
-
-        </a>
-      </div>
-
+      <ul class="nav navbar-nav navbar-right">
+          <li style="color:#B1F5FF; margin-right:15px">{{session['office_name'].capitalize()}}<i style="color:#FFFFFF; margin-left:5px;" class="fa fa-user"></i></li>
+          <li><a style="color:#B1F5FF; margin-right:5px" href="{{ url_for('auth.logout') }}">Log Out </a> <i style="color:#FFFFFF;" class="fa fa-sign-out-alt"></i> </li>
+      </ul>
       {% elif session['nurse_id'] %}
-      <div>
-        <span> {{ session['nurse_first_name'].capitalize() }} {{ session['nurse_last_name'].capitalize() }}  <i
-                style="color:#FFFFFF" class="fa fa-user"></i> </span>
-        <a  href="{{ url_for('auth.logout') }}">Log Out <i style="color:#FFFFFF"
-                                                                                             class="fa fa-sign-out-alt"></i>
-        </a>
-      </div>
-      {% else %}
+      <ul class="nav navbar-nav navbar-right">
+          <li style="color:#B1F5FF; margin-right:15px">{{session['nurse_first_name'].capitalize()}} {{session['nurse_last_name'].capitalize()}}<i style="color:#FFFFFF; margin-left:5px;" class="fa fa-user"></i></li>
+          <li><a style="color:#B1F5FF; margin-right:5px" href="{{ url_for('auth.logout') }}">Log Out </a> <i style="color:#FFFFFF;" class="fa fa-sign-out-alt"></i> </li>
+      </ul>
       {% endif %}
-  </div>
-
+    </div>
 </nav>
 
 <div id="wrapper">
