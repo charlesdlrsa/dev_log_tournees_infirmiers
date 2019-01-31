@@ -55,14 +55,9 @@
             <form method="post">
                 <div class="row">
                     <div class="col">
-                        <select id="patient_search" class="form-control" required="required" name="patient_search">
-                            <option value="" selected>Choose Patient</option>
-                            {% for patient in patients %}
-                            <option value="{{patient.id}}">
-                                {{patient.last_name}} - {{patient.first_name}}
-                            </option>
-                            {% endfor %}
-                        </select>
+                        <input id="patient_appointments_research" class="form-control"
+                               placeholder="Search (patient last-name then first-name)" required="required"
+                               name="patient_appointments_research">
                     </div>
                     <div class="col">
                         <button class="btn btn-info" type="submit">Search appointments</button>
