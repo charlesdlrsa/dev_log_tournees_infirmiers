@@ -4,53 +4,74 @@
 <div class="container-fluid">
 
     <!-- Page Content -->
+    <div class="card" style="margin-bottom:30px;">
+        <div class="card-header">
+            <h1>Add an appointment </h1>
+        </div>
+        <div class="card-body">
 
-  <div class="card-body">
-  <div class="table-responsive">
-    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-      <div class="card-header">
-        <h1>Add an appointment </h1>
-        <div class='flex-row'>
-            <div class="d-flex justify-content-between">
-                <form method="post">
-                <div class="form-group">
-                    <select id="input_patient" class="form-control" required="required" name="input_patient">
-                      <option value="" selected>Choose Patient</option>
-                      {% for patient in patients %}
-                      <option value="{{patient.id}}">
-                      {{patient.last_name}} - {{patient.first_name}}
-                      </option>
-                      {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <select id="input_care" class="form-control" required="required" name="input_care">
-                      <option value="" selected>Choose Care</option>
-                      {% for care in cares %}
-                      <option value="{{care.id}}">
-                      {{care.description}}
-                      </option>
-                      {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                  <input type="date" id="date" class="form-control" required="required" name="date">
-                </div>
-                <div>
-                    <button class="btn btn-secondary btn-md" type="submit">Search availabilities</button>
-                </div>
-                </form>
+            <form method="post">
+                <div class="row">
+                    <div class="col">
+                        <select id="input_patient" class="form-control" required="required" name="input_patient">
+                            <option value="" selected>Choose Patient</option>
+                            {% for patient in patients %}
+                            <option value="{{patient.id}}">
+                                {{patient.last_name}} - {{patient.first_name}}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select id="input_care" class="form-control" required="required" name="input_care">
+                            <option value="" selected>Choose Care</option>
+                            {% for care in cares %}
+                            <option value="{{care.id}}">
+                                {{care.description}}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
 
-              </div>
+                        <input type="date" id="date" class="form-control" required="required" name="date">
+
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-info" type="submit">Search availabilities</button>
+                    </div>
+                </div>
+            </form>
 
         </div>
-      </div>
+    </div>
 
+    <div class="card" style="margin-bottom:30px;">
+        <div class="card-header">
+            <h1>Search an appointment </h1>
+        </div>
+        <div class="card-body">
 
-    </table>
-  </div>
-  </div>
+            <form method="post">
+                <div class="row">
+                    <div class="col">
+                        <select id="patient_search" class="form-control" required="required" name="patient_search">
+                            <option value="" selected>Choose Patient</option>
+                            {% for patient in patients %}
+                            <option value="{{patient.id}}">
+                                {{patient.last_name}} - {{patient.first_name}}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-info" type="submit">Search appointments</button>
+                    </div>
+                </div>
+            </form>
 
+        </div>
+    </div>
 
 </div>
 

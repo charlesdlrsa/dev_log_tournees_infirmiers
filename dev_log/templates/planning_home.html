@@ -1,54 +1,60 @@
 {% extends 'base_template.html' %}
 {% block content %}
 
+<div class="container-fluid">
 
-<a href="{{ url_for('planning.reinit_db')}}" class="btn btn-secondary btn-sm active"
-   role="button"> Reinitialise database </a>
+    <div class="card" style="margin-bottom:30px;">
+        <div class="card-header">
+            {% if session['office_id'] %}
+            <h1>Get a nurse planning </h1>
+            {% elif session['nurse_id'] %}
+            <h1>Get your planning, {{nurses.first_name}} {{nurses.last_name}} </h1>
+            {% endif %}
+        </div>
+        <div class="card-body">
 
-<div class="card-body">
-    <div class="table-responsive">
-        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-            <div class="card-header">
-                {% if session['office_id'] %}
-                <h1>Get a nurse planning </h1>
-                {% elif session['nurse_id'] %}
-                <h1>Get your planning, {{nurses.first_name}} {{nurses.last_name}} </h1>
-                {% endif %}
-                <div class='flex-row'>
-                    <div class="d-flex justify-content-between">
-                        <form method="post">
-                            {% if session['office_id'] %}
-                            <div class="form-group">
-                                <select id="input_nurse" class="form-control" required="required" name="input_nurse">
-                                    <option value="">Choose Nurse</option>
-                                    {% for nurse in nurses %}
-                                    <option value="{{nurse.id}}">
-                                        {{nurse.last_name}} - {{nurse.first_name}}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            {% elif session['nurse_id'] %}
-                            {% endif %}
-                            <div class="form-group">
-                                <input type="date" id="date" class="form-control" required="required" name="date">
-                            </div>
-                            <div class="form-group">
-                                <select id="halfday" class="form-control" required="required" name="halfday">
-                                    <option value="" selected>Choose Halfday</option>
-                                    <option value="Morning"> Morning</option>
-                                    <option value="Afternoon"> Afternoon</option>
-                                </select>
-                            </div>
-                            <div>
-                                <button class="btn btn-secondary btn-md" type="submit">View planning</button>
-                            </div>
-                        </form>
+            <form method="post">
+                <div class="row">
+                    {% if session['office_id'] %}
+                    <div class="col">
+                        <select id="input_nurse" class="form-control" required="required" name="input_nurse">
+                            <option value="">Choose Nurse</option>
+                            {% for nurse in nurses %}
+                            <option value="{{nurse.id}}">
+                                {{nurse.last_name}} - {{nurse.first_name}}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="col">
+                        <select id="input_care" class="form-control" required="required" name="input_care">
+                            <option value="" selected>Choose Care</option>
+                            {% for care in cares %}
+                            <option value="{{care.id}}">
+                                {{care.description}}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+
+                        <select id="halfday" class="form-control" required="required" name="halfday">
+                            <option value="" selected>Choose Halfday</option>
+                            <option value="Morning"> Morning</option>
+                            <option value="Afternoon"> Afternoon</option>
+                        </select>
+
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-info" type="submit">View planning</button>
                     </div>
                 </div>
-            </div>
-        </table>
+            </form>
+
+        </div>
     </div>
+
 </div>
 
 
