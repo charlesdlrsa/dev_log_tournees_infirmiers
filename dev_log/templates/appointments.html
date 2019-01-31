@@ -48,32 +48,32 @@
             </thead>
 
 
-            <tbody style="font-weight:bold; text-align:center; vertical-align:middle;">
+            <tbody style="text-align:center;">
+            {% for appointment in appointments %}
             <tr>
-                {% for appointment in appointments %}
-                <td width="20%" style="font-size:14px; border:1px solid black;">
+                <td width="20%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
                     {{appointment.patient.last_name}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black;">
+                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
                     {{appointment.patient.first_name}}
                 </td>
-                <td width="15%" style="font-size:14px; border:1px solid black;">
+                <td width="15%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
                     {{appointment.patient.email}}
                 </td>
-                <td width="35%" style="font-size:14px; border:1px solid black;">
+                <td width="35%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
                     {{appointment.patient.address}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black;">
+                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
                     {{appointment.care.description}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black;">
+                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
                     {{appointment.date.strftime("%d/%m/%y")}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black;">
+                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
                     {{appointment.halfday}}
                 </td>
-                {% endfor %}
             </tr>
+            {% endfor %}
 
             </tbody>
 
