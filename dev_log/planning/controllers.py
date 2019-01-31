@@ -1,10 +1,7 @@
-from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
+from flask import Blueprint, request, render_template, flash, session, redirect, url_for
 from dev_log.models import init_db
-from dev_log.auth.controllers import login_required
-from dev_log.auth.controllers import admin_required
-from dev_log.utils.calendar import *
-from dev_log.models import Appointment, Patient, Nurse, Care, Office
-from dev_log import db
+from dev_log.auth.controllers import login_required, admin_required
+from dev_log.models import Nurse
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
@@ -48,12 +45,15 @@ def get_nurse_planning(nurse_id, date, halfday):
     arrival = {'lat': 48.83, 'lng': 2.36}
     travel_mode = 'DRIVING'
 
-    return render_template("planning_nurse.html", departure=departure, arrival=arrival, travel_mode=travel_mode,
-                           date=date, halfday=halfday)
+    return render_template("planning_nurse.html", departure=departure, arrival=arrival,
+                           travel_mode=travel_mode, date=date, halfday=halfday)
 
 
 @planning.route("/init", methods=['GET', 'POST'])
 @admin_required
 def reinit_db():
+    """
+    Initializes the database on click
+    """
     init_db()
     return redirect(url_for("planning.home"))
