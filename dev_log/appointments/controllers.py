@@ -168,3 +168,13 @@ def add_appointment(patient_id, date, care_id, halfday):
     return redirect(url_for('appointments.home'))
 
 
+@appointments.route('/delete_appointment/<int:appointment_id>')
+@admin_required
+def delete_appointment(appointment_id):
+    appointment = Appointment.query.get(appointment_id)
+    db.session.delete(appointment)
+    db.session.commit()
+    flash("The appointment was successfully deleted.")
+    return redirect(url_for('appointments.home'))
+
+
