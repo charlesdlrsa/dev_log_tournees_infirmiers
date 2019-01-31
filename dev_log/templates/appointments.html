@@ -5,7 +5,7 @@
 
     <div class="card" style="margin-bottom:30px;">
         <div class="card-header">
-            <h1>Search an appointment </h1>
+            <h1>Search another appointment </h1>
         </div>
         <div class="card-body">
 
@@ -13,7 +13,7 @@
                 <div class="row">
                     <div class="col">
                         <input id="patient_appointments_research" class="form-control"
-                               placeholder="Search (patient last-name then first-name)" required="required"
+                               placeholder="Search (patient first-name then last-name)" required="required"
                                name="patient_appointments_research">
                     </div>
                     <div class="col">
@@ -25,7 +25,7 @@
         </div>
     </div>
 
-
+    {% if appointments[0] %}
     <div class="table-responsive">
         <table class="table table-bordered" width="100%" cellspacing="0">
             <thead>
@@ -48,28 +48,28 @@
             </thead>
 
 
-            <tbody style="font-weight:bold; font-family:Trebuchet MS; text-align:center; vertical-align:middle;">
+            <tbody style="font-weight:bold; text-align:center; vertical-align:middle;">
             <tr>
                 {% for appointment in appointments %}
-                <td width="25%" style="font-size:12px; border:1px solid black;">
+                <td width="20%" style="font-size:14px; border:1px solid black;">
                     {{appointment.patient.last_name}}
                 </td>
-                <td width="15%" style="font-size:12px; border:1px solid black;">
+                <td width="10%" style="font-size:14px; border:1px solid black;">
                     {{appointment.patient.first_name}}
                 </td>
-                <td width="15%" style="font-size:12px; border:1px solid black;">
+                <td width="15%" style="font-size:14px; border:1px solid black;">
                     {{appointment.patient.email}}
                 </td>
-                <td width="25%" style="font-size:12px; border:1px solid black;">
+                <td width="35%" style="font-size:14px; border:1px solid black;">
                     {{appointment.patient.address}}
                 </td>
-                <td width="10%" style="font-size:12px; border:1px solid black;">
+                <td width="10%" style="font-size:14px; border:1px solid black;">
                     {{appointment.care.description}}
                 </td>
-                <td width="10%" style="font-size:12px; border:1px solid black;">
+                <td width="10%" style="font-size:14px; border:1px solid black;">
                     {{appointment.date.strftime("%d/%m/%y")}}
                 </td>
-                <td width="10%" style="font-size:12px; border:1px solid black;">
+                <td width="10%" style="font-size:14px; border:1px solid black;">
                     {{appointment.halfday}}
                 </td>
                 {% endfor %}
@@ -79,6 +79,13 @@
 
         </table>
     </div>
+
+    {% else %}
+
+    <p style="font-size:15px; font-weight: bold; color:#FF124F; text-align:center;"> No appointments found for
+        this research ! Please, enter a request respecting this format : first-name and then last-name.</p>
+
+    {% endif %}
 
 </div>
 {% endblock %}
