@@ -371,7 +371,7 @@ def init_db():
                            additional_postal_information="2eme gauche", office_id=1))
     db.session.add(Care(description="Bandage", duration=60))
     db.session.add(Care(description="Sting", duration=30))
-    db.session.add(Care(description="Post operative follow-up", duration=20))
+    db.session.add(Care(description="Post operative", duration=20))
     db.session.add(Care(description="Injection", duration=35))
     db.session.add(Care(description="Auscultation", duration=20))
     db.session.add(Care(description="Assistance", duration=60))
