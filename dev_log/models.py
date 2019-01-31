@@ -70,22 +70,22 @@ class Patient(BasePerson):
         db.Integer,
         db.ForeignKey('office.office_id'),
         nullable=False)
-    #
-    # office = db.relationship(
-    #     "Office",
-    #     backref="office_patient")
-    #
-    # def __init__(self, last_name, first_name, email, address, phone, digicode, additional_postal_information,
-    #              office_id, latitude=None, longitude=None):
-    #     self.last_name = last_name
-    #     self.first_name = first_name
-    #     self.email = email
-    #     self.address = address
-    #     self.digicode = digicode
-    #     self.additional_postal_information = additional_postal_information
-    #     self.phone = phone
-    #     self.office_id = office_id
-    #     geolocation(self, key)
+
+    office = db.relationship(
+        "Office",
+        backref="office_patient")
+
+    def __init__(self, last_name, first_name, email, address, phone, digicode, additional_postal_information,
+                 office_id, latitude=None, longitude=None):
+        self.last_name = last_name
+        self.first_name = first_name
+        self.email = email
+        self.address = address
+        self.digicode = digicode
+        self.additional_postal_information = additional_postal_information
+        self.phone = phone
+        self.office_id = office_id
+        geolocation(self, key)
 
 
 class Nurse(BasePerson):
@@ -109,19 +109,19 @@ class Nurse(BasePerson):
         db.String(50)
     )
 
-    # office = db.relationship(
-    #     "Office",
-    #     backref="office_nurse")
-    #
-    # def __init__(self, last_name, first_name, email, password, phone, address, office_id, cares):
-    #     self.last_name = last_name
-    #     self.first_name = first_name
-    #     self.email = email
-    #     self.phone = phone
-    #     self.password = password
-    #     self.address = address
-    #     self.office_id = office_id
-    #     self.cares = cares
+    office = db.relationship(
+        "Office",
+        backref="office_nurse")
+
+    def __init__(self, last_name, first_name, email, password, phone, address, office_id, cares):
+        self.last_name = last_name
+        self.first_name = first_name
+        self.email = email
+        self.phone = phone
+        self.password = password
+        self.address = address
+        self.office_id = office_id
+        self.cares = cares
 
 
 class Appointment(Base):
@@ -150,19 +150,19 @@ class Appointment(Base):
         db.String
     )
 
-    # patient = db.relationship(
-    #     "Patient",
-    #     backref="patient")
-    #
-    # care = db.relationship(
-    #     "Care",
-    #     backref="care")
-    #
-    # def __init__(self, patient_id, date, care_id, halfday=None):
-    #     self.patient_id = patient_id
-    #     self.date = date
-    #     self.halfday = halfday
-    #     self.care_id = care_id
+    patient = db.relationship(
+        "Patient",
+        backref="patient")
+
+    care = db.relationship(
+        "Care",
+        backref="care")
+
+    def __init__(self, patient_id, date, care_id, halfday=None):
+        self.patient_id = patient_id
+        self.date = date
+        self.halfday = halfday
+        self.care_id = care_id
 
 
 class Schedule(Base):
@@ -187,13 +187,13 @@ class Schedule(Base):
     #     backref="appointment"
     # )
 
-    # nurse = db.relationship(
-    #     "Nurse",
-    #     backref="nurse")
-    #
-    # def __init__(self, hour, nurse_id):
-    #     self.hour = hour
-    #     self.nurse_id = nurse_id
+    nurse = db.relationship(
+        "Nurse",
+        backref="nurse")
+
+    def __init__(self, hour, nurse_id):
+        self.hour = hour
+        self.nurse_id = nurse_id
 
 
 class Care(Base):
@@ -210,9 +210,9 @@ class Care(Base):
         db.Integer,
         nullable=False)
 
-    # def __init__(self, description, duration):
-    #     self.description = description
-    #     self.duration = duration
+    def __init__(self, description, duration):
+        self.description = description
+        self.duration = duration
 
 
 class Office(Base):
@@ -250,15 +250,15 @@ class Office(Base):
         db.Float
     )
 
-    # nurses = db.relationship("AssociationOfficeNurse")
-    #
-    # def __init__(self, name, address, email, phone, password, latitude=None, longitude=None):
-    #     self.name = name
-    #     self.address = address
-    #     self.email = email
-    #     self.phone = phone
-    #     self.password = password
-    #     geolocation(self, key)
+    nurses = db.relationship("AssociationOfficeNurse")
+
+    def __init__(self, name, address, email, phone, password, latitude=None, longitude=None):
+        self.name = name
+        self.address = address
+        self.email = email
+        self.phone = phone
+        self.password = password
+        geolocation(self, key)
 
 
 # Many to Many relation
