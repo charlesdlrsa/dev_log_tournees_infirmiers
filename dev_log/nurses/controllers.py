@@ -59,7 +59,8 @@ def search_nurses(research):
         error = "Please enter a lastname"
         flash(error)
 
-    return render_template('nurses.html', nurses=nurses)
+    cares = Care.query.all()
+    return render_template('nurses.html', nurses=nurses, cares=cares)
 
 
 @nurses.route('/add_nurse', methods=['GET', 'POST'])
