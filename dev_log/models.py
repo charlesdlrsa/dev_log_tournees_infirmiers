@@ -215,7 +215,7 @@ class Care(Base):
         self.duration = duration
 
 
-class Office(BasePerson):
+class Office(Base):
     id = db.Column(
         'office_id',
         db.Integer,
