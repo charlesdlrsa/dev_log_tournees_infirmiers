@@ -17,23 +17,30 @@ appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 @admin_required
 def home():
     if request.method == "POST":
-        patient_id = request.form['input_patient']
-        date = request.form['date']
-        date_selected = calendar.get_dates_from_form(date)[0]
-        care_id = request.form['input_care']
-        error = None
+        if request.form.get('input_patient') is not None:
+            patient_id = request.form['input_patient']
+            date = request.form['date']
+            date_selected = calendar.get_dates_from_form(date)[0]
+            care_id = request.form['input_care']
+            error = None
 
-        if patient_id == "":
-            error = "You need to select a nurse to view a planning"
-        elif care_id == "":
-            error = "You need to select a care"
-        elif date_selected <= datetime.date.today():
-            error = "You cannot add an appointment 24 hours before the wanted date."
-        if error is not None:
-            flash(error)
+            if patient_id == "":
+                error = "You need to select a nurse to view a planning"
+            elif care_id == "":
+                error = "You need to select a care"
+            elif date_selected <= datetime.date.today():
+                error = "You cannot add an appointment 24 hours before the wanted date."
+            if error is not None:
+                flash(error)
+            else:
+                return redirect(url_for('appointments.availabilities', patient_id=patient_id, date=date,
+                                        care_id=care_id))
+        elif request.form.get('patient_appointments_research') is not None:
+            research = request.form['patient_appointments_research']
+            return redirect(url_for('appointments.search_patient_appointments', research=research))
         else:
-            return redirect(url_for('appointments.availabilities', patient_id=patient_id, date=date,
-                                    care_id=care_id))
+            error = 'You must choose a patient.'
+            flash(error)
 
     patients = Patient.query.filter(Patient.office_id == session['office_id'])
     cares = db.session.query(Care).all()
@@ -79,6 +86,26 @@ def availabilities(patient_id, date, care_id):
     return render_template("availabilities.html", availabilities=availabilities, date_selected=date_selected,
                            date_start_week=date_start_week, date_end_week=date_end_week, patient=patient,
                            care=care)
+
+
+@appointments.route('/research-<research>', methods=['GET', 'POST'])
+def search_patient_appointments(research):
+
+    if request.method == "POST":
+        research = request.form['patient_appointments_research']
+        return redirect(url_for('appointments.search_patient_appointments', research=research))
+
+    if len(research.split()) >= 2:
+        first_name, last_name = research.split()[0], " ".join(research.split()[1:])
+        appointments = Appointment.query \
+            .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
+                                                  Patient.first_name.like('%' + first_name + '%')))
+    else:
+        appointments = Appointment.query \
+            .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + research + '%'),
+                                                  Patient.first_name.like('%' + research + '%')))
+
+    return render_template('appointments.html', appointments=appointments)
 
 
 def check_appointments_nurses(care_id, date, halfday):

@@ -28,14 +28,7 @@
                     </div>
                     {% endif %}
                     <div class="col">
-                        <select id="input_care" class="form-control" required="required" name="input_care">
-                            <option value="" selected>Choose Care</option>
-                            {% for care in cares %}
-                            <option value="{{care.id}}">
-                                {{care.description}}
-                            </option>
-                            {% endfor %}
-                        </select>
+                        <input type="date" id="date" class="form-control" required="required" name="date">
                     </div>
                     <div class="col">
 

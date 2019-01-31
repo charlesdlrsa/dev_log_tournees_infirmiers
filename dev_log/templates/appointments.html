@@ -1,0 +1,84 @@
+{% extends 'base_template.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="card" style="margin-bottom:30px;">
+        <div class="card-header">
+            <h1>Search an appointment </h1>
+        </div>
+        <div class="card-body">
+
+            <form method="post">
+                <div class="row">
+                    <div class="col">
+                        <input id="patient_appointments_research" class="form-control"
+                               placeholder="Search (patient last-name then first-name)" required="required"
+                               name="patient_appointments_research">
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-info" type="submit">Search appointments</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+
+    <div class="table-responsive">
+        <table class="table table-bordered" width="100%" cellspacing="0">
+            <thead>
+            <tr style="vertical-align:middle; text-align:center;" class="table-secondary">
+                <th scope="col" style="border:1px solid black;">Last Name
+                </th>
+                <th scope="col" style="border:1px solid black;">First Name
+                </th>
+                <th scope="col" style="border:1px solid black;">Email
+                </th>
+                <th scope="col" style="border:1px solid black;">Address
+                </th>
+                <th scope="col" style="border:1px solid black;">Care
+                </th>
+                <th scope="col" style="border:1px solid black;">Date
+                </th>
+                <th scope="col" style="border:1px solid black;">Halfday
+                </th>
+            </tr>
+            </thead>
+
+
+            <tbody style="font-weight:bold; font-family:Trebuchet MS; text-align:center; vertical-align:middle;">
+            <tr>
+                {% for appointment in appointments %}
+                <td width="25%" style="font-size:12px; border:1px solid black;">
+                    {{appointment.patient.last_name}}
+                </td>
+                <td width="15%" style="font-size:12px; border:1px solid black;">
+                    {{appointment.patient.first_name}}
+                </td>
+                <td width="15%" style="font-size:12px; border:1px solid black;">
+                    {{appointment.patient.email}}
+                </td>
+                <td width="25%" style="font-size:12px; border:1px solid black;">
+                    {{appointment.patient.address}}
+                </td>
+                <td width="10%" style="font-size:12px; border:1px solid black;">
+                    {{appointment.care.description}}
+                </td>
+                <td width="10%" style="font-size:12px; border:1px solid black;">
+                    {{appointment.date.strftime("%d/%m/%y")}}
+                </td>
+                <td width="10%" style="font-size:12px; border:1px solid black;">
+                    {{appointment.halfday}}
+                </td>
+                {% endfor %}
+            </tr>
+
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+{% endblock %}
