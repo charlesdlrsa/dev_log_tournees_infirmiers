@@ -56,4 +56,6 @@ def reinit_db():
     Initializes the database on click
     """
     init_db()
+    message = "The database has been reinitialised"
+    flash(message)
     return redirect(url_for("planning.home"))

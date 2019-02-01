@@ -149,7 +149,7 @@ def add_absence():
                     db.session.commit()
         flash("This absence has been added")
         return redirect(url_for('account.home'))
-    return render_template('add_vacation.html', nurse=nurse)
+    return render_template('add_absence.html', nurse=nurse)
 
 
 @account.route('/delete_nurse/<int:absence_id>')
