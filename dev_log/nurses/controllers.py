@@ -50,16 +50,18 @@ def search_nurses(research):
         first_name, last_name = research.split()[0], " ".join(research.split()[1:])
         nurses = Nurse.query.filter(or_(Nurse.last_name.like('%' + last_name + '%'),
                                         Nurse.first_name.like('%' + first_name + '%')),
-                                    Nurse.office_id == session['office_id'])
+                                    Nurse.office_id == session['office_id']).all()
     else:
         nurses = Nurse.query.filter(or_(Nurse.last_name.like('%' + research + '%'),
                                         Nurse.first_name.like('%' + research + '%')),
-                                    Nurse.office_id == session['office_id'])
+                                    Nurse.office_id == session['office_id']).all()
     if nurses is None:
         error = "Please enter a lastname"
         flash(error)
 
-    return render_template('nurses.html', nurses=nurses)
+    cares = db.session.query(Care).all()
+
+    return render_template('nurses.html', nurses=nurses, cares=cares)
 
 
 @nurses.route('/add_nurse', methods=['GET', 'POST'])

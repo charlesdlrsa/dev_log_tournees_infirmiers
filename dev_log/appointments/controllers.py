@@ -42,7 +42,7 @@ def home():
             error = 'You must choose a patient.'
             flash(error)
 
-    patients = Patient.query.filter(Patient.office_id == session['office_id'])
+    patients = Patient.query.filter(Patient.office_id == session['office_id']).order_by(Patient.last_name)
     cares = db.session.query(Care).all()
 
     return render_template("appointments_home.html", patients=patients, cares=cares)
@@ -78,7 +78,7 @@ def availabilities(patient_id, date, care_id):
                 else:
                     availabilities[week_day][halfday] = "No nurse is available"
             else:
-                availabilities[week_day][halfday] = "Appointment already scheduled: {}".format(appointment)
+                availabilities[week_day][halfday] = "Appointment already scheduled: -- {} --".format(appointment)
 
     patient = Patient.query.filter(Patient.id == patient_id).first()
     care = Care.query.filter(Care.id == care_id).first()

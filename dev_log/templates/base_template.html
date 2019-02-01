@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Dev Log Project</title>
+    <title>Nursissimo website</title>
 
     <!-- Bootstrap core CSS-->
     <link href="{{ url_for('static', filename='bootstrap.min.css')}}" rel="stylesheet">
@@ -31,21 +31,24 @@
 <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand mr-1" href="{{ url_for('planning.home') }}" style="color:#B1F5FF;">DevLog </a>
+            <img src="{{ url_for('static', filename='nurse_logo.png') }}"
+                 style="width:60px;margin-right:5px; vertical-align:middle;">
+            <a class="navbar-brand mr-1" href="{{ url_for('planning.home') }}"
+               style="color:#B1F5FF; font-size:30px; vertical-align:middle; font-family:Impact;">Nursissimo </a>
         </div>
         {% if session['office_id'] %}
         <ul class="nav navbar-nav navbar-right">
-            <li style="color:#B1F5FF; margin-right:15px">{{session['office_name'].capitalize()}}<i
-                    style="color:#FFFFFF; margin-left:5px;" class="fa fa-user"></i></li>
-            <li><a style="color:#B1F5FF; margin-right:5px" href="{{ url_for('auth.logout') }}">Log Out </a> <i
+            <li style="color:#B1F5FF; margin-right:15px; font-style:italic;">{{session['office_name'].capitalize()}}<i
+                    style="color:#FFFFFF; margin-left:8px;" class="fa fa-user"></i></li>
+            <li><a style="color:#B1F5FF; margin-right:5px; font-style:italic;" href="{{ url_for('auth.logout') }}">Log Out </a> <i
                     style="color:#FFFFFF;" class="fa fa-sign-out-alt"></i></li>
         </ul>
         {% elif session['nurse_id'] %}
         <ul class="nav navbar-nav navbar-right">
-            <li style="color:#B1F5FF; margin-right:15px">{{session['nurse_first_name'].capitalize()}}
+            <li style="color:#B1F5FF; margin-right:15px font-style:italic;">{{session['nurse_first_name'].capitalize()}}
                 {{session['nurse_last_name'].capitalize()}}<i style="color:#FFFFFF; margin-left:5px;"
                                                               class="fa fa-user"></i></li>
-            <li><a style="color:#B1F5FF; margin-right:5px" href="{{ url_for('auth.logout') }}">Log Out </a> <i
+            <li><a style="color:#B1F5FF; margin-right:5px; font-style:italic;" href="{{ url_for('auth.logout') }}">Log Out </a> <i
                     style="color:#FFFFFF;" class="fa fa-sign-out-alt"></i></li>
         </ul>
         {% endif %}
@@ -56,10 +59,10 @@
 
     <!-- Sidebar -->
     <ul class="sidebar navbar-nav" , id="myDIV">
-        <li class="nav-item active" id="global_planning">
-            <a class="nav-link" href="{{url_for('planning.home')}}" id="global_planning_link">
+        <li class="nav-item active" id="planning">
+            <a class="nav-link" href="{{url_for('planning.home')}}" id="planning_link">
                 <i class="far fa-calendar-alt"></i>
-                <span>Nurse Planning</span>
+                <span>Planning</span>
             </a>
         </li>
         {% if session['office_id'] %}
@@ -163,10 +166,10 @@
         var right = document.getElementById('nurses');
         right.className += " active";
     }
-    else if (ref.includes('global_planning')) {
+    else if (ref.includes('planning')) {
         var current = document.getElementsByClassName("active");
         current[0].className = current[0].className.replace(" active", "");
-        var right = document.getElementById('global_planning');
+        var right = document.getElementById('planning');
         right.className += " active";
     }
     else if (ref.includes('account')) {
@@ -178,23 +181,9 @@
     else {
         var current = document.getElementsByClassName("active");
         current[0].className = current[0].className.replace(" active", "");
-        var right = document.getElementById('global_planning');
+        var right = document.getElementById('planning');
         right.className += " active";
     }
 
-    // Get the container element
-    //var btnContainer = document.getElementById("myDIV");
-
-    // Get all buttons with class="nav-item" inside the container
-    //var btns = btnContainer.getElementsByClassName("nav-link");
-
-    // Loop through the buttons and add the active class to the current/clicked button
-    // for (var i = 0; i < btns.length; i++) {
-    //   btns[i].addEventListener("click", function() {
-    //     var current = document.getElementsByClassName("active");
-    //     current[0].className = current[0].className.replace(" active", "");
-    //     this.className += " active";
-    //   });
-    // }
 
 </script>

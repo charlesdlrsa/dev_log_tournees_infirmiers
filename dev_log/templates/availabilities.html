@@ -34,7 +34,7 @@
                                value="{{date_selected.isoformat()}}">
                     </div>
                     <div>
-                        <button class="btn btn-info" type="submit">Search availabilities
+                        <button class="btn btn-primary" type="submit">Search availabilities
                         </button>
                     </div>
                 </div>
@@ -45,37 +45,37 @@
     <div class="table-responsive">
         <table class="table table-bordered" width="100%" cellspacing="0">
             <thead>
-            <tr style="vertical-align:middle; text-align:center;" class="table-secondary">
-                <th scope="col" style="background-color:white; border:0px;"></th>
-                <th scope="col" style="border:1px solid black;">Monday <br>
+            <tr style="text-align:center;" class="table-secondary">
+                <th scope="col" style="background-color:white; border:0px; vertical-align:middle;"></th>
+                <th scope="col" style="border:1px solid black; vertical-align:middle;">Monday <br>
                     {{availabilities[0]['date'].strftime("%d/%m/%y")}}
                 </th>
-                <th scope="col" style="border:1px solid black;">Tuesday <br>
+                <th scope="col" style="border:1px solid black; vertical-align:middle;">Tuesday <br>
                     {{availabilities[1]['date'].strftime("%d/%m/%y")}}
                 </th>
-                <th scope="col" style="border:1px solid black;">Wednesday <br>
+                <th scope="col" style="border:1px solid black; vertical-align:middle;">Wednesday <br>
                     {{availabilities[2]['date'].strftime("%d/%m/%y")}}
                 </th>
-                <th scope="col" style="border:1px solid black;">Thursday <br>
+                <th scope="col" style="border:1px solid black; vertical-align:middle;">Thursday <br>
                     {{availabilities[3]['date'].strftime("%d/%m/%y")}}
                 </th>
-                <th scope="col" style="border:1px solid black;">Friday <br>{{availabilities[4]['date'].strftime("%d/%m/%y")}}
+                <th scope="col" style="border:1px solid black; vertical-align:middle;">Friday <br>{{availabilities[4]['date'].strftime("%d/%m/%y")}}
                 </th>
-                <th scope="col" style="border:1px solid black;">Saturday <br>
+                <th scope="col" style="border:1px solid black; vertical-align:middle;">Saturday <br>
                     {{availabilities[5]['date'].strftime("%d/%m/%y")}}
                 </th>
-                <th scope="col" style="border:1px solid black;">Sunday <br>
+                <th scope="col" style="border:1px solid black; vertical-align:middle;">Sunday <br>
                     {{availabilities[6]['date'].strftime("%d/%m/%y")}}
                 </th>
             </tr>
             </thead>
 
-            <tbody style="font-weight:bold; font-family:Trebuchet MS; text-align:center; vertical-align:middle;">
+            <tbody style="text-align:center;">
             <tr>
                 <th style="border:1px solid black; vertical-align:middle;" class="table-secondary">Morning</th>
                 {% for week_day in availabilities %}
                 {% if week_day['Morning'] == "A nurse is available" %}
-                <td width="13%" style="font-size:10px; color:#19B8CF; border:1px solid black;">
+                <td width="13%" style="font-size:12px; color:#19B8CF; border:1px solid black; vertical-align:middle;">
                     <div style="margin-bottom:10px;">
                         <a href="{{ url_for('appointments.add_appointment',patient_id=patient.id, date=week_day['date'],
                             care_id=care.id, halfday='Morning')}}" class="btn btn-info">Add </a>
@@ -85,7 +85,7 @@
                     </div>
                 </td>
                 {% else %}
-                <td width="13%" class="bg-danger" style="font-size:12px; color:#FFFFFF;border:1px solid black;">
+                <td width="13%" class="bg-danger" style="font-size:14px; color:#FFFFFF; border:1px solid black; vertical-align:middle;">
                     {{week_day['Morning']}}
                 </td>
                 {% endif %}
@@ -96,7 +96,7 @@
                 <th style="border:1px solid black; vertical-align:middle;" class="table-secondary">Afternoon</th>
                 {% for week_day in availabilities %}
                 {% if week_day['Afternoon'] == "A nurse is available" %}
-                <td width="13%" style="font-size:10px; color:#19B8CF; border:1px solid black;">
+                <td width="13%" style="font-size:12px; color:#19B8CF; border:1px solid black; vertical-align:middle;">
                     <div style="margin-bottom:10px;">
                         <a href="{{ url_for('appointments.add_appointment',patient_id=patient.id, date=week_day['date'],
                             care_id=care.id, halfday='Afternoon')}}" class="btn btn-info">Add </a>
@@ -106,7 +106,7 @@
                     </div>
                 </td>
                 {% else %}
-                <td width="13%" class="bg-danger" style="font-size:12px; color:#FFFFFF; border:1px solid black;">
+                <td width="13%" class="bg-danger" style="font-size:14px; color:#FFFFFF; border:1px solid black; vertical-align:middle;">
                     {{week_day['Afternoon']}}
                 </td>
                 {% endif %}
