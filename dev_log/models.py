@@ -1,9 +1,9 @@
-import googlemaps
-from werkzeug.security import check_password_hash, generate_password_hash
-from dev_log import db
-from dev_log.key import key
 import datetime
 import random
+import googlemaps
+from werkzeug.security import generate_password_hash
+from dev_log import db
+from dev_log.key import key
 
 
 def geolocation(classe, key):
