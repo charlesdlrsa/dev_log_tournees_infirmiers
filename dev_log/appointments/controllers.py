@@ -51,7 +51,6 @@ def home():
 @appointments.route('/availabilities/patient-<int:patient_id>/date-<date>/care-<care_id>', methods=['GET', 'POST'])
 @admin_required
 def availabilities(patient_id, date, care_id):
-
     if request.method == "POST":
         patient_id = request.form['input_patient']
         date = request.form['date']
@@ -90,7 +89,6 @@ def availabilities(patient_id, date, care_id):
 
 @appointments.route('/research-<research>', methods=['GET', 'POST'])
 def search_patient_appointments(research):
-
     if request.method == "POST":
         research = request.form['patient_appointments_research']
         return redirect(url_for('appointments.search_patient_appointments', research=research))
@@ -109,7 +107,6 @@ def search_patient_appointments(research):
 
 
 def check_appointments_nurses(care_id, date, halfday):
-
     # nurses = Nurse.query.filter(Nurse.office_id == session['office_id'])
     # office = Office.query.filter(Office.id == session['office_id'])
     # data = {}
@@ -154,7 +151,8 @@ def check_appointments_patient(patient_id, date, halfday):
         return care_description
 
 
-@appointments.route('/add_appointment/patient-<int:patient_id>/date-<date>/care-<care_id>/halfday-<halfday>', methods=['GET', 'POST'])
+@appointments.route('/add_appointment/patient-<int:patient_id>/date-<date>/care-<care_id>/halfday-<halfday>',
+                    methods=['GET', 'POST'])
 def add_appointment(patient_id, date, care_id, halfday):
     """
     Add a new appointment
@@ -176,5 +174,3 @@ def delete_appointment(appointment_id):
     db.session.commit()
     flash("The appointment was successfully deleted.")
     return redirect(url_for('appointments.home'))
-
-

@@ -1,7 +1,8 @@
 from flask import Blueprint, request, render_template, flash, session, redirect, url_for
 from dev_log.models import init_db
 from dev_log.auth.controllers import login_required, admin_required
-from dev_log.models import Nurse
+from dev_log.models import Nurse, Patient, Schedule, Appointment
+from dev_log.utils import calendar
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
@@ -30,7 +31,7 @@ def home():
     if session.get('office_id'):
         nurses = Nurse.query.filter(Nurse.office_id == session['office_id'])
     else:
-        nurses = Nurse.query.filter(Nurse.id == session.get('nurse_id')).first()
+        nurses = None
 
     return render_template("planning_home.html", nurses=nurses)
 
@@ -38,15 +39,18 @@ def home():
 @planning.route('/<int:nurse_id>/<date>/<halfday>', methods=['GET', 'POST'])
 @login_required
 def get_nurse_planning(nurse_id, date, halfday):
-    if request.method == "POST":
+    if request.method == 'POST':
         pass
 
-    departure = {'lat': 48.81, 'lng': 2.34}
-    arrival = {'lat': 48.83, 'lng': 2.36}
-    travel_mode = 'DRIVING'
+    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+    date_selected = calendar.get_dates_from_form(date)[0]
 
-    return render_template("planning_nurse.html", departure=departure, arrival=arrival,
-                           travel_mode=travel_mode, date=date, halfday=halfday)
+    # TO DO : à changer par la vraie fonction de Romu
+    schedules = Patient.query.all()[:5]
+    nb_schedules = len(schedules)
+
+    return render_template("planning_nurse.html", nurse=nurse, date=date_selected, halfday=halfday,
+                           schedules=schedules, nb_schedules=nb_schedules)
 
 
 @planning.route("/init", methods=['GET', 'POST'])
