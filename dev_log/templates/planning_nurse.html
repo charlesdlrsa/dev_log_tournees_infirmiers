@@ -11,10 +11,12 @@
     {% endif %}
 </div>
 
+<div style="font-size:18px; font-weight: bold; color:#0F94FF; text-align:center; margin-bottom:2%;">
+   Please click on one of the blue buttons to see how to go to the appointment from the previous appointment.
+</div>
+
 <div style="float:left; width:57%; vertical-align:middle; margin-left:2%; margin-right:2%;">
-    {% if schedules[0] %}
-    <p style="font-size:14px; font-weight: bold; color:#648DFF; text-align:center;">
-        Please click on one of the blue buttons to see how to go to the appointment from the previous appointment. </p>
+    {% if schedules[1] %}
     <div class="table-responsive">
         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
             <thead>
@@ -44,24 +46,24 @@
             <tbody style="text-align:center;">
             <tr>
                 <td width=5% style="font-size:12px; border:1px solid black; vertical-align:middle;">
-                    Your office
+                    <a onclick="initMap()" href="#office" class="btn btn-primary"> Your office </a>
                 </td>
                 <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
-                    {{nurse.office.name}}
+                    {{schedules[0].name}}
                 </td>
                 <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
                     ---
                 </td>
                 <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
-                    {{nurse.office.phone}}
+                    {{schedules[0].phone}}
                 </td>
-                <td width=30% style="font-size:12px; border:1px solid black; vertical-align:middle;">
-                    {{nurse.office.address}}
+                <td width=40% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                    {{schedules[0].address}}
                 </td>
                 <td width=5% style="font-size:12px; border:1px solid black; vertical-align:middle;">
                     ---
                 </td>
-                <td width=15% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=5% style="font-size:12px; border:1px solid black; vertical-align:middle;">
                     ---
                 </td>
                 <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
@@ -71,13 +73,13 @@
                     8h
                 </td>
             </tr>
-            {% for i in range(nb_schedules) %}
+            {% for i in range(1, nb_schedules) %}
             <tr>
                 <td width=5%
                     style="font-size:12px; border:1px solid black; vertical-align:middle;">
                     <a onclick="drawMap('{{schedules[i-1].latitude}}', '{{schedules[i-1].longitude}}',
-                      '{{schedules[i].latitude}}', '{{schedules[i].longitude}}')" href="#{{i-1}}->{{i+1}}" class="btn btn-primary">RDV
-                        {{i+1}}</a>
+                      '{{schedules[i].latitude}}', '{{schedules[i].longitude}}')" href="#{{i-1}}->{{i}}" class="btn btn-primary">RDV
+                        {{i}}</a>
                 </td>
                 <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
                     {{schedules[i].last_name}}
@@ -88,13 +90,13 @@
                 <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
                     {{schedules[i].phone}}
                 </td>
-                <td width=30% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=40% style="font-size:12px; border:1px solid black; vertical-align:middle;">
                     {{schedules[i].address}}
                 </td>
                 <td width=5% style="font-size:12px; border:1px solid black; vertical-align:middle;">
                     {{schedules[i].digicode}}
                 </td>
-                <td width=15% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=5% style="font-size:12px; border:1px solid black; vertical-align:middle;">
                     {{schedules[i].additional_postal_information}}
                 </td>
                 <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
