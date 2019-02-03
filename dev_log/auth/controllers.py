@@ -71,7 +71,7 @@ def login():
         if user_type == "nurse":
             nurse = Nurse.query.filter(Nurse.email == email).first()
             if nurse is None:
-                error = 'Incorrect email address.'
+                error = 'Incorrect email address or user type.'
             elif not check_password_hash(nurse.password, password):
                 error = 'Incorrect password.'
 
@@ -97,7 +97,7 @@ def login():
             office = Office.query.filter(Office.email == email).first()
 
             if office is None:
-                error = 'Incorrect email address.'
+                error = 'Incorrect email address or user type.'
             elif not check_password_hash(office.password, password):
                 error = 'Incorrect password.'
 
