@@ -47,7 +47,7 @@ def get_nurse_planning(nurse_id, date, halfday):
 
     # TO DO : à changer par la vraie fonction de Romu
     office = Office.query.filter(Office.id == nurse.office_id).all()
-    schedules = Patient.query.all()[:5]
+    schedules = Patient.query.filter(Patient.office_id == nurse.office_id)[:5]
     schedules = office + schedules
     nb_schedules = len(schedules)
 
