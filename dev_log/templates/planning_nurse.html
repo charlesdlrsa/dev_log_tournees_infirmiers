@@ -12,7 +12,7 @@
 </div>
 
 <div style="font-size:18px; font-weight: bold; color:#0F94FF; text-align:center; margin-bottom:2%;">
-   Please click on one of the blue buttons to see how to go to the appointment from the previous appointment.
+    Please click on one of the blue buttons to see how to go to the appointment from the previous appointment.
 </div>
 
 <div style="float:left; width:57%; vertical-align:middle; margin-left:2%; margin-right:2%;">
@@ -46,7 +46,7 @@
             <tbody style="text-align:center;">
             <tr>
                 <td width=5% style="font-size:12px; vertical-align:middle;">
-                    <a onclick="initMap()" href="#office" class="btn btn-primary"> Your office </a>
+                    <a onclick="seeMyOffice()" href="#office" class="btn btn-primary"> Your office </a>
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
                     {{schedules[0].name}}
@@ -77,8 +77,9 @@
             <tr>
                 <td width=5%
                     style="font-size:12px; vertical-align:middle;">
-                    <a onclick="drawMap('{{schedules[i-1].latitude}}', '{{schedules[i-1].longitude}}',
-                      '{{schedules[i].latitude}}', '{{schedules[i].longitude}}')" href="#{{i-1}}->{{i}}" class="btn btn-primary">RDV
+                    <a onclick="drawMap({{schedules[i-1].latitude}}, {{schedules[i-1].longitude}},
+                      {{schedules[i].latitude}}, {{schedules[i].longitude}})" href="#{{i-1}}->{{i}}"
+                       class="btn btn-primary">RDV
                         {{i}}</a>
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
@@ -122,14 +123,17 @@
 
 </div>
 
-<div id="map" style="height:80%; width:37%; float:right; margin-left:0%; margin-right:2%; vertical-align:middle;"></div>
+<div id="map"
+     style="height:80%; width:37%; float:right; margin-left:0%; margin-right:2%; vertical-align:middle; padding:150px;">
+    <a onclick="initMap()" href="#alltrajects" class="btn btn-danger"> See all your journeys on a map ! </a>
+</div>
 
 <script>
 
 var office_lat = {{nurse.office.latitude}};
 var office_lng = {{nurse.office.longitude}};
 
-function initMap(lat=office_lat, lng=office_lng){
+function seeMyOffice(lat=office_lat, lng=office_lng){
     var office = {'lat': lat , 'lng': lng};
     var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: office});
     var marker = new google.maps.Marker({position: office, map: map, label: {text: 'Your office', fontSize:"18px",fontWeight:"bold", color:'black'}});
@@ -137,11 +141,39 @@ function initMap(lat=office_lat, lng=office_lng){
     directionsDisplay.setMap(map);
 };
 
+var schedules_js = [];
+{% for schedule in schedules %}
+schedules_js.push( {'latitude':{{schedule.latitude}}, 'longitude':{{schedule.longitude}} } )
+{% endfor %}
+
+function initMap(schedules=schedules_js, travel_mode='DRIVING'){
+    var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: departure});
+    var directionsService = new google.maps.DirectionsService();
+    var directionsDisplay = new google.maps.DirectionsRenderer();
+    directionsDisplay.setMap(map);
+    var departure = {'lat': schedules[0]['latitude'], 'lng': schedules[0]['longitude']};
+    var arrival = {'lat': schedules[schedules.length-1]['latitude'], 'lng': schedules[schedules.length-1]['longitude']};
+    console
+   var request = {
+        origin: departure,
+        destination: arrival,
+        waypoints: [],
+        travelMode: travel_mode,
+    };
+    for (var i=1; i<schedules.length-1; i++){
+        request.waypoints.push({
+          location: {'lat':schedules[i]['latitude'], 'lng':schedules[i]['longitude'] },
+          stopover: true,
+          });
+    };
+    directionsService.route(request, function(result, status) {
+        if (status == 'OK') {
+            directionsDisplay.setDirections(result);
+        }
+    });
+};
+
 function drawMap(lat_depart, lng_depart, lat_arrival, lng_arrival, travel_mode='DRIVING') {
-    lat_depart = parseFloat(lat_depart);
-    lng_depart = parseFloat(lng_depart);
-    lat_arrival = parseFloat(lat_arrival);
-    lng_arrival = parseFloat(lng_arrival);
     var departure = {'lat': lat_depart, 'lng': lng_depart};
     var arrival = {'lat': lat_arrival, 'lng': lng_arrival};
     var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: departure});
@@ -161,10 +193,12 @@ function drawMap(lat_depart, lng_depart, lat_arrival, lng_arrival, travel_mode='
 };
 
 
+
+
 </script>
 
 <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoozmkZ8_YSofc8Hb7nqnG3cWcJSlY6gQ&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoozmkZ8_YSofc8Hb7nqnG3cWcJSlY6gQ">
 </script>
 
 {% endblock %}
