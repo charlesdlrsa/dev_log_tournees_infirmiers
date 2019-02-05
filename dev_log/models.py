@@ -9,6 +9,7 @@ class Base(db.Model):
         db.Integer,
         primary_key=True,
         nullable=False)
+    
 
     def geolocation(self):
         """
