@@ -1,12 +1,11 @@
 from flask import Blueprint, request, render_template, flash, redirect, url_for, session
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import generate_password_hash
 import re
 from sqlalchemy.sql import or_
 from dev_log import db
 from dev_log.models import Nurse, Care
 from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
-from dev_log.key import key
 
 nurses = Blueprint('nurses', __name__, url_prefix='/nurses')
 
@@ -27,7 +26,7 @@ def home():
             return redirect(url_for('nurses.search_nurses', research=research))
 
     nurses = Nurse.query.filter(Nurse.office_id == session['office_id']).order_by(Nurse.last_name)
-    cares = db.session.query(Care).all()
+    cares = Care.query.all()
     return render_template('nurses.html', nurses=nurses, cares=cares)
 
 
@@ -110,7 +109,7 @@ def add_nurse():
 
         flash(error)
 
-    cares = db.session.query(Care).all()
+    cares = Care.query.all()
     return render_template('add_nurse.html', cares=cares)
 
 
@@ -144,7 +143,7 @@ def edit_nurse(nurse_id):
         else:
             nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
             password = nurse.password
-            db.session.query(Nurse).filter(Nurse.id == nurse_id). \
+            Nurse.query.filter(Nurse.id == nurse_id). \
                 update(dict(last_name=last_name,
                             first_name=first_name,
                             email=email,
@@ -160,7 +159,7 @@ def edit_nurse(nurse_id):
         flash(error)
 
     nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
-    cares = db.session.query(Care).all()
+    cares = Care.query.all()
     return render_template("edit_nurse.html", cares=cares, nurse=nurse)
 
 

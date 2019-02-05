@@ -1,5 +1,5 @@
 from flask import Blueprint, request, render_template, flash, session, redirect, url_for
-from dev_log.models import init_db
+from dev_log.init_database import init_db
 from dev_log.auth.controllers import login_required, admin_required
 from dev_log.models import Nurse, Patient, Schedule, Appointment, Office
 from dev_log.utils import calendar
@@ -53,8 +53,6 @@ def get_nurse_planning(nurse_id, date, halfday):
 
     return render_template("planning_nurse.html", nurse=nurse, date=date_selected, halfday=halfday,
                            schedules=schedules, nb_schedules=nb_schedules)
-
-
 
 
 @planning.route("/init", methods=['GET', 'POST'])
