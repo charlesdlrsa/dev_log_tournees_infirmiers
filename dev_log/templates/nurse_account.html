@@ -11,23 +11,23 @@
         <table class="table table-bordered" width="100%" cellspacing="0">
             <thead>
             <tr style="text-align:center;" class="table-secondary">
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Last Name
+                <th scope="col" style="vertical-align:middle;">Last Name
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">First Name
+                <th scope="col" style="vertical-align:middle;">First Name
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Handled Cares
+                <th scope="col" style="vertical-align:middle;">Handled Cares
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Email
+                <th scope="col" style="vertical-align:middle;">Email
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Phone number
+                <th scope="col" style="vertical-align:middle;">Phone number
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Address
+                <th scope="col" style="vertical-align:middle;">Address
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Office
+                <th scope="col" style="vertical-align:middle;">Office
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Edit
+                <th scope="col" style="vertical-align:middle;">Edit
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Add vacation
+                <th scope="col" style="vertical-align:middle;">Add vacation
                 </th>
             </tr>
             </thead>
@@ -35,36 +35,36 @@
 
             <tbody style="text-align:center;">
             <tr>
-                <td width="10%" style="font-size:16px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:16px; vertical-align:middle;">
                     {{nurse.last_name}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     {{nurse.first_name}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     {% for care in cares %}
                     {% if "-{}-".format(care.id) in nurse.cares %}
                     - {{ care.description }} <br>
                     {% endif %}
                     {% endfor %}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     {{nurse.email}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     {{ nurse.phone}}
                 </td>
-                <td width="30%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="30%" style="font-size:14px; vertical-align:middle;">
                     {{nurse.address}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     {{ nurse.office.name}}
                 </td>
-                <td width="5%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="5%" style="font-size:14px; vertical-align:middle;">
                     <a href="{{ url_for('account.edit_nurse_account',nurse_id=nurse.id)}}"
                        class="btn btn-outline-danger">Edit</a>
                 </td>
-                <td width="5%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="5%" style="font-size:14px; vertical-align:middle;">
                     <a href="{{ url_for('account.add_absence', nurse_id=nurse.id)}}"
                        class="btn btn-primary">Add vacation</a>
                 </td>
@@ -79,15 +79,15 @@
         <h1>My absences</h1>
     </div>
 
-    <div class="table-responsive" style="margin-bottom:50px;">
+    <div class="table-responsive" style="margin-bottom:50px; border-radius:10px;">
         <table class="table table-bordered" width="100%" cellspacing="0">
             <thead>
             <tr style="text-align:center;" class="table-secondary">
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Date
+                <th scope="col" style="vertical-align:middle;">Date
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Halfday
+                <th scope="col" style="vertical-align:middle;">Halfday
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Delete
+                <th scope="col" style="vertical-align:middle;">Delete
                 </th>
             </tr>
             </thead>
@@ -96,13 +96,13 @@
             <tbody style="text-align:center;">
             {% for absence in absences %}
             <tr>
-                <td width="10%" style="font-size:16px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:16px; vertical-align:middle;">
                     {{absence.date}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     {{absence.halfday}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     <a href="{{ url_for('account.delete_absence',absence_id=absence.id)}}"
                        class="btn btn-primary">Delete</a>
                 </td>
