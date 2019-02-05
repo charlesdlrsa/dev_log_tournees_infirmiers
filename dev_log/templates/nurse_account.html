@@ -80,7 +80,7 @@
     </div>
 
     <div class="table-responsive" style="margin-bottom:50px; border-radius:10px;">
-        <table class="table table-bordered" width="100%" cellspacing="0">
+        <table id="absence" class="table table-bordered" width="100%" cellspacing="0">
             <thead>
             <tr style="text-align:center;" class="table-secondary">
                 <th scope="col" style="vertical-align:middle;">Date
@@ -95,7 +95,7 @@
 
             <tbody style="text-align:center;">
             {% for absence in absences %}
-            <tr>
+            <tr id={{absence.date}}>
                 <td width="10%" style="font-size:16px; vertical-align:middle;">
                     {{absence.date}}
                 </td>
@@ -114,6 +114,14 @@
         </table>
     </div>
 
-
+    <script>
+        var today = new Date().toISOString().split('T')[0];
+        var table = document.getElementById("absence");
+        for(var i=1; i<table.getElementsByTagName("tr").length ;i++){
+            if (table.getElementsByTagName("tr")[i].id < today) {
+                table.getElementsByTagName("tr")[i].style.color = "#f00" ;
+            }
+        }
+    </script>
 </div>
 {% endblock %}
