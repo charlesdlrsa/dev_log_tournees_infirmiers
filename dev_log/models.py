@@ -208,7 +208,8 @@ class Schedule(Base):
         "Nurse",
         backref="nurse")
 
-    def __init__(self, hour, nurse_id):
+    def __init__(self, appointment_id, hour, nurse_id):
+        self.appointment_id = appointment_id
         self.hour = hour
         self.nurse_id = nurse_id
 
