@@ -21,23 +21,23 @@
         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
             <thead>
             <tr style="text-align:center; font-size:14px;" class="table-secondary">
-                <th scope="col" style="border:0px solid black; background-color:white;">
+                <th scope="col" style="vertical-align:middle;">RDV
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Last Name
+                <th scope="col" style="vertical-align:middle;">Last Name
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">First Name
+                <th scope="col" style="vertical-align:middle;">First Name
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Phone
+                <th scope="col" style="vertical-align:middle;">Phone
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Address
+                <th scope="col" style="vertical-align:middle;">Address
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Digicode
+                <th scope="col" style="vertical-align:middle;">Digicode
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Other information
+                <th scope="col" style="vertical-align:middle;">Other information
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Care
+                <th scope="col" style="vertical-align:middle;">Care
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Hour
+                <th scope="col" style="vertical-align:middle;">Hour
                 </th>
             </tr>
             </thead>
@@ -45,64 +45,64 @@
 
             <tbody style="text-align:center;">
             <tr>
-                <td width=5% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=5% style="font-size:12px; vertical-align:middle;">
                     <a onclick="initMap()" href="#office" class="btn btn-primary"> Your office </a>
                 </td>
-                <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=10% style="font-size:12px; vertical-align:middle;">
                     {{schedules[0].name}}
                 </td>
-                <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=10% style="font-size:12px; vertical-align:middle;">
                     ---
                 </td>
-                <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=10% style="font-size:12px; vertical-align:middle;">
                     {{schedules[0].phone}}
                 </td>
-                <td width=40% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=40% style="font-size:12px; vertical-align:middle;">
                     {{schedules[0].address}}
                 </td>
-                <td width=5% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=5% style="font-size:12px; vertical-align:middle;">
                     ---
                 </td>
-                <td width=5% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=5% style="font-size:12px; vertical-align:middle;">
                     ---
                 </td>
-                <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=10% style="font-size:12px; vertical-align:middle;">
                     ---
                 </td>
-                <td width=5% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=5% style="font-size:12px; vertical-align:middle;">
                     8h
                 </td>
             </tr>
             {% for i in range(1, nb_schedules) %}
             <tr>
                 <td width=5%
-                    style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                    style="font-size:12px; vertical-align:middle;">
                     <a onclick="drawMap('{{schedules[i-1].latitude}}', '{{schedules[i-1].longitude}}',
                       '{{schedules[i].latitude}}', '{{schedules[i].longitude}}')" href="#{{i-1}}->{{i}}" class="btn btn-primary">RDV
                         {{i}}</a>
                 </td>
-                <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=10% style="font-size:12px; vertical-align:middle;">
                     {{schedules[i].last_name}}
                 </td>
-                <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=10% style="font-size:12px; vertical-align:middle;">
                     {{schedules[i].first_name}}
                 </td>
-                <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=10% style="font-size:12px; vertical-align:middle;">
                     {{schedules[i].phone}}
                 </td>
-                <td width=40% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=40% style="font-size:12px; vertical-align:middle;">
                     {{schedules[i].address}}
                 </td>
-                <td width=5% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=5% style="font-size:12px; vertical-align:middle;">
                     {{schedules[i].digicode}}
                 </td>
-                <td width=5% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=5% style="font-size:12px; vertical-align:middle;">
                     {{schedules[i].additional_postal_information}}
                 </td>
-                <td width=10% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=10% style="font-size:12px; vertical-align:middle;">
                     Care
                 </td>
-                <td width=5% style="font-size:12px; border:1px solid black; vertical-align:middle;">
+                <td width=5% style="font-size:12px; vertical-align:middle;">
                     Hour
                 </td>
             </tr>
