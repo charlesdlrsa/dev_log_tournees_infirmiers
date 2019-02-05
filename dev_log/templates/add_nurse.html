@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
+<head>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,84 +20,91 @@
     <!-- Custom styles for this template-->
     <link href="{{ url_for('static', filename='sb-admin.css')}}" rel="stylesheet">
 
-  </head>
+</head>
 
-  <body class="bg-dark">
+<body class="bg-dark">
 
-    {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-    {% endfor %}
+{% for message in get_flashed_messages() %}
+<div class="flash">{{ message }}</div>
+{% endfor %}
 
 
-    <div class="container">
-      <div class="card card-register mx-auto mt-5">
+<div class="container">
+    <div class="card card-register mx-auto mt-5">
         <div class="card-header">Register a Nurse</div>
         <div class="card-body">
             <form method="post">
-            <div class="form-group">
-              <div class="form-row">
-                <div class="col-md-6">
-                  <div class="form-label-group">
-                    <input type="text" id="first_name" class="form-control" placeholder="First name" required="required" autofocus="autofocus" name="first_name">
-                    <label for="first_name">First name</label>
-                  </div>
+                <div class="form-group">
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            <div class="form-label-group">
+                                <input type="text" id="first_name" class="form-control" placeholder="First name"
+                                       required="required" autofocus="autofocus" name="first_name">
+                                <label for="first_name">First name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-label-group">
+                                <input type="text" id="last_name" class="form-control" placeholder="Last name"
+                                       required="required" name="last_name">
+                                <label for="last_name">Last name</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="form-label-group">
-                    <input type="text" id="last_name" class="form-control" placeholder="Last name" required="required" name="last_name">
-                    <label for="last_name">Last name</label>
-                  </div>
+                <div class="form-group">
+                    <label for="checked_cares">Handled cares</label>
+                    <div class="form-label-group" id="checked_cares"
+                         style="border:1px solid #C6C8CA; border-radius:5px; padding:8px; height:80px; overflow:auto; overflow-y:scroll;">
+                        {% for care in cares %}
+                        <input type="checkbox" name={{care.id}} value={{care.id}}>{{ care.description }} <br>
+                        {% endfor %}
+                    </div>
+                    <small class="form-text text-muted"> You may select more than one care.</small>
                 </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="checked_cares">Handled cares</label>
-              <div class="form-label-group" id="checked_cares" style="height:80px; overflow:auto; overflow-y:scroll;">
-                {% for care in cares %}
-                <input type="checkbox" name={{care.id}} value={{care.id}}>{{ care.description }} <br>
-                {% endfor %}
-              </div>
-              <small class="form-text text-muted"> You may select more than one. </small>
-            </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="email" id="email" class="form-control" placeholder="Email address" required="required" name="email">
-                <label for="email">Email address</label>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="text" id="phone_number" pattern="(0|\\+33|0033)[1-9][0-9]{8}" class="form-control" placeholder="Phone number" required="required" name="phone_number">
-                <label for="phone_number">Phone Number</label>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="password" id="password" class="form-control" placeholder="Password" required="required" name="password">
-                <label for="password">Password</label>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="text" id="address" class="form-control" placeholder="Postal Address" required="required" name="address">
-                <label for="address">Postal address</label>
-              </div>
-            </div>
-            <div id="map"></div>
-            <button class="btn btn-primary btn-block" type="submit">Register</button>
-          </form>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="email" id="email" class="form-control" placeholder="Email address"
+                               required="required" name="email">
+                        <label for="email">Email address</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="text" id="phone_number" pattern="(0|\\+33|0033)[1-9][0-9]{8}" class="form-control"
+                               placeholder="Phone number" required="required" name="phone_number">
+                        <label for="phone_number">Phone Number</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="password" id="password" class="form-control" placeholder="Password"
+                               required="required" name="password">
+                        <label for="password">Password</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input type="text" id="address" class="form-control" placeholder="Postal Address"
+                               required="required" name="address">
+                        <label for="address">Postal address</label>
+                    </div>
+                </div>
+                <div id="map"></div>
+                <button class="btn btn-primary btn-block" type="submit">Register</button>
+            </form>
         </div>
-      </div>
     </div>
+</div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap core JavaScript-->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Core plugin JavaScript-->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<!-- Core plugin JavaScript-->
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
-    <script>
+<script>
       function initMap() {
 
         var map = new google.maps.Map(document.getElementById('map'), {
@@ -138,11 +145,12 @@
 
       autocomplete.setTypes([])
       }
-    </script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoozmkZ8_YSofc8Hb7nqnG3cWcJSlY6gQ&libraries=places&callback=initMap"
-            async defer></script>
+</script>
 
-  </body>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoozmkZ8_YSofc8Hb7nqnG3cWcJSlY6gQ&libraries=places&callback=initMap"
+        async defer></script>
+
+</body>
 
 </html>

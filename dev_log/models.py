@@ -1,6 +1,6 @@
 import googlemaps
 from dev_log import db
-from dev_log.key import key
+from dev_log.utils.key import key
 
 
 class Base(db.Model):
