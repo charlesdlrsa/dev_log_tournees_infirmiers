@@ -70,17 +70,26 @@
                     ---
                 </td>
                 <td width=5% style="font-size:12px; vertical-align:middle;">
-                    8h
+                    8h30
                 </td>
             </tr>
             {% for i in range(1, nb_schedules) %}
             <tr>
                 <td width=5%
                     style="font-size:12px; vertical-align:middle;">
+                    {% if i==1 %}
                     <a onclick="drawMap({{schedules[i-1].latitude}}, {{schedules[i-1].longitude}},
-                      {{schedules[i].latitude}}, {{schedules[i].longitude}})" href="#{{i-1}}->{{i}}"
+                      {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
+                       href="#{{i-1}}->{{i}}"
                        class="btn btn-primary">RDV
                         {{i}}</a>
+                    {% else %}
+                    <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
+                      {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
+                       href="#{{i-1}}->{{i}}"
+                       class="btn btn-primary">RDV
+                        {{i}}</a>
+                    {% endif %}
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
                     {{schedules[i].appointment.patient.last_name}}
@@ -130,8 +139,8 @@
 
 <script>
 
-var office_lat = {{nurse.office.latitude}};
-var office_lng = {{nurse.office.longitude}};
+var office_lat = {{schedules[0].latitude}};
+var office_lng = {{schedules[0].longitude}};
 
 function seeMyOffice(lat=office_lat, lng=office_lng){
     var office = {'lat': lat , 'lng': lng};
@@ -142,19 +151,19 @@ function seeMyOffice(lat=office_lat, lng=office_lng){
 };
 
 var schedules_js = [];
-{% for schedule in schedules %}
-schedules_js.push( {'latitude':{{schedule.latitude}}, 'longitude':{{schedule.longitude}} } )
+schedules_js.push( {'latitude': office_lat, 'longitude':office_lng} );
+{% for i in range(1, nb_schedules) %}
+schedules_js.push( {'latitude':{{schedules[i].appointment.patient.latitude}}, 'longitude':{{schedules[i].appointment.patient.longitude}} } )
 {% endfor %}
 
 function initMap(schedules=schedules_js, travel_mode='DRIVING'){
+    var departure = {'lat': schedules[0]['latitude'], 'lng': schedules[0]['longitude']};
+    var arrival = {'lat': schedules[schedules.length-1]['latitude'], 'lng': schedules[schedules.length-1]['longitude']};
     var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: departure});
     var directionsService = new google.maps.DirectionsService();
     var directionsDisplay = new google.maps.DirectionsRenderer();
     directionsDisplay.setMap(map);
-    var departure = {'lat': schedules[0]['latitude'], 'lng': schedules[0]['longitude']};
-    var arrival = {'lat': schedules[schedules.length-1]['latitude'], 'lng': schedules[schedules.length-1]['longitude']};
-    console
-   var request = {
+    var request = {
         origin: departure,
         destination: arrival,
         waypoints: [],
@@ -191,9 +200,6 @@ function drawMap(lat_depart, lng_depart, lat_arrival, lng_arrival, travel_mode='
         }
     });
 };
-
-
-
 
 </script>
 
