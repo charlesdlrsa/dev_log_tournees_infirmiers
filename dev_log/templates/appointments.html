@@ -30,21 +30,21 @@
         <table class="table table-bordered" width="100%" cellspacing="0">
             <thead>
             <tr style="text-align:center;" class="table-secondary">
-                <th scope="col" style="border:1px solid black; vertical-align:center;">Last Name
+                <th scope="col" style="vertical-align:center;">Last Name
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:center;">First Name
+                <th scope="col" style="vertical-align:center;">First Name
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:center;">Email
+                <th scope="col" style="vertical-align:center;">Email
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:center;">Address
+                <th scope="col" style="vertical-align:center;">Address
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:center;">Care
+                <th scope="col" style="vertical-align:center;">Care
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:center;">Date
+                <th scope="col" style="vertical-align:center;">Date
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:center;">Halfday
+                <th scope="col" style="vertical-align:center;">Halfday
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:center;">Delete
+                <th scope="col" style="vertical-align:center;">Delete
                 </th>
             </tr>
             </thead>
@@ -53,28 +53,28 @@
             <tbody style="text-align:center;">
             {% for appointment in appointments %}
             <tr>
-                <td width="20%" style="font-size:16px; border:1px solid black; vertical-align:middle;">
+                <td width="20%" style="font-size:16px; vertical-align:middle;">
                     {{appointment.patient.last_name}}
                 </td>
-                <td width="12%" style="font-size:16px; border:1px solid black; vertical-align:middle;">
+                <td width="12%" style="font-size:16px; vertical-align:middle;">
                     {{appointment.patient.first_name}}
                 </td>
-                <td width="15%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="15%" style="font-size:14px; vertical-align:middle;">
                     {{appointment.patient.email}}
                 </td>
-                <td width="35%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="35%" style="font-size:14px; vertical-align:middle;">
                     {{appointment.patient.address}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     {{appointment.care.description}}
                 </td>
-                <td width="8%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="8%" style="font-size:14px; vertical-align:middle;">
                     {{appointment.date.strftime("%d/%m/%y")}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     {{appointment.halfday}}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     <a href="{{ url_for('appointments.delete_appointment',appointment_id=appointment.id)}}"
                        class="btn btn-danger">Delete</a>
 

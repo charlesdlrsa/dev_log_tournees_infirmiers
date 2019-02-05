@@ -54,8 +54,7 @@ def init_db():
                            additional_postal_information="2eme gauche", office_id=1))
     db.session.add(Patient(last_name="Lajouanie", first_name="Simon", email="simon.lajouanie@hotmail.fr",
                            address="39 rue du Général Leclerc, 92130 Issy Les Moulineaux", phone="0674695898",
-                           digicode="4B34",
-                           additional_postal_information="2eme gauche", office_id=1))
+                           digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
     db.session.add(Patient(last_name="Bellec", first_name="Thomas", email="thomas.bellec@hotmail.fr",
                            address="4 rue de Paris, 92190 Meudon", phone="0674695898", digicode="4B34",
                            additional_postal_information="2eme gauche", office_id=2))
@@ -63,8 +62,8 @@ def init_db():
                            address="20 rue Leriche, 75015 Paris", phone="0674695898", digicode="4B34",
                            additional_postal_information="2eme gauche", office_id=2))
     db.session.add(Patient(last_name="Borel", first_name="Edouard", email="edouard.borel@hotmail.fr",
-                           address="29 rue d'Etienne d'Orves, 92120 Montrouge", phone="0674695898", digicode="4B34",
-                           additional_postal_information="2eme gauche", office_id=2))
+                           address="29 rue d'Etienne d'Orves, 92120 Montrouge", phone="0674695898",
+                           digicode="4B34", additional_postal_information="2eme gauche", office_id=2))
     db.session.add(Patient(last_name="Martinet", first_name="Hugo", email="hugo.martinet@hotmail.fr",
                            address="79 Avenue du Président Allende, 94800 Villejuif", phone="0674695898",
                            digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
