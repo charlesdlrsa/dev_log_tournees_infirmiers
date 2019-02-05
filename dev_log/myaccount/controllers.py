@@ -1,8 +1,8 @@
 import re
+import datetime
 from flask import Blueprint, request, render_template, flash, redirect, url_for, session
 from werkzeug.security import generate_password_hash
 from dev_log import db
-import datetime
 from dev_log.models import Absence, Office, Nurse, Care
 from dev_log.auth.controllers import login_required, admin_required
 
@@ -153,7 +153,7 @@ def add_absence(nurse_id):
                     db.session.add(absence)
                     db.session.commit()
         flash("This absence has been added")
-        if session['office_id'] is not None:
+        if session.get('office_id') is not None:
             return redirect(url_for('account.nurse_info', nurse_id=nurse_id))
         else:
             return redirect(url_for('account.home'))

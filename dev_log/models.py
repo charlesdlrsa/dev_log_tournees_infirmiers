@@ -90,6 +90,13 @@ class Patient(BasePerson):
 
 
 class Nurse(BasePerson):
+    """
+    Store the information of nurses.
+
+    Attributes:
+          office_id : id of the office the nurse works at.
+          cares : string that contains the id of the cares the nurse can do.
+    """
     id = db.Column(
         'nurse_id',
         db.Integer,
@@ -126,6 +133,14 @@ class Nurse(BasePerson):
 
 
 class Appointment(Base):
+    """
+    Store the information linked to an appointment request.
+
+    Attributes:
+          patient_id : id of the patient that needs an appointment.
+          care_id : care requested by the patient.
+          date, halfday : moment requested.
+    """
     id = db.Column(
         'appointment_id',
         db.Integer,
@@ -158,7 +173,7 @@ class Appointment(Base):
         "Care",
         backref="care")
 
-    def __init__(self, patient_id, date, care_id, halfday=None):
+    def __init__(self, patient_id, date, care_id, halfday):
         self.patient_id = patient_id
         self.date = date
         self.halfday = halfday
@@ -273,6 +288,14 @@ class Office(Base):
 
 
 class Absence(Base):
+    """
+        Store the absences by nurse, by date and halfday.
+
+        Attributes:
+              nurse_id : nurse that is absent
+              date : date of absence.
+              halfday : Morning or Afternoon.
+        """
     id = db.Column(
         db.Integer,
         primary_key=True,

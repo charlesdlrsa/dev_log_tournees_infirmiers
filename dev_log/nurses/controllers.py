@@ -1,10 +1,9 @@
+import re
 from flask import Blueprint, request, render_template, flash, redirect, url_for, session
 from werkzeug.security import generate_password_hash
-import re
 from sqlalchemy.sql import or_
 from dev_log import db
 from dev_log.models import Nurse, Care
-from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 
 nurses = Blueprint('nurses', __name__, url_prefix='/nurses')
@@ -13,6 +12,10 @@ nurses = Blueprint('nurses', __name__, url_prefix='/nurses')
 @nurses.route('/', methods=['GET', 'POST'])
 @admin_required
 def home():
+    """
+    Shows all nurses information and search option.
+    :return:
+    """
     if request.method == "POST":
         research = request.form['research']
         error = None
@@ -33,6 +36,11 @@ def home():
 @nurses.route('/results/<research>', methods=['GET', 'POST'])
 @admin_required
 def search_nurses(research):
+    """
+    Search for a precise nurse's information.
+    :param research: Input from the user.
+    :return:
+    """
     if request.method == "POST":
         new_research = request.form['research']
         error = None
@@ -63,9 +71,10 @@ def search_nurses(research):
 
 
 @nurses.route('/add_nurse', methods=['GET', 'POST'])
+@admin_required
 def add_nurse():
     """
-    Add a new nurse
+    Add a new nurse in the database, table nurse.
     :return:
     """
     if request.method == 'POST':
@@ -116,6 +125,11 @@ def add_nurse():
 @nurses.route('/edit/<int:nurse_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_nurse(nurse_id):
+    """
+    Edit nurse information in database.
+    :param nurse_id:
+    :return:
+    """
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
@@ -166,6 +180,11 @@ def edit_nurse(nurse_id):
 @nurses.route('/delete_nurse/<int:nurse_id>')
 @admin_required
 def delete_nurse(nurse_id):
+    """
+    Delete nurse in database.
+    :param nurse_id:
+    :return:
+    """
     nurse = Nurse.query.get(nurse_id)
     db.session.delete(nurse)
     db.session.commit()
