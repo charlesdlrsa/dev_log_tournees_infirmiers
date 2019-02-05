@@ -1,7 +1,7 @@
 import datetime
 import random
 from werkzeug.security import generate_password_hash
-from dev_log.models import db, Nurse, Office, Patient, Care, Appointment, Schedule
+from dev_log.models import db, Nurse, Office, Patient, Care, Appointment, Schedule, Absence
 
 
 def init_db():
@@ -78,10 +78,15 @@ def init_db():
     db.session.add(Care(description="Auscultation", duration=20))
     db.session.add(Care(description="Assistance", duration=60))
 
+    db.session.add(Absence(1, datetime.date(2019, 1, 1), "Morning"))
+    db.session.add(Absence(3, datetime.date(2019, 2, 1), "Morning"))
+    db.session.add(Absence(3, datetime.date(2019, 2, 1), "Afternoon"))
+
     halfday = ["Morning", "Afternoon"]
     for pID in range(1, 7):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 5), care_id=random.randint(1, 3),
                                    halfday=halfday[pID % 2]))
+        # To be deleted
         db.session.add(Schedule(hour=datetime.time(8 + pID % 2 * 6 + pID - 1), nurse_id=random.randint(1, 4)))
 
     db.session.commit()
