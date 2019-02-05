@@ -5,7 +5,7 @@
     {% if session['nurse_id'] %}
     <h3> Your planning on {{date.strftime("%d/%m/%y")}} in the {{halfday}} </h3>
     {% else %}
-    <h3> {{nurse.first_name.capitalize()}} {{nurse.last_name}}'s planning on {{date.strftime("%d/%m/%y")}} in
+    <h3> {{nurse.first_name}} {{nurse.last_name}}'s planning on {{date.strftime("%d/%m/%y")}} in
         the
         {{halfday}} </h3>
     {% endif %}
