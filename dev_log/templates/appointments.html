@@ -3,265 +3,96 @@
 
 <div class="container-fluid">
 
-    <!-- Page Content -->
-
-  <div class="card-body">
-  <div class="table-responsive">
-    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-      <div class="card-header">
-        <h1>Appointments from
-          {{start_week}}
-          to
-          {{end_week}}
-        </h1>
-        <div class='flex-row'>
+    <div class="card" style="margin-bottom:30px;">
+        <div class="card-header">
+            <h1>Search another appointment </h1>
+        </div>
+        <div class="card-body">
 
             <form method="post">
-
-
-                  <div class="d-flex justify-content-between">
-
-
-                    <form method="post">
-                    <div class="form-group">
-
-                        <select id="inputpatient" class="form-control" placeholder="patient" required="required" name="research" onchange="this.form.submit()" value="{{research}}" >
-                          <option>Choose Patient</option>
-                          {% for patient in patients %}
-                          {% if patient.last_name + ' - ' + patient.first_name == research %}
-                          <option selected>
-                          {{research}}
-                          </option>
-                          {% else %}
-                          <option>
-                          {{patient.last_name}} - {{patient.first_name}}
-                          </option>
-                          {% endif %}
-                          {% endfor %}
-                        </select>
+                <div class="row">
+                    <div class="col">
+                        <input id="patient_appointments_research" class="form-control"
+                               placeholder="Search (patient first-name then last-name)" required="required"
+                               name="patient_appointments_research">
                     </div>
-                    <div class="form-group">
-
-                        <select id="inputcare" class="form-control" placeholder="care" required="required" name="care_research" onchange="this.form.submit()" value="{{care_research}}" >
-                          <option>Choose Care</option>
-                          {% for care in cares %}
-                          {% if care.description == care_research %}
-                          <option selected>
-                          {{care_research}}
-                          </option>
-                          {% else %}
-                          <option>
-                          {{care.description}}
-                          </option>
-                          {% endif %}
-                          {% endfor %}
-                        </select>
+                    <div class="col">
+                        <button class="btn btn-primary" type="submit">Search appointments</button>
                     </div>
-                    <div class="form-group">
-                      <input type="date" id="date" class="form-control" placeholder="date" required="required" name="date" onchange="this.form.submit()" value="{{time}}">
-                    </div>
-                    </form>
-
-                  </div>
-
-
-                </form>
+                </div>
+            </form>
 
         </div>
-      </div>
+    </div>
 
-      <thead>
-        <tr>
-          <th>Monday</th>
-          <th>Tuesday</th>
-          <th>Wednesday</th>
-          <th>Thursday</th>
-          <th>Friday</th>
-          <th>Saturday</th>
-          <th>Sunday</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr>
-          {% if appointments[0][0] %}
-          <td> {{appointments[0][0]}} </td>
-          {% elif not availabilities[0][0] %}
-            <td> </td>
-          {% else %}
-
-          <td> <div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=1,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div></td>
-          {% endif %}
-
-          {% if appointments[1][0] %}
-          <td> {{appointments[1][0]}} </td>
-          {% elif not availabilities[1][0] %}
-            <td> </td>
-          {% else %}
-
-          <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=2,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div> </td>
-          {% endif %}
-
-          {% if appointments[2][0] %}
-          <td> {{appointments[2][0]}} </td>
-          {% elif not availabilities[2][0] %}
-            <td> </td>
-          {% else %}
-
-          <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=3,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div> </td>
-          {% endif %}
+    {% if appointments[0] %}
+    <div class="table-responsive">
+        <table class="table table-bordered" width="100%" cellspacing="0">
+            <thead>
+            <tr style="text-align:center;" class="table-secondary">
+                <th scope="col" style="border:1px solid black; vertical-align:center;">Last Name
+                </th>
+                <th scope="col" style="border:1px solid black; vertical-align:center;">First Name
+                </th>
+                <th scope="col" style="border:1px solid black; vertical-align:center;">Email
+                </th>
+                <th scope="col" style="border:1px solid black; vertical-align:center;">Address
+                </th>
+                <th scope="col" style="border:1px solid black; vertical-align:center;">Care
+                </th>
+                <th scope="col" style="border:1px solid black; vertical-align:center;">Date
+                </th>
+                <th scope="col" style="border:1px solid black; vertical-align:center;">Halfday
+                </th>
+                <th scope="col" style="border:1px solid black; vertical-align:center;">Delete
+                </th>
+            </tr>
+            </thead>
 
 
-          {% if appointments[3][0] %}
-          <td> {{appointments[3][0]}} </td>
-          {% elif not availabilities[3][0] %}
-            <td> </td>
-          {% else %}
+            <tbody style="text-align:center;">
+            {% for appointment in appointments %}
+            <tr>
+                <td width="20%" style="font-size:16px; border:1px solid black; vertical-align:middle;">
+                    {{appointment.patient.last_name}}
+                </td>
+                <td width="12%" style="font-size:16px; border:1px solid black; vertical-align:middle;">
+                    {{appointment.patient.first_name}}
+                </td>
+                <td width="15%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                    {{appointment.patient.email}}
+                </td>
+                <td width="35%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                    {{appointment.patient.address}}
+                </td>
+                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                    {{appointment.care.description}}
+                </td>
+                <td width="8%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                    {{appointment.date.strftime("%d/%m/%y")}}
+                </td>
+                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                    {{appointment.halfday}}
+                </td>
+                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                    <a href="{{ url_for('appointments.delete_appointment',appointment_id=appointment.id)}}"
+                       class="btn btn-danger">Delete</a>
 
-          <td> <div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=4,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div></td>
-          {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
 
-          {% if appointments[4][0] %}
-          <td> {{appointments[4][0]}} </td>
-          {% elif not availabilities[4][0] %}
-            <td>  </td>
-          {% else %}
+            </tbody>
 
-          <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=5,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div> </td>
-          {% endif %}
+        </table>
+    </div>
 
-          {% if appointments[5][0] %}
-          <td> {{appointments[5][0]}} </td>
-          {% elif not availabilities[5][0] %}
-            <td> </td>
-          {% else %}
+    {% else %}
 
-          <td> <div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=6,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div></td>
-          {% endif %}
+    <p style="font-size:15px; font-weight: bold; color:#FF124F; text-align:center;"> No appointments found for
+        this research ! Please, enter a request respecting this format : first-name and then last-name.</p>
 
-          {% if appointments[6][0] %}
-          <td> {{appointments[6][0]}} </td>
-          {% elif not availabilities[6][0] %}
-            <td> </td>
-          {% else %}
-
-          <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=7,week=week,year=year,halfday='morning',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div> </td>
-          {% endif %}
-      </tr>
-
-      <tr>
-
-          {% if appointments[0][1] %}
-          <td> {{appointments[0][1]}} </td>
-          {% elif not availabilities[0][1] %}
-            <td> </td>
-          {% else %}
-
-          <td> <div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=1,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div></td>
-          {% endif %}
-
-          {% if appointments[1][1] %}
-          <td> {{appointments[1][1]}} </td>
-          {% elif not availabilities[1][1] %}
-            <td> </td>
-          {% else %}
-
-          <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=2,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div> </td>
-          {% endif %}
-
-          {% if appointments[2][1] %}
-          <td> {{appointments[2][1]}} </td>
-          {% elif not availabilities[2][1] %}
-            <td> </td>
-          {% else %}
-
-          <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=3,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div> </td>
-          {% endif %}
-
-          {% if appointments[3][1] %}
-          <td> {{appointments[3][1]}} </td>
-          {% elif not availabilities[3][1] %}
-            <td> </td>
-          {% else %}
-
-          <td> <div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=4,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div></td>
-          {% endif %}
-
-          {% if appointments[4][1] %}
-          <td> {{appointments[4][1]}} </td>
-          {% elif not availabilities[4][1] %}
-            <td>  </td>
-          {% else %}
-
-          <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=5,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div> </td>
-          {% endif %}
-
-          {% if appointments[5][1] %}
-          <td> {{appointments[5][1]}} </td>
-          {% elif not availabilities[5][1] %}
-            <td> </td>
-          {% else %}
-
-          <td> <div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=6,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div></td>
-          {% endif %}
-
-          {% if appointments[6][1] %}
-          <td> {{appointments[6][1]}} </td>
-          {% elif not availabilities[6][1] %}
-            <td> </td>
-          {% else %}
-
-          <td><div class="col-lg-8 col-lg-8">
-            <a href="{{ url_for('appointments.add_appointment',day=7,week=week,year=year,halfday='afternoon',research=research,care_research=care_research)}}" class="btn btn-secondary btn-sm active"
-              role="button">New </a>
-          </div> </td>
-          {% endif %}
-      </tr>
-      </tbody>
-    </table>
-  </div>
-  </div>
-
+    {% endif %}
 
 </div>
-
-{% endblock%}
+{% endblock %}

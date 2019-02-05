@@ -1,0 +1,73 @@
+{% extends 'base_template.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Content -->
+    <div class="card" style="margin-bottom:30px;">
+        <div class="card-header">
+            <h1>Add an appointment </h1>
+        </div>
+        <div class="card-body">
+
+            <form method="post">
+                <div class="row">
+                    <div class="col">
+                        <select id="input_patient" class="form-control" required="required" name="input_patient">
+                            <option value="" selected>Choose Patient</option>
+                            {% for patient in patients %}
+                            <option value="{{patient.id}}">
+                                {{patient.last_name}} - {{patient.first_name}}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select id="input_care" class="form-control" required="required" name="input_care">
+                            <option value="" selected>Choose Care</option>
+                            {% for care in cares %}
+                            <option value="{{care.id}}">
+                                {{care.description}}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+
+                        <input type="date" id="date" class="form-control" required="required" name="date">
+
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-primary" type="submit">Search availabilities</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:30px;">
+        <div class="card-header">
+            <h1>Search an appointment </h1>
+        </div>
+        <div class="card-body">
+
+            <form method="post">
+                <div class="row">
+                    <div class="col">
+                        <input id="patient_appointments_research" class="form-control"
+                               placeholder="Search (patient first-name then last-name)" required="required"
+                               name="patient_appointments_research">
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-primary" type="submit">Search appointments</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock%}

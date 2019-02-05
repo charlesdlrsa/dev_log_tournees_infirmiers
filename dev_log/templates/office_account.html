@@ -1,0 +1,54 @@
+{% extends 'base_template.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="card-header" style="margin-bottom:30px;">
+        <h1>Office account </h1>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered" width="100%" cellspacing="0">
+            <thead>
+            <tr style="text-align:center;" class="table-secondary">
+                <th scope="col" style="border:1px solid black; vertical-align:middle;">Name
+                </th>
+                <th scope="col" style="border:1px solid black; vertical-align:middle;">Email
+                </th>
+                <th scope="col" style="border:1px solid black; vertical-align:middle;">Phone number
+                </th>
+                <th scope="col" style="border:1px solid black; vertical-align:middle;">Address
+                </th>
+                <th scope="col" style="border:1px solid black; vertical-align:middle;">Edit
+                </th>
+            </tr>
+            </thead>
+
+
+            <tbody style="text-align:center;">
+            <tr>
+                <td width="20%" style="font-size:16px; border:1px solid black; vertical-align:middle;">
+                    {{office.name}}
+                </td>
+                <td width="20%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                    {{office.email}}
+                </td>
+                <td width="15%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                    {{office.phone}}
+                </td>
+                <td width="35%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                    {{ office.address}}
+                </td>
+                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                    <a href="{{ url_for('account.edit_office_account',office_id=office.id)}}"
+                       class="btn btn-outline-danger">Edit</a>
+                </td>
+
+            </tr>
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+{% endblock %}
