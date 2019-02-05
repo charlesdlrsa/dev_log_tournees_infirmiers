@@ -83,28 +83,28 @@
                         {{i}}</a>
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[i].last_name}}
+                    {{schedules[i].appointment.patient.last_name}}
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[i].first_name}}
+                    {{schedules[i].appointment.patient.first_name}}
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[i].phone}}
+                    {{schedules[i].appointment.patient.phone}}
                 </td>
                 <td width=40% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[i].address}}
+                    {{schedules[i].appointment.patient.address}}
                 </td>
                 <td width=5% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[i].digicode}}
+                    {{schedules[i].appointment.patient.digicode}}
                 </td>
                 <td width=5% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[i].additional_postal_information}}
+                    {{schedules[i].appointment.patient.additional_postal_information}}
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
-                    Care
+                    {{schedules[i].appointment.care.description}}
                 </td>
                 <td width=5% style="font-size:12px; vertical-align:middle;">
-                    Hour
+                    {{schedules[i].hour}}
                 </td>
             </tr>
             {% endfor %}

@@ -87,7 +87,8 @@ def init_db():
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 5), care_id=random.randint(1, 3),
                                    halfday=halfday[pID % 2]))
         # To be deleted
-        db.session.add(Schedule(hour=datetime.time(8 + pID % 2 * 6 + pID - 1), nurse_id=random.randint(1, 4)))
+        db.session.add(Schedule(appointment_id=pID, hour=datetime.time(8 + pID % 2 * 6 + pID - 1),
+                                nurse_id=1))
 
     db.session.commit()
 
