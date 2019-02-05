@@ -1,12 +1,10 @@
-from flask import Blueprint, request, render_template, flash, redirect, url_for, session
-from werkzeug.security import check_password_hash, generate_password_hash
 import re
+from flask import Blueprint, request, render_template, flash, redirect, url_for, session
+from werkzeug.security import generate_password_hash
 from sqlalchemy.sql import or_
 from dev_log import db
 from dev_log.models import Nurse, Care
-from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
-from dev_log.key import key
 
 nurses = Blueprint('nurses', __name__, url_prefix='/nurses')
 
@@ -14,6 +12,10 @@ nurses = Blueprint('nurses', __name__, url_prefix='/nurses')
 @nurses.route('/', methods=['GET', 'POST'])
 @admin_required
 def home():
+    """
+    Shows all nurses information and search option.
+    :return:
+    """
     if request.method == "POST":
         research = request.form['research']
         error = None
@@ -27,13 +29,18 @@ def home():
             return redirect(url_for('nurses.search_nurses', research=research))
 
     nurses = Nurse.query.filter(Nurse.office_id == session['office_id']).order_by(Nurse.last_name)
-    cares = db.session.query(Care).all()
+    cares = Care.query.all()
     return render_template('nurses.html', nurses=nurses, cares=cares)
 
 
 @nurses.route('/results/<research>', methods=['GET', 'POST'])
 @admin_required
 def search_nurses(research):
+    """
+    Search for a precise nurse's information.
+    :param research: Input from the user.
+    :return:
+    """
     if request.method == "POST":
         new_research = request.form['research']
         error = None
@@ -64,9 +71,10 @@ def search_nurses(research):
 
 
 @nurses.route('/add_nurse', methods=['GET', 'POST'])
+@admin_required
 def add_nurse():
     """
-    Add a new nurse
+    Add a new nurse in the database, table nurse.
     :return:
     """
     if request.method == 'POST':
@@ -110,13 +118,18 @@ def add_nurse():
 
         flash(error)
 
-    cares = db.session.query(Care).all()
+    cares = Care.query.all()
     return render_template('add_nurse.html', cares=cares)
 
 
 @nurses.route('/edit/<int:nurse_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_nurse(nurse_id):
+    """
+    Edit nurse information in database.
+    :param nurse_id:
+    :return:
+    """
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
@@ -144,7 +157,7 @@ def edit_nurse(nurse_id):
         else:
             nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
             password = nurse.password
-            db.session.query(Nurse).filter(Nurse.id == nurse_id). \
+            Nurse.query.filter(Nurse.id == nurse_id). \
                 update(dict(last_name=last_name,
                             first_name=first_name,
                             email=email,
@@ -160,13 +173,18 @@ def edit_nurse(nurse_id):
         flash(error)
 
     nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
-    cares = db.session.query(Care).all()
+    cares = Care.query.all()
     return render_template("edit_nurse.html", cares=cares, nurse=nurse)
 
 
 @nurses.route('/delete_nurse/<int:nurse_id>')
 @admin_required
 def delete_nurse(nurse_id):
+    """
+    Delete nurse in database.
+    :param nurse_id:
+    :return:
+    """
     nurse = Nurse.query.get(nurse_id)
     db.session.delete(nurse)
     db.session.commit()

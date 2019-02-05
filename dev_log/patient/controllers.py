@@ -129,7 +129,7 @@ def edit_patient(patient_id):
         elif not phone:
             error = 'Phone is required.'
         else:
-            db.session.query(Patient).filter(Patient.id == patient_id). \
+            Patient.query.filter(Patient.id == patient_id). \
                 update(dict(last_name=last_name,
                             first_name=first_name,
                             email=email,

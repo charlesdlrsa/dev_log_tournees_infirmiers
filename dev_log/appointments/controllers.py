@@ -43,7 +43,7 @@ def home():
             flash(error)
 
     patients = Patient.query.filter(Patient.office_id == session['office_id']).order_by(Patient.last_name)
-    cares = db.session.query(Care).all()
+    cares = Care.query.all()
 
     return render_template("appointments_home.html", patients=patients, cares=cares)
 
@@ -123,8 +123,8 @@ def check_appointments_nurses(care_id, date, halfday):
     # appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).all()
     # data["appointments"] = []
     # for app in appointments:
-    #     patient = db.session.query(Patient).filter(Patient.id == app.patient_id).all()
-    #     care = db.session.query(Care).filter(Care.id == app.care_id).all()
+    #     patient = Patient.query.filter(Patient.id == app.patient_id).all()
+    #     care = Care.query.filter(Care.id == app.care_id).all()
     #     app_data = {}
     #     app_data["app_id"] = str(app.id)
     #     app_data["app_lat"] = str(patient[0].latitude)

@@ -8,7 +8,7 @@
             {% if session['office_id'] %}
             <h1>Get a nurse planning </h1>
             {% elif session['nurse_id'] %}
-            <h1>Get your planning, {{nurses.first_name}} {{nurses.last_name}} </h1>
+            <h1>Get your planning, {{session['nurse_first_name']}} {{session['nurse_last_name']}} </h1>
             {% endif %}
         </div>
         <div class="card-body">

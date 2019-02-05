@@ -1,8 +1,8 @@
 import re
+import datetime
 from flask import Blueprint, request, render_template, flash, redirect, url_for, session
 from werkzeug.security import generate_password_hash
 from dev_log import db
-import datetime
 from dev_log.models import Absence, Office, Nurse, Care
 from dev_log.auth.controllers import login_required, admin_required
 
@@ -13,15 +13,21 @@ account = Blueprint('account', __name__, url_prefix='/account')
 @login_required
 def home():
     if session.get('office_id') is None:
-        id = session['nurse_id']
-        nurse = Nurse.query.filter(Nurse.id == id).first()
-        absences = Absence.query.filter(Absence.nurse_id == id).all()
-        cares = Care.query.all()
-        return render_template('nurse_account.html', nurse=nurse, absences=absences, cares=cares)
+        print(session['nurse_id'])
+        return redirect(url_for('account.nurse_info', nurse_id=session['nurse_id']))
     else:
         id = session['office_id']
         office = Office.query.filter(Office.id == id).first()
         return render_template('office_account.html', office=office)
+
+
+@account.route('/nurse/<int:nurse_id>', methods=['GET', 'POST'])
+@login_required
+def nurse_info(nurse_id):
+    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+    absences = Absence.query.filter(Absence.nurse_id == nurse_id).all()
+    cares = Care.query.all()
+    return render_template('nurse_account.html', nurse=nurse, absences=absences, cares=cares)
 
 
 @account.route('/edit/nurse/<int:nurse_id>', methods=['GET', 'POST'])
@@ -56,7 +62,7 @@ def edit_nurse_account(nurse_id):
 
         else:
             password = generate_password_hash(password)
-            db.session.query(Nurse).filter(Nurse.id == nurse_id). \
+            Nurse.query.filter(Nurse.id == nurse_id). \
                 update(dict(last_name=last_name,
                             first_name=first_name,
                             email=email,
@@ -71,7 +77,7 @@ def edit_nurse_account(nurse_id):
         flash(error)
 
     nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
-    cares = db.session.query(Care).all()
+    cares = Care.query.all()
     return render_template("edit_nurse.html", cares=cares, nurse=nurse)
 
 
@@ -100,7 +106,7 @@ def edit_office_account(office_id):
 
         else:
             password = generate_password_hash(password)
-            db.session.query(Office).filter(Office.id == office_id). \
+            Office.query.filter(Office.id == office_id). \
                 update(dict(name=name,
                             email=email,
                             phone=phone,
@@ -116,12 +122,11 @@ def edit_office_account(office_id):
     return render_template("edit_office.html", office=office)
 
 
-@account.route('/absence', methods=['GET', 'POST'])
+@account.route('/absence/<int:nurse_id>', methods=['GET', 'POST'])
 @login_required
-def add_absence():
+def add_absence(nurse_id):
     # TODO : drop old absences
-    id = session['nurse_id']
-    nurse = Nurse.query.filter(Nurse.id == id).first()
+    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
     if request.method == "POST":
         start_date = datetime.datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
         end_date = datetime.datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
@@ -137,18 +142,21 @@ def add_absence():
                 days_in_period.append(start_date - datetime.timedelta(n))
         for d in days_in_period:
             if d == start_date and start_halfday == 'Afternoon':
-                db.session.add(Absence(nurse_id=id, date=d, halfday='Afternoon'))
+                db.session.add(Absence(nurse_id=nurse_id, date=d, halfday='Afternoon'))
                 db.session.commit()
             elif d == end_date and end_halfday == 'Morning':
-                db.session.add(Absence(nurse_id=id, date=d, halfday='Morning'))
+                db.session.add(Absence(nurse_id=nurse_id, date=d, halfday='Morning'))
                 db.session.commit()
             else:
                 for halfday in ['Morning', 'Afternoon']:
-                    absence = Absence(nurse_id=id, date=d, halfday=halfday)
+                    absence = Absence(nurse_id=nurse_id, date=d, halfday=halfday)
                     db.session.add(absence)
                     db.session.commit()
         flash("This absence has been added")
-        return redirect(url_for('account.home'))
+        if session.get('office_id') is not None:
+            return redirect(url_for('account.nurse_info', nurse_id=nurse_id))
+        else:
+            return redirect(url_for('account.home'))
     return render_template('add_absence.html', nurse=nurse)
 
 

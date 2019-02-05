@@ -45,7 +45,7 @@
         </ul>
         {% elif session['nurse_id'] %}
         <ul class="nav navbar-nav navbar-right">
-            <li style="color:#B1F5FF; margin-right:15px; font-style:italic;">{{session['nurse_first_name'].capitalize()}}
+            <li style="color:#B1F5FF; margin-right:15px; font-style:italic;">{{session['nurse_first_name']}}
                 {{session['nurse_last_name'].capitalize()}}<i style="color:#FFFFFF; margin-left:8px;"
                                                               class="fa fa-user"></i></li>
             <li><a style="color:#B1F5FF; margin-right:5px; font-style:italic;" href="{{ url_for('auth.logout') }}">Log Out </a> <i
