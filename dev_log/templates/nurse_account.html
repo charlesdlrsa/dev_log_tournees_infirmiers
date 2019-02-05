@@ -119,9 +119,7 @@
         var table = document.getElementById("absence");
         for(var i=1; i<table.getElementsByTagName("tr").length ;i++){
             if (table.getElementsByTagName("tr")[i].id < today) {
-                var couleur = document.createAttribute("bgcolor");
-                couleur.nodeValue = "FCBABA";
-                table.getElementsByTagName("tr")[i].setAttributeNode(couleur);
+                table.getElementsByTagName("tr")[i].style.color = "#f00" ;
             }
         }
     </script>
