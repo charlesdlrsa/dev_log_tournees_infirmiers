@@ -3,6 +3,7 @@ from dev_log.init_database import init_db
 from dev_log.auth.controllers import login_required, admin_required
 from dev_log.models import Nurse, Schedule, Office
 from dev_log.utils import calendar
+import datetime
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
@@ -16,6 +17,7 @@ def home():
         else:
             nurse_id = request.form['input_nurse']
         date = request.form['date']
+        date_selected = calendar.get_dates_from_form(date)[0]
         halfday = request.form['halfday']
         error = None
 
@@ -23,6 +25,9 @@ def home():
             error = "You need to select a nurse to view a planning"
         elif halfday == "":
             error = "You need to select a halfday"
+        elif date_selected > datetime.date.today() + datetime.timedelta(1):
+            # error = "You cannot see a nurse planning more than 24 hours before the desired date."
+            pass
         if error is not None:
             flash(error)
         else:

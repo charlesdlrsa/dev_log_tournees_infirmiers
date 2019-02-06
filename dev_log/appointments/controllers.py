@@ -4,7 +4,6 @@ import datetime
 from dev_log.utils import calendar
 from dev_log import db
 from dev_log.models import Appointment, Patient, Nurse, Care, Office
-from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 
 # from dev_log.opti.space import solve_boolean
@@ -28,8 +27,8 @@ def home():
                 error = "You need to select a nurse to view a planning"
             elif care_id == "":
                 error = "You need to select a care"
-            elif date_selected <= datetime.date.today():
-                error = "You cannot add an appointment 24 hours before the wanted date."
+            elif date_selected <= datetime.date.today() + datetime.timedelta(1):
+                error = "You cannot add an appointment less than 24 hours before the desired date."
             if error is not None:
                 flash(error)
             else:
