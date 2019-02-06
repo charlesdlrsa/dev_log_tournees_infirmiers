@@ -1,7 +1,7 @@
 from flask import Blueprint, request, render_template, flash, session, redirect, url_for
 from dev_log.init_database import init_db
 from dev_log.auth.controllers import login_required, admin_required
-from dev_log.models import Nurse, Patient, Schedule, Appointment, Office
+from dev_log.models import Nurse, Schedule, Office
 from dev_log.utils import calendar
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
@@ -42,7 +42,7 @@ def get_nurse_planning(nurse_id, date, halfday):
     if request.method == 'POST':
         pass
 
-    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+    nurse = Nurse.query.get(nurse_id)
     date_selected = calendar.get_dates_from_form(date)[0]
 
     # TO DO : à changer par la vraie fonction de Romu

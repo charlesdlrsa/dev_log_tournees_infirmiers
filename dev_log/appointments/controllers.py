@@ -79,8 +79,8 @@ def availabilities(patient_id, date, care_id):
             else:
                 availabilities[week_day][halfday] = "Appointment already scheduled: -- {} --".format(appointment)
 
-    patient = Patient.query.filter(Patient.id == patient_id).first()
-    care = Care.query.filter(Care.id == care_id).first()
+    patient = Patient.query.get(patient_id)
+    care = Care.query.get(care_id)
 
     return render_template("availabilities.html", availabilities=availabilities, date_selected=date_selected,
                            date_start_week=date_start_week, date_end_week=date_end_week, patient=patient,
@@ -155,8 +155,7 @@ def check_appointments_patient(patient_id, date, halfday):
                     methods=['GET', 'POST'])
 def add_appointment(patient_id, date, care_id, halfday):
     """
-    Add a new appointment
-    :return:
+    Add a new appointment in database.
     """
     date_selected = calendar.get_dates_from_form(date)[0]
     appointment = Appointment(patient_id=patient_id, date=date_selected, care_id=care_id, halfday=halfday)
@@ -169,6 +168,9 @@ def add_appointment(patient_id, date, care_id, halfday):
 @appointments.route('/delete_appointment/<int:appointment_id>')
 @admin_required
 def delete_appointment(appointment_id):
+    """
+    Delete an appointment with its id from the database.
+    """
     appointment = Appointment.query.get(appointment_id)
     db.session.delete(appointment)
     db.session.commit()

@@ -1,9 +1,8 @@
-from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 import re
+from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 from sqlalchemy.sql import or_
 from dev_log import db
 from dev_log.models import Patient
-from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
@@ -143,7 +142,7 @@ def edit_patient(patient_id):
             return redirect(url_for('patients.home'))
         flash(error)
 
-    patient = Patient.query.filter(Patient.id == patient_id).first()
+    patient = Patient.query.get(patient_id)
     return render_template("edit_patient.html", patient=patient)
 
 

@@ -155,7 +155,7 @@ def edit_nurse(nurse_id):
             error = 'Please enter an address.'
 
         else:
-            nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+            nurse = Nurse.query.get(nurse_id)
             password = nurse.password
             Nurse.query.filter(Nurse.id == nurse_id). \
                 update(dict(last_name=last_name,
@@ -172,7 +172,7 @@ def edit_nurse(nurse_id):
 
         flash(error)
 
-    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+    nurse = Nurse.query.get(nurse_id)
     cares = Care.query.all()
     return render_template("edit_nurse.html", cares=cares, nurse=nurse)
 
@@ -181,9 +181,7 @@ def edit_nurse(nurse_id):
 @admin_required
 def delete_nurse(nurse_id):
     """
-    Delete nurse in database.
-    :param nurse_id:
-    :return:
+    Delete nurse from database.
     """
     nurse = Nurse.query.get(nurse_id)
     db.session.delete(nurse)

@@ -13,18 +13,17 @@ account = Blueprint('account', __name__, url_prefix='/account')
 @login_required
 def home():
     if session.get('office_id') is None:
-        print(session['nurse_id'])
         return redirect(url_for('account.nurse_info', nurse_id=session['nurse_id']))
     else:
         id = session['office_id']
-        office = Office.query.filter(Office.id == id).first()
+        office = Office.query.get(id)
         return render_template('office_account.html', office=office)
 
 
 @account.route('/nurse/<int:nurse_id>', methods=['GET', 'POST'])
 @login_required
 def nurse_info(nurse_id):
-    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+    nurse = Nurse.query.get(nurse_id)
     absences = Absence.query.filter(Absence.nurse_id == nurse_id).all()
     cares = Care.query.all()
     return render_template('nurse_account.html', nurse=nurse, absences=absences, cares=cares)
@@ -76,7 +75,7 @@ def edit_nurse_account(nurse_id):
 
         flash(error)
 
-    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+    nurse = Nurse.query.get(nurse_id)
     cares = Care.query.all()
     return render_template("edit_nurse.html", cares=cares, nurse=nurse)
 
@@ -85,7 +84,6 @@ def edit_nurse_account(nurse_id):
 @admin_required
 def edit_office_account(office_id):
     if request.method == "POST":
-        print(request.form)
         name = request.form['name']
         email = request.form['email']
         phone = request.form['phone_number']
@@ -118,7 +116,7 @@ def edit_office_account(office_id):
 
         flash(error)
 
-    office = Office.query.filter(Office.id == office_id).first()
+    office = Office.query.get(office_id)
     return render_template("edit_office.html", office=office)
 
 
@@ -126,7 +124,7 @@ def edit_office_account(office_id):
 @login_required
 def add_absence(nurse_id):
     # TODO : drop old absences
-    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+    nurse = Nurse.query.get(nurse_id)
     if request.method == "POST":
         start_date = datetime.datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
         end_date = datetime.datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
