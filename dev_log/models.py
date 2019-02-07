@@ -153,7 +153,9 @@ class Appointment(Base):
     id = db.Column(
         'appointment_id',
         db.Integer,
-        primary_key=True)
+        primary_key=True,
+        nullable=False,
+        autoincrement=True)
 
     patient_id = db.Column(
         db.Integer,

@@ -35,7 +35,11 @@
                 </th>
                 <th scope="col" style="vertical-align:middle;">First Name
                 </th>
-                <th scope="col" style="vertical-align:middle;">Phone
+                <th scope="col" style="vertical-align:middle;">Hour of visit
+                </th>
+                <th scope="col" style="vertical-align:middle;">Care
+                </th>
+                <th scope="col" style="vertical-align:middle;">Duration
                 </th>
                 <th scope="col" style="vertical-align:middle;">Address
                 </th>
@@ -43,85 +47,102 @@
                 </th>
                 <th scope="col" style="vertical-align:middle;">Other information
                 </th>
-                <th scope="col" style="vertical-align:middle;">Care
-                </th>
-                <th scope="col" style="vertical-align:middle;">Hour
+                <th scope="col" style="vertical-align:middle;">Phone
                 </th>
             </tr>
             </thead>
 
 
             <tbody style="text-align:center;">
-            <tr>
-                <td width=5% style="font-size:12px; vertical-align:middle;">
-                    <a onclick="seeMyOffice()" href="#office" class="btn btn-primary"> Your office </a>
-                </td>
-                <td width=10% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[0].name}}
-                </td>
-                <td width=10% style="font-size:12px; vertical-align:middle;">
-                    ---
-                </td>
-                <td width=10% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[0].phone}}
-                </td>
-                <td width=40% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[0].address}}
-                </td>
-                <td width=5% style="font-size:12px; vertical-align:middle;">
-                    ---
-                </td>
-                <td width=5% style="font-size:12px; vertical-align:middle;">
-                    ---
-                </td>
-                <td width=10% style="font-size:12px; vertical-align:middle;">
-                    ---
-                </td>
-                <td width=5% style="font-size:12px; vertical-align:middle;">
-                    08:30:00
-                </td>
-            </tr>
-            {% for i in range(1, nb_schedules) %}
+            {% for i in range(0, nb_schedules) %}
             <tr>
                 <td width=5%
                     style="font-size:12px; vertical-align:middle;">
-                    {% if i==1 %}
-                    <a onclick="drawMap({{schedules[i-1].latitude}}, {{schedules[i-1].longitude}},
-                      {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
-                       href="#{{i-1}}->{{i}}"
-                       class="btn btn-primary">RDV
-                        {{i}}</a>
-                    {% else %}
+                    {% if i==0 %}
+                        {% if schedules[0].appointment %}
+                        <a onclick="seeMyPointOfDeparture({{schedules[0].appointment.patient.latitude}}, {{schedules[0].appointment.patient.longitude}})"
+                           href="#departure" class="btn btn-primary"> RDV 0 </a>
+                        {% else %}
+                        <a onclick="seeMyPointOfDeparture({{schedules[0].latitude}}, {{schedules[0].longitude}})"
+                           href="#departure" class="btn btn-primary"> Your Office </a>
+                    {% endif %}
+                    {% elif i==nb_schedules-1 and halfday=="Afternoon"%}
                     <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
-                      {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
+                          {{schedules[i].latitude}}, {{schedules[i].longitude}})"
                        href="#{{i-1}}->{{i}}"
-                       class="btn btn-primary">RDV
-                        {{i}}</a>
+                       class="btn btn-primary">Your Office</a>
+                    {% else %}
+                        {% if schedules[i-1].latitude %}
+                        <a onclick="drawMap({{schedules[i-1].latitude}}, {{schedules[i-1].longitude}},
+                              {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
+                           href="#{{i-1}}->{{i}}"
+                           class="btn btn-primary">RDV
+                            {{i}}</a>
+                        {% else %}
+                        <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
+                              {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
+                           href="#{{i-1}}->{{i}}"
+                           class="btn btn-primary">RDV
+                            {{i}}</a>
+                        {% endif %}
                     {% endif %}
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
                     {{schedules[i].appointment.patient.last_name}}
+                    {% else %}
+                    {{schedules[i].name}}
+                    {% endif %}
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
                     {{schedules[i].appointment.patient.first_name}}
-                </td>
-                <td width=10% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[i].appointment.patient.phone}}
-                </td>
-                <td width=40% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[i].appointment.patient.address}}
+                    {% endif %}
                 </td>
                 <td width=5% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[i].appointment.patient.digicode}}
-                </td>
-                <td width=5% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[i].appointment.patient.additional_postal_information}}
-                </td>
-                <td width=10% style="font-size:12px; vertical-align:middle;">
-                    {{schedules[i].appointment.care.description}}
-                </td>
-                <td width=5% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].hour %}
                     {{schedules[i].hour}}
+                    {% elif halfday=="Morning"%}
+                    07:45:00
+                    {% else %}
+                    18:00:00
+                    {% endif %}
+                </td>
+                <td width=10% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.care.description}}
+                    {% endif %}
+                </td>
+                <td width=5% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.care.duration}} min
+                    {% else %}
+                    15 min
+                    {% endif %}
+                </td>
+                <td width=45% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.patient.address}}
+                    {% else %}
+                    {{schedules[i].address}}
+                    {% endif %}
+                </td>
+                <td width=2% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.patient.digicode}}
+                    {% endif %}
+                </td>
+                <td width=5% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.patient.additional_postal_information}}
+                    {% endif %}
+                </td>
+                <td width=10% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.patient.phone}}
+                    {% else %}
+                    {{schedules[i].phone}}
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -134,31 +155,29 @@
 </div>
 
 <div id="map"
-     style="height:80%; width:37%; float:right; margin-left:0%; margin-right:2%; vertical-align:middle; padding:150px;">
+     style="height:70%; width:37%; float:right; margin-left:0%; margin-right:2%; vertical-align:middle; padding:150px;">
     <a onclick="initMap()" href="#alltrajects" class="btn btn-danger"> See all your journeys on a map ! </a>
 </div>
 
 {% endif %}
 
-<p>{{message}}</p>
-
 <script>
 
-var office_lat = {{schedules[0].latitude}};
-var office_lng = {{schedules[0].longitude}};
-
-function seeMyOffice(lat=office_lat, lng=office_lng){
-    var office = {'lat': lat , 'lng': lng};
+function seeMyPointOfDeparture(lat_depart, lng_depart){
+    var office = {'lat': lat_depart , 'lng': lng_depart};
     var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: office});
-    var marker = new google.maps.Marker({position: office, map: map, label: {text: 'Your office', fontSize:"18px",fontWeight:"bold", color:'black'}});
+    var marker = new google.maps.Marker({position: office, map: map, label: {text: 'Your departure', fontSize:"18px",fontWeight:"bold", color:'black'}});
     var directionsDisplay = new google.maps.DirectionsRenderer();
     directionsDisplay.setMap(map);
 };
 
 var schedules_js = [];
-schedules_js.push( {'latitude': office_lat, 'longitude':office_lng} );
-{% for i in range(1, nb_schedules) %}
+{% for i in range(0, nb_schedules) %}
+{% if schedules[i].appointment %}
 schedules_js.push( {'latitude':{{schedules[i].appointment.patient.latitude}}, 'longitude':{{schedules[i].appointment.patient.longitude}} } )
+{% else %}
+schedules_js.push( {'latitude':{{schedules[i].latitude}}, 'longitude':{{schedules[i].longitude}} } )
+{% endif %}
 {% endfor %}
 
 function initMap(schedules=schedules_js, travel_mode='DRIVING'){
@@ -205,6 +224,9 @@ function drawMap(lat_depart, lng_depart, lat_arrival, lng_arrival, travel_mode='
         }
     });
 };
+
+
+
 
 
 </script>

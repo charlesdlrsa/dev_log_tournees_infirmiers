@@ -50,8 +50,6 @@ def get_nurse_planning(nurse_id, date, halfday):
     nurse = Nurse.query.get(nurse_id)
     date_selected = calendar.get_dates_from_form(date)[0]
 
-    # TO DO :
-    message = None
     office = Office.query.filter(Office.id == nurse.office_id).all()
     schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
                                       Schedule.appointment.has(date=date_selected),
@@ -62,8 +60,12 @@ def get_nurse_planning(nurse_id, date, halfday):
         schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
                                           Schedule.appointment.has(date=date_selected),
                                           Schedule.appointment.has(halfday=halfday)).all()
-    schedules = office + schedules
-    nb_schedules = len(schedules)
+    if halfday == "Morning":
+        schedules = office + schedules
+        nb_schedules = len(schedules)
+    else:
+        schedules = schedules + office
+        nb_schedules = len(schedules)
 
     return render_template("planning_nurse.html", nurse=nurse, date=date_selected, halfday=halfday,
                            schedules=schedules, nb_schedules=nb_schedules)
