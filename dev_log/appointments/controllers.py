@@ -106,6 +106,7 @@ def search_patient_appointments(research):
 
 
 def check_appointments_nurses(care_id, date, halfday):
+    """Ne pas oublier d'envoyer la position du cabinet"""
     # nurses = Nurse.query.filter(Nurse.office_id == session['office_id'])
     # office = Office.query.filter(Office.id == session['office_id'])
     # data = {}
@@ -114,9 +115,9 @@ def check_appointments_nurses(care_id, date, halfday):
     # data["office_lon"] = str(office[0].longitude)
     # if halfday == "Morning":
     #     data["start"] = "08:00"
-    #     data["end"] = "12:30"
+    #     data["end"] = "12:00"
     # if halfday == "Afternoon":
-    #     data["start"] = "13:30"
+    #     data["start"] = "14:00"
     #     data["end"] = "18:00"
     #
     # appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).all()
