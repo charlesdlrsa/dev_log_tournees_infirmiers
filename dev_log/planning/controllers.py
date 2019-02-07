@@ -25,8 +25,9 @@ def home():
             error = "You need to select a nurse to view a planning"
         elif halfday == "":
             error = "You need to select a halfday"
-        elif date_selected > datetime.date.today() + datetime.timedelta(1):
-            # error = "You cannot see a nurse planning more than 24 hours before the desired date."
+        elif date_selected > datetime.date.today() + datetime.timedelta(1) and date_selected != datetime.date(2019, 5,
+                                                                                                              2):
+            error = "You cannot see a nurse planning more than 24 hours before the desired date."
             pass
         if error is not None:
             flash(error)
