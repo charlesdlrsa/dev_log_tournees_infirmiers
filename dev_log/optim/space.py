@@ -21,8 +21,6 @@ function naming:
 solve_boolean(data)
 solve_complete(data)
 
-ISSUE : if we have one big cluster that a nurse can not cover by him(her)self. -> done
-
 Output:
 [{"nurse_id":"id", "app_id":"id", "hour":"hh:mm"}]
 
@@ -330,7 +328,11 @@ class Space :
     # -------------------------------------------------------------------------
     # -- DMIN USING DIVIDE AND CONQUER
     # -------------------------------------------------------------------------
-        
+    
+    """
+    Dmin is computed approximating latitude and longitude as coordinates in a 2D space
+    """
+
     def bruteForce(self,points_by_long):
         """
         Brute force guess for small instances
@@ -426,6 +428,8 @@ class Space :
     Andrew's monotone chain algorithm is used to build the convex hull and
     Shamos algorithm (based on rotating calipers) to compute the diamater of the
     convex hull.
+    
+    Dmax is computed approximating latitude and longitude as coordinates in a 2D space
     """
     
     def orient (self, p, q, r):
@@ -513,11 +517,13 @@ class Space :
     def computeExtremalDistances(self):
         """
         Compute the extremal distances using the two algorithms explained above.
+        They are computed approximating latitude and longitude as coordinates in a 
+        2D space.
         """
         if self.dmin is None or self.dmax is None:
-            _, _, dmin = Space.computeDmin(self)
-            _, _, dmax = Space.computeDmax(self)
-            self.dmin, self.dmax = math.sqrt(dmin), math.sqrt(dmax)
+            pmin1, pmin2, _ = Space.computeDmin(self)
+            pmax1, pmax2, _ = Space.computeDmax(self)
+            self.dmin, self.dmax = pmin1.distanceKmTo(pmin2), pmax1.distanceKmTo(pmax2)
             
             # freeing memory
             self.points_by_long = []
@@ -534,7 +540,8 @@ class Space :
     def getNumberOfCluster(self):
         """
         Compute the minimum number of cluster having a radius bounded by
-        walkingThreshold, which is a distance in kilometers (=2.0 by default)
+        the minimimum between the average between dmin and dmax and the 
+        walkingThreshold (=2.0 by default), which is a distance in kilometers.
 
         The office is set to be a center by default. 
         NB: The office id has to be set to 0.
@@ -543,9 +550,10 @@ class Space :
         """
         # dist is a triangular matrix
         dist = self.getKmDistance()
+        threshold = min(self.walkingThreshold, (self.dmax+self.dmin)/2.0)
         with open("models/clustering.dat", "w") as clustering:
             clustering.write("# threshold for walking distance\n")
-            clustering.write("param d:= {};\n".format(self.walkingThreshold))
+            clustering.write("param d:= {};\n".format(threshold))
             
             clustering.write("\n")
             
@@ -669,10 +677,12 @@ class Space :
             ctime = self.clusterTime.pop(c)
             k = math.ceil(0.5 * self.duration / ctime)
 
+            # gmaps walking time is approximately 4.8km/hr and 3600/4.8 = 
+            threshold = int(self.walkingThreshold*750)
+
             with open("models/clusteringWithVertexValues.dat", "w") as clustering:
                 clustering.write("# threshold for walking distance\n")
-                # gmaps walking time is approximately 4.8km/hr and 3600/4.8 = 750
-                clustering.write("param t:= {};\n".format(int(self.walkingThreshold*750)))
+                clustering.write("param t:= {};\n".format(threshold))
                 
                 clustering.write("\n")
 
@@ -857,13 +867,56 @@ class Space :
         Split the clusters between the various nurses.
         """
 
+        """
+        at this point: 
+        => cluster is a dictionnary with:
+            - key = center (its index)
+            - value = hamiltonian path in the cluster (always starting with the center)
+        => cluster_time is a dictionnary with:
+            - key = center (its index)
+            - value = time to go through the path stored in cluster
+        """
+
+        centers = self.getListPointsByID(self.cluster_time.keys())
+        time = self.getGoogleTravelTimes(centers, "driving")
         
         with open("models/vrp.dat", "w") as vrp:
-            
-            # TODO: Write data
-            # TODO: Write LP
+            # number of nurses
+            vrp.write("# number of clusters\n")
+            vrp.write("param k := {};\n".format(len(self.nurse_ids)))
 
+            vrp.write("\n")
+            
+            # TODO: adapt according to nurses
+            vrp.write("# max cluster size\n")
+            vrp.write("param maxt := {};\n".format(self.duration))
+
+            vrp.write("\n")
+            
+            vrp.write("# nombre de sommets {}\n".format(len(centers)))
+            vrp.write("param: V: duration :=\n")
+            for p in centers:
+                p_ID = p.getID()
+                vrp.write("\t{} {}\n".format(p_ID,self.cluster_time[p_ID]))
             vrp.write(";\n")
+
+            vrp.write("\n")
+
+            vrp.write("# id_sommet1, id_sommet2, time\n")
+            vrp.write("param: A: time :=\n")
+            for p in centers:
+                p_ID = p.getID()
+                vrp.write("\t{} {} 0\n".format(p_ID, p_ID))
+            for i in range(len(centers)):
+                for j in range(i+1, n):
+                    p_ID1 = centers[i].getID()
+                    p_ID2 = centers[j].getID()
+                    vrp.write("\t{} {} {}\n".format(p_ID1, p_ID2, int(time[i][j])))
+                    vrp.write("\t{} {} {}\n".format(p_ID2, p_ID1, int(time[j][i])))
+            vrp.write(";\n")
+
+
+            # TODO: Write LP
 
         # set up ampl
         ampl = AMPL(Environment('ampl'))
@@ -883,17 +936,24 @@ class Space :
         """
 
         """
-        self.getNumberOfCluster()
-        self.clusterSpace()
-        self.clusterTime = dict()
+        if self.dmin is None or self.dmax is None:
+            Space.computeExtremalDistances(self)
 
+        # get the minimal number of clusters
+        self.getNumberOfCluster()
+
+        # cluster the space
+        self.clusterSpace()
+
+        # compute time to see patients in each cluster
+        self.clusterTime = dict()
         for c,p in self.clusters.items():
             walking_points = self.getListPointsByID(p)
             walking_path, walking_time = self.getHamiltonianCycle(walking_points, mode="walking")
             walking_time += sum(self.care_duration[app_id] for app_id in walking_path)
             self.clusters[c] = walking_path
             self.clusterTime[c] = walking_time
-
+        return
         """
         at this point: 
         => cluster is a dictionnary with:
@@ -904,6 +964,7 @@ class Space :
             - value = time to go through the path stored in cluster
         """
 
+        # recluster the patients to avoid having clusters with too important time to process
         toRecluster = []
         for c,t in self.clusterTime.items():
             if t >=  0.5 * self.duration:
@@ -915,6 +976,7 @@ class Space :
                 if t >=  0.5 * self.duration:
                     toRecluster.append(c)
 
+        # split the clusters among the nurses
         #appointment_distribution = self.splitAmongNurse()
 
         # TODO: mettre en forme la sortie.
@@ -941,19 +1003,24 @@ if __name__ == "__main__":
     office = [latRef + random() * latRange, lonRef + random() * lonRange]
 
     patientDict = dict()
-    for k in range(5):
+    for k in range(20):
         lon = lonRef + random() * lonRange
         lat = latRef + random() * latRange
         patientDict[k+1] = (lat,lon)
 
     s = Space()
     s.buildSpaceFromDB(office, patientDict)
+    s.solve()
+    """
     s.clusters = dict()
     s.clusterTime = dict()
     path, time = s.getHamiltonianCycle(s.points,"walking")
     s.clusters[0] = path
     s.clusterTime[0] = time//4
     s.recluster([0])
+    """
+    print(s.clusters)
+    print(s.clusterTime)
     quit()
     s.getNumberOfCluster()
     points = s.getListPointsByID(s.clusters.keys())
