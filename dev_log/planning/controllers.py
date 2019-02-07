@@ -50,11 +50,18 @@ def get_nurse_planning(nurse_id, date, halfday):
     nurse = Nurse.query.get(nurse_id)
     date_selected = calendar.get_dates_from_form(date)[0]
 
-    # TO DO : à changer par la vraie fonction de Romu
+    # TO DO :
+    message = None
     office = Office.query.filter(Office.id == nurse.office_id).all()
     schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
                                       Schedule.appointment.has(date=date_selected),
                                       Schedule.appointment.has(halfday=halfday)).all()
+    if len(schedules) == 0:
+        # TODO : à changer par la vraie fonction de Romu
+        # run Romuald's optimizer to set the schedules before requesting schedules' database
+        schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
+                                          Schedule.appointment.has(date=date_selected),
+                                          Schedule.appointment.has(halfday=halfday)).all()
     schedules = office + schedules
     nb_schedules = len(schedules)
 
