@@ -129,34 +129,33 @@ def check_appointments_nurses(care_id, date, halfday):
     appointment that the administrator wants to schedule by calling the optimizer function """
 
     # TODO : Ne pas oublier d'envoyer la position du cabinet
-    # nurses_office = Nurse.query.filter(Nurse.office_id == session['office_id']).all()
-    # nurses_absent = Nurse.query.filter(Nurse.nurse_absence.any(date=date)).all()
-    # nurses = list(set(nurses_office) - set(nurses_absent))
-    # office = Office.query.filter(Office.id == session['office_id']).first()
-    # data = {}
-    # data["nurse_ids"] = [str(nurse.id) for nurse in nurses]
-    # data["office_lat"] = str(office[0].latitude)
-    # data["office_lon"] = str(office[0].longitude)
-    # if halfday == "Morning":
-    #     data["start"] = "08:00"
-    #     data["end"] = "12:00"
-    # if halfday == "Afternoon":
-    #     data["start"] = "14:00"
-    #     data["end"] = "18:00"
-    #
-    # appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).all()
-    # data["appointments"] = []
-    # for app in appointments:
-    #     patient = Patient.query.filter(Patient.id == app.patient_id).all()
-    #     care = Care.query.filter(Care.id == app.care_id).all()
-    #     app_data = {}
-    #     app_data["app_id"] = str(app.id)
-    #     app_data["app_lat"] = str(patient[0].latitude)
-    #     app_data["app_lon"] = str(patient[0].longitude)
-    #     app_data["app_length"] = str(care[0].duration)
-    #     data["appointments"].append(app_data)
+    nurses_office = Nurse.query.filter(Nurse.office_id == session['office_id']).all()
+    nurses_absent = Nurse.query.filter(Nurse.nurse_absence.any(date=date)).all()
+    nurses = list(set(nurses_office) - set(nurses_absent))
+    office = Office.query.filter(Office.id == session['office_id']).first()
+    data = {}
+    data["nurse_ids"] = [str(nurse.id) for nurse in nurses]
+    data["office_lat"] = str(office.latitude)
+    data["office_lon"] = str(office.longitude)
+    if halfday == "Morning":
+        data["start"] = "08:00"
+        data["end"] = "12:00"
+    if halfday == "Afternoon":
+        data["start"] = "14:00"
+        data["end"] = "18:00"
+
+    appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).all()
+    data["appointments"] = []
+    for app in appointments:
+        app_data = {}
+        app_data["app_id"] = str(app.id)
+        app_data["app_lat"] = str(app.patient.latitude)
+        app_data["app_lon"] = str(app.patient.longitude)
+        app_data["app_length"] = str(app.care.duration)
+        data["appointments"].append(app_data)
     # response = solve_boolean(data)
     response = True
+
     return response
 
 

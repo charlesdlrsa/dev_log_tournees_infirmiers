@@ -78,9 +78,10 @@ def init_db():
     db.session.add(Care(description="Auscultation", duration=20))
     db.session.add(Care(description="Assistance", duration=60))
 
-    db.session.add(Absence(1, datetime.date(2019, 1, 1), "Morning"))
-    db.session.add(Absence(3, datetime.date(2019, 2, 1), "Morning"))
-    db.session.add(Absence(3, datetime.date(2019, 2, 1), "Afternoon"))
+    db.session.add(Absence(1, datetime.date(2019, 1, 10), "Afternoon"))
+    db.session.add(Absence(2, datetime.date(2019, 2, 25), "Afternoon"))
+    db.session.add(Absence(3, datetime.date(2019, 5, 2), "Morning"))
+    db.session.add(Absence(4, datetime.date(2019, 5, 2), "Morning"))
 
     for pID in range(1, 5):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
@@ -88,25 +89,12 @@ def init_db():
         # To be deleted
         db.session.add(Schedule(appointment_id=pID, hour=datetime.time(8 + pID-1, 30),
                                 nurse_id=1))
-    for pID in range(1, 5):
-        db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
-                                   halfday="Afternoon"))
-        # To be deleted
-        db.session.add(Schedule(appointment_id=pID+4, hour=datetime.time(13 + pID-1, 30),
-                                nurse_id=1))
     for pID in range(5, 9):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
                                    halfday="Morning"))
         # To be deleted
-        db.session.add(Schedule(appointment_id=pID+4, hour=datetime.time(8 + pID-4-1, 30),
+        db.session.add(Schedule(appointment_id=pID, hour=datetime.time(8 + pID-4-1, 30),
                                 nurse_id=2))
-    for pID in range(5, 9):
-        db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
-                                   halfday="Afternoon"))
-        # To be deleted
-        db.session.add(Schedule(appointment_id=pID+8, hour=datetime.time(13 + pID-4-1, 30),
-                                nurse_id=2))
-
     db.session.commit()
 
     lg.warning('Database initialized!')
