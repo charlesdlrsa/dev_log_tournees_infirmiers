@@ -618,7 +618,7 @@ class Space :
     def setDrivingTimes(self,time):
         self.driving_mat = time
 
-    def solve(self, addApp=False):
+    def solve(self, addApp=False, ft = 1):
         """
 
         """
@@ -699,10 +699,10 @@ class Space :
                 except:
                     raise GmapApiError
                 for k in range(len(walking_path)-2):
-                    res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                    res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time, ft=ft)})
                     current_time += self.care_duration[current_pointID] + travel_times[k,k+1]
                     current_pointID = walking_path[k+1]
-                res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time, ft=ft)})
                 current_time += self.care_duration[current_pointID] + travel_times[len(walking_path)-2,0]
                 previous_index = point_index
             current_time += self.driving_mat[previous_index,officeIndex]
@@ -721,11 +721,11 @@ class Space :
 
         return res
 
-    def formatTime(self, time):
+    def formatTime(self, time, ft=1):
         t = int(time)
-        s = "%s%d.%s%d"%("0" if t % 3600 < 10 else "", t // 3600, "0" if (t % 3600)//60 < 10 else "", (t % 3600)//60)
+        s = "%s%d.%s%d"%("0" if t // 3600 < 10 else "", t // 3600, "0" if (t % 3600)//60 < 10 else "", (t % 3600)//60)
         return s
- 
+        
 
 def solve_complete(data):
     s = Space()
@@ -762,6 +762,6 @@ if __name__ == "__main__":
 
     nurses = [1,2,3,4]
     s = Space()
-    s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses) 
+    s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses)
+    
     print(s.solve())
-
