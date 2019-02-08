@@ -13,8 +13,10 @@ TODO:
     solve
     mettre en forme les sorties
     functions solve_boolean(data) and solve_complete(data)
-    GoogleMaps gestion des exceptions
     clean le code
+
+ISSUES:
+    reclustering -> some solutions are infeasible
 
 
 function naming:
@@ -68,6 +70,8 @@ class Space :
     # dmin: minimal distance between two points in the space
     # dmax: maximal distance between two points in the space
 
+    clustering_factor = 0.5
+    
     # -------------------------------------------------------------------------
     # -- INITIALIZATION
     # -------------------------------------------------------------------------
@@ -189,7 +193,7 @@ class Space :
         """
         return self.care_duration
 
-    def getPointsByID(self, id):
+    def getPointByID(self, id):
         """
         Return the point in the space having the given id if exists, None otherwise.
         """
@@ -223,7 +227,13 @@ class Space :
 
         return l
 
-    def regenerateCyclingPath(self, listPoints, amplMatPath, travel_times):
+    def rotateToStartingPoint(self, path, starting_point):
+        while path[0].getID() != starting_point:
+            point = path.pop(0)
+            path.append(point)
+        path.append(path[0])
+
+    def regenerateCyclingPath(self, listPoints, amplMatPath, travel_times, starting_point):
         """
         Given a list of points and the ampl transition matrix, rebuild the path.
         @param listPoints: list of points (id, lat, lon) such that its order is the same as
@@ -231,12 +241,13 @@ class Space :
         @param amplMatPath: transition matrix (returned by ampl) describing the path 
         (zero, one matrix) such that:
             amplMatPath[i,j] = 1 iff the path goes from listPoint[i] to listPoint[j]
+        @param travel_times: time matrix such that travel_times[i][j] is the time to 
+        travel from from listPoint[i] to listPoint[j].
         """
-
         n = len(listPoints)
         i = 0
         j = -1
-        path = [listPoints[i]]
+        path = []
         travel_time = 0
         while j != 0:
             for k in range(n):
@@ -245,7 +256,42 @@ class Space :
             travel_time += travel_times[i][j]
             i = j
             path.append(listPoints[i])
+        self.rotateToStartingPoint(path, starting_point)
         return path, travel_time
+
+    
+    def buildVRPSolution(self, listCenters, amplMatPath, travel_times, path_number):
+        """
+        Given a list of points and the ampl transition matrix, rebuild the differents
+        pathes (according to the number of pathes).
+        Return a list of path x time.
+
+        @param listPoints: list of points (id, lat, lon) such that its order is the same as
+        the index in amplMatPath
+        @param amplMatPath: transition matrix (returned by ampl) describing the path 
+        (zero, one matrix) such that:
+            amplMatPath[i,j] = 1 iff one path goes from listPoint[i] to listPoint[j]
+        @param travel_times: time matrix such that travel_times[i][j] is the time to 
+        travel from from listPoint[i] to listPoint[j].
+        @param path_number: number of pathes that we try to rebuild
+        """
+        n = len(listCenters)
+        VRP = []
+        for p in range(n):
+            if p != 0 and amplMatPath[1,p+1].value():
+                i = p
+                j = -1
+                path = [listCenters[0], listCenters[p]]
+                travel_time = travel_times[0][p]
+                while j != 0:
+                    for k in range(n):
+                        if i != k and amplMatPath[i+1,k+1].value():
+                            j = k
+                    travel_time += self.clusterTime[listCenters[i].getID()] + travel_times[i][j]
+                    i = j
+                    path.append(listCenters[i])
+                VRP.append([path,travel_time])
+        return VRP
         
     # -------------------------------------------------------------------------
     
@@ -296,15 +342,16 @@ class Space :
         
         return delta_lat * delta_long
     
-    def getKmDistance(self):
+    def computeKmDistance(self):
         """
         Compute the matrix of distance between the points using distance as the crow flies.
+        This is a triangular matrix.
         """
         dist = [[0 for k in range(self.nb_points)] for k in range(self.nb_points)]
         for i in range(self.nb_points):
             for j in range(i+1, self.nb_points):
                 dist[i][j] = self.points[i].distanceKmTo(self.points[j])
-        return dist
+        self.kmDist = dist
 
     def getGoogleTravelTimes(self, addresses, mode):
         """
@@ -542,422 +589,49 @@ class Space :
     # -------------------------------------------------------------------------
     # -- PROCESS
     # -------------------------------------------------------------------------
-    def getNumberOfCluster(self):
-        """
-        Compute the minimum number of cluster having a radius bounded by
-        the minimimum between the average between dmin and dmax and the 
-        walkingThreshold (=2.0 by default), which is a distance in kilometers.
+    def setClusterNumber(self, clusterNumber):
+        self.clusterNumber = clusterNumber
+    
+    def computeClusterNumber(self):
+        from clusterNumber import numberOfClusters
+        numberOfClusters(self)
 
-        The office is set to be a center by default. 
-        NB: The office id has to be set to 0.
-
-        @return: the minimal number of clusters
-        """
-        # dist is a triangular matrix
-        dist = self.getKmDistance()
-        threshold = min(self.walkingThreshold, (self.dmax+self.dmin)/2.0)
-        with open("models/clustering.dat", "w") as clustering:
-            clustering.write("# threshold for walking distance\n")
-            clustering.write("param d:= {};\n".format(threshold))
-            
-            clustering.write("\n")
-            
-            clustering.write("# nombre de sommets {}\n".format(self.nb_points))
-            clustering.write("set V :=\n")
-            for p in self.points:
-                clustering.write("\t{}\n".format(p.getID()))
-            clustering.write(";\n")
-
-            clustering.write("\n")
-
-            clustering.write("# id_sommet1, id_sommet2, distance\n")
-            clustering.write("param distance :=\n")
-            for p in self.points:
-                p_ID = p.getID()
-                clustering.write("\t{} {} 0\n".format(p_ID, p_ID))
-            for i in range(self.nb_points):
-                for j in range(i+1, self.nb_points):
-                    p_ID1 = self.points[i].getID()
-                    p_ID2 = self.points[j].getID()
-                    clustering.write("\t{} {} {:.4f}\n".format(p_ID1, p_ID2, dist[i][j]))
-                    clustering.write("\t{} {} {:.4f}\n".format(p_ID2, p_ID1, dist[i][j]))
-            clustering.write(";\n")
-
-        # set up ampl
-        ampl = AMPL(Environment('ampl'))
-
-        # Interpret the two files
-        ampl.read('models/clustering.mod')
-        ampl.readData('models/clustering.dat')
-
-        # Solve
-        print("Get number of clusters")
-        ampl.solve()
-
-        # Get objective entity by AMPL name
-        numberCenters = ampl.getObjective('numberCenters')
-        
-        self.clusterNumber = numberCenters.get().value()
-
-    def clusterSpace(self):
-        """
-        Cluster the space, using the k-median paradigm:
-            provide the set of $k$ vertices ${c_1, ... c_k}$ minimizing
-                sum_{v in V} min_i d_{c_i,v}
-        
-        k is stored in self.clusterNumber
-
-        The office is set to be a center by default. 
-        NB: The office id has to be set to 0.
-
-        @store  a dict representing the clusters in self.clusters.
-
-        The dictionnary representing the cluster has the format:
-            - key = center
-            - value = list of the points in the cluster (always starting with the center)
-        """
-        with open("models/clustering.dat", "r") as clustering:
-            with open("models/kmedian.dat", "w") as kmedian:
-                kmedian.write("# number of clusters\n")
-                kmedian.write("param k := {};\n".format(self.clusterNumber))
-
-                kmedian.write("\n")
-
-                clustering.readline()
-                clustering.readline()
-                clustering.readline()
-
-                for line in clustering.readlines():
-                    kmedian.write(line)
-
-        # set up ampl
-        ampl = AMPL(Environment('ampl'))
-
-        # Interpret the two files
-        ampl.read('models/kmedian.mod')
-        ampl.readData('models/kmedian.dat')
-
-        # Solve
-        print("cluster space")
-        ampl.solve()
-
-        # Get objective entity by AMPL name
-        centers = ampl.getVariable('center')
-        
-        listCenters = []
-
-        # Access all instances using an iterator
-        for index, instance in centers:
-            if instance.value():
-                listCenters.append(int(index))
-
-        clusters = dict()
-        for c in listCenters:
-            clusters[c] = [c]
-
-        # access the variable
-        closestCenter = ampl.getVariable('closestCenter')
-        for index, instance in closestCenter:
-            if int(index[0]) not in listCenters and instance.value():
-                clusters[int(index[1])].append(int(index[0]))
-
+    def setClusters(self, clusters):
         self.clusters = clusters
-
-    def recluster(self, toRecluster):
-        """
-        Recluster some clusters that are "too big".
-        Namely, all clusters having a traveling time greater or equal to half the working time.
-
-        This is used to prevent huge cluster that would be done by only one nurse. The half factor
-        is used to soften the optimization.
-
-        NB: The function assume the points have already been clustered and some clusters are "too big".
-            The linear solver will fail to recluster a set of points not satisfying the cluster
-            constraints.
-
-        @param toRecluster: list of "too big" cluster centers
-        """
-        for c in toRecluster:
-            unclusteredPoints = self.getListPointsByID(self.clusters.pop(c)[:-1])
-            n = len(unclusteredPoints)
-            try:
-                time = self.getGoogleTravelTimes(unclusteredPoints, "walking")
-            except:
-                raise GmapApiError
-            ctime = self.clusterTime.pop(c)
-            k = math.ceil(8./7. * ctime / self.duration)
-
-            # gmaps walking time is approximately 4.8km/hr and 3600/4.8 = 
-            threshold = int(self.walkingThreshold*750)
-
-            with open("models/clusteringWithVertexValues.dat", "w") as clustering:
-                clustering.write("# threshold for walking distance\n")
-                clustering.write("param t:= {};\n".format(threshold))
-                
-                clustering.write("\n")
-
-                clustering.write("# number of clusters\n")
-                clustering.write("param k := {};\n".format(k))
-
-                clustering.write("\n")
-
-                clustering.write("# max cluster size\n")
-                clustering.write("param maxt := {};\n".format(math.floor(0.5 * self.duration)))
-
-                clustering.write("\n")
-
-                
-                clustering.write("# nombre de sommets {}\n".format(n))
-                clustering.write("param: V: duration :=\n")
-                for p in unclusteredPoints:
-                    p_ID = p.getID()
-                    clustering.write("\t{} {}\n".format(p_ID,self.care_duration[p_ID]))
-                clustering.write(";\n")
-
-                clustering.write("\n")
-
-                clustering.write("# id_sommet1, id_sommet2, time\n")
-                clustering.write("param: A: time :=\n")
-                for p in unclusteredPoints:
-                    p_ID = p.getID()
-                    clustering.write("\t{} {} 0\n".format(p_ID, p_ID))
-                for i in range(n):
-                    for j in range(i+1, n):
-                        p_ID1 = unclusteredPoints[i].getID()
-                        p_ID2 = unclusteredPoints[j].getID()
-                        clustering.write("\t{} {} {}\n".format(p_ID1, p_ID2, int(time[i][j])))
-                        clustering.write("\t{} {} {}\n".format(p_ID2, p_ID1, int(time[j][i])))
-                clustering.write(";\n")
-
-            # set up ampl
-            ampl = AMPL(Environment('ampl'))
-
-            # Interpret the two files
-            ampl.read('models/clusteringWithVertexValues.mod')
-            ampl.readData('models/clusteringWithVertexValues.dat')
-
-            # Solve
-            print("reclustering")
-            ampl.solve()
-
-            # Get objective entity by AMPL name
-            centers = ampl.getVariable('center')
-            
-            listCenters = []
-
-            # Access all instances using an iterator
-            for index, instance in centers:
-                if instance.value():
-                    listCenters.append(int(index))
-
-            clusters = dict()
-            for c in listCenters:
-                clusters[c] = [c]
-
-            # access the variable
-            closestCenter = ampl.getVariable('closestCenter')
-            for index, instance in closestCenter:
-                if int(index[0]) not in listCenters and instance.value():
-                    clusters[int(index[1])].append(int(index[0]))
-
-            # update self.cluster and self.clusterTime 
-            for cc in listCenters:
-                walking_points = self.getListPointsByID(clusters[cc])
-                walking_path, walking_time = self.getHamiltonianCycle(walking_points, mode="walking")
-                walking_time += sum(self.care_duration[app_id] for app_id in walking_path)
-                self.clusters[cc] = walking_path
-                self.clusterTime[cc] = walking_time
-            
-        print("done")
     
-    def getHamiltonianCycle(self, points, mode="driving", recompute=True):
-        """
-        Compute an hamiltonian cycle on the set of points.
+    def clusterSpace(self):
+        from processClustering import runClustering
+        runClustering(self)
 
-        It uses a google maps key. Note that mode should be one of
-            -"driving", 
-            -"walking", 
-            - (and "bicycling" but it is not taken into account at the moment)
-        
-        @param points: should be a subset of self.points
-        """
-        if recompute:
-
-            n = len(points)
-
-            if n == 1:
-                path, travel_time = points, 0
-            
-            else:
-                try:
-                    travel_times = self.getGoogleTravelTimes(points, mode)
-                except:
-                    raise GmapApiError
-            
-                if n == 2:
-                    path, travel_time = [points[0], points[1], points[0]], travel_times[0][1] + travel_times[1][0]
-
-                else:
-                    """
-                    For the solver to work, the points has to be numbered from 1 to n
-                    """
-
-                    with open("models/travellingSalesman.dat", "w") as hamiltonian:
-                        hamiltonian.write("# nombre de sommets {}\n".format(n))
-                        hamiltonian.write("set V :=\n")
-                        for k in range(1, n+1):
-                            hamiltonian.write("\t{}\n".format(k))
-                        hamiltonian.write(";\n")
-
-                        hamiltonian.write("\n")
-
-                        hamiltonian.write("# id_sommet1, id_sommet2, travelling time\n")
-                        hamiltonian.write("param: A: time :=\n")
-                        for i in range(n):
-                            for j in range(i+1, n):
-                                hamiltonian.write("\t{} {} {}\n".format(i+1, j+1, travel_times[i][j]))
-                                hamiltonian.write("\t{} {} {}\n".format(j+1, i+1, travel_times[j][i]))
-                        hamiltonian.write(";\n")
-
-                    # set up ampl
-                    ampl = AMPL(Environment('ampl'))
-
-                    # Interpret the two files
-                    ampl.read('models/travellingSalesman.mod')
-                    ampl.readData('models/travellingSalesman.dat')
-
-                    # Solve
-                    print("get Hamiltonian cycle in recompute")
-                    ampl.solve()
-                    
-                    #regenerate the path
-                    x = ampl.getVariable("x")
-
-                    path, travel_time = self.regenerateCyclingPath(points, x, travel_times)
-            return [p.getID() for p in path], travel_time
+    def reclusterSpace(self, toRecluster):
+        from reclustering import runReclustering
+        runReclustering(self, toRecluster)
     
+    def getHamiltonianCycle(self, points, starting_point):
+        from hamiltonian import hamiltonian
+        return hamiltonian(self, points, starting_point)
 
-        else:
+    def splitAmongNurse(self, centers):
+        from splitAmongNurses import vrp
+        return vrp(self, centers)
+    
+    def setDrivingTimes(self,time):
+        self.driving_mat = time
 
-            # set up ampl
-            ampl = AMPL(Environment('ampl'))
-            
-            #model4
-            btm4 = time.time()
-
-            # Interpret the two files
-            ampl.read('models/travellingSalesman.mod')
-            ampl.readData('models/travellingSalesman.dat')
-
-            # Solve
-            print("get Hamiltonian cycle out of recompute")
-            ampl.solve()
-
-            # Get objective entity by AMPL name
-            total_time_m4 = ampl.getObjective("total_time").value()
-            
-            etm4 = time.time()
-
-            print("travellingSalesman - score: {}, time {}.".format(total_time_m4, etm4 - btm4))
-
-            #regenerate the path
-            x = ampl.getVariable("x")
-
-            travel_times = []
-            with open("times.txt", "r") as times:
-                for line in times.readlines():
-                    t = []
-                    l = re.findall('[0-9]*',line)
-                    for c in l:
-                        try:
-                            t.append(int(c))
-                        except ValueError:
-                            pass
-                    travel_times.append(t)
-
-            path, travel_time = self.regenerateCyclingPath(points, x, travel_times)
-            return [p.getID() for p in path], travel_time
-
-    def splitAmongNurse(self):
-        """
-        Split the clusters between the various nurses.
-        """
-
-        """
-        at this point: 
-        => cluster is a dictionnary with:
-            - key = center (its index)
-            - value = hamiltonian path in the cluster (always starting with the center)
-        => clusterTime is a dictionnary with:
-            - key = center (its index)
-            - value = time to go through the path stored in cluster
-        """
-
-        centers = self.getListPointsByID(self.clusterTime.keys())
-        n = len(centers)
-        print(n)
-        try:
-            time = self.getGoogleTravelTimes(centers, "driving")
-        except:
-            raise GmapApiError
-        
-        with open("models/vrp.dat", "w") as vrp:
-            # number of nurses
-            vrp.write("# number of clusters\n")
-            vrp.write("param k := {};\n".format(len(self.nurse_ids)))
-
-            vrp.write("\n")
-            
-            # TODO: adapt according to nurses
-            vrp.write("# max cluster size\n")
-            vrp.write("param maxt := {};\n".format(self.duration))
-
-            vrp.write("\n")
-
-            vrp.write("# nombre de sommets {}\n".format(n))
-            vrp.write("param: V: duration :=\n")
-            for k in range(n):
-                p_ID = centers[k].getID()
-                vrp.write("\t{} {}\n".format(k+1,self.clusterTime[p_ID]))
-            vrp.write(";\n")
-
-            vrp.write("\n")
-
-            vrp.write("# id_sommet1, id_sommet2, time\n")
-            vrp.write("param: A: time :=\n")
-            for i in range(n):
-                for j in range(i+1, n):
-                    vrp.write("\t{} {} {}\n".format(i+1, j+1, int(time[i][j])))
-                    vrp.write("\t{} {} {}\n".format(j+1, i+1, int(time[j][i])))
-            vrp.write(";\n")
-
-        return None
-            # TODO: Write LP
-
-        # set up ampl
-        ampl = AMPL(Environment('ampl'))
-
-        # Interpret the two files
-        ampl.read('models/vrp.mod')
-        ampl.readData('models/vrp.dat')
-
-        # Solve
-        print("VRP")
-        ampl.solve()
-
-        # Get objective entity by AMPL name
-        return None
-
-
-    def solve(self):
+    def solve(self, addApp=False):
         """
 
         """
         if self.dmin is None or self.dmax is None:
             Space.computeExtremalDistances(self)
 
+        # compute distance as the crow flies
+        self.computeKmDistance()
+
         # get the minimal number of clusters
-        self.getNumberOfCluster()
+        self.computeClusterNumber()
+
+        del self.kmDist
 
         # cluster the space
         self.clusterSpace()
@@ -966,7 +640,7 @@ class Space :
         self.clusterTime = dict()
         for c,p in self.clusters.items():
             walking_points = self.getListPointsByID(p)
-            walking_path, walking_time = self.getHamiltonianCycle(walking_points, mode="walking")
+            walking_path, walking_time = self.getHamiltonianCycle(walking_points, c)
             walking_time += sum(self.care_duration[app_id] for app_id in walking_path)
             self.clusters[c] = walking_path
             self.clusterTime[c] = walking_time
@@ -981,29 +655,89 @@ class Space :
             - value = time to go through the path stored in cluster
         """
 
+        """
         # recluster the patients to avoid having clusters with too important time to process
         toRecluster = []
         print("before reclustering:", len(self.clusters.keys()))
         for c,t in self.clusterTime.items():
-            if t >  7./8. * self.duration:
+            if t >  Space.clustering_factor * self.duration:
+                print("center", c, "cluster", self.clusters[c])
                 toRecluster.append(c)
         while(len(toRecluster) > 0):   
-            self.recluster(toRecluster)
+            self.reclusterSpace(toRecluster)
             toRecluster = []
             for c,t in self.clusterTime.items():
-                if t >=  7./8. * self.duration:
+                if t >=  Space.clustering_factor * self.duration:
                     toRecluster.append(c)
         
         print("after reclustering:", len(self.clusters.keys()))
+        """
 
         # split the clusters among the nurses
-        appointment_distribution = self.splitAmongNurse()
-
+        centers = list(self.clusters.keys())
+        appointment_distribution = self.splitAmongNurse(centers)
         # TODO: mettre en forme la sortie.
 
-        return None
+        i = 0
+        n_id = self.nurse_ids[i]
+        officeIndex = centers.index(0)
+        res = []
 
+        for [path,_] in appointment_distribution:
+            current_time = self.start[0]*3600 + self.start[1] * 60
+            previous_index = officeIndex
+            for c in range(1, len(path) -1):
+                current_pointID = path[c].getID()
+                point_index = centers.index(current_pointID)
+                current_time += self.driving_mat[previous_index,point_index]
+                
+                walking_path = self.clusters[current_pointID]
+                walking_point = [self.getPointByID(p_id) for p_id in walking_path[:-1]]
+                
+                try:
+                    travel_times = self.getGoogleTravelTimes(walking_point, "walking")
+                except:
+                    raise GmapApiError
+                for k in range(len(walking_path)-2):
+                    res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                    current_time += self.care_duration[current_pointID] + travel_times[k,k+1]
+                    current_pointID = walking_path[k+1]
+                res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                current_time += self.care_duration[current_pointID] + travel_times[len(walking_path)-2,0]
+                previous_index = point_index
+            current_time += self.driving_mat[previous_index,officeIndex]
 
+            i += 1
+            try:
+                n_id = self.nurse_ids[i]
+            except:
+                return False
+
+            if addApp and current_time > self.end[0]*3600 + self.end[1] * 60:
+                return False
+
+        if addApp:
+            return True
+
+        return res
+
+    def formatTime(self, time):
+        h = time // 3600
+        time %= 3600
+        m = int(time/60.)
+        s = str(h) + ":" + str(m)
+        return s
+ 
+
+def solve_complete(data):
+    s = Space()
+    s.buildSpaceFromDic(data)
+    return s.solve()
+
+def solve_boolean(data):
+    s = Space()
+    s.buildSpaceFromDic(data)
+    return s.solve(addApp=True)
 
 if __name__ == "__main__":
     from random import random, seed
@@ -1023,7 +757,7 @@ if __name__ == "__main__":
     office = [latRef + random() * latRange, lonRef + random() * lonRange]
 
     patientDict = dict()
-    for k in range(20):
+    for k in range(10):
         lon = lonRef + random() * lonRange
         lat = latRef + random() * latRange
         patientDict[k+1] = (lat,lon)
@@ -1031,31 +765,5 @@ if __name__ == "__main__":
     nurses = [1,2,3,4]
     s = Space()
     s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses) 
-    s.solve()
-    """
-    s.clusters = dict()
-    s.clusterTime = dict()
-    path, time = s.getHamiltonianCycle(s.points,"walking")
-    s.clusters[0] = path
-    s.clusterTime[0] = time//4
-    s.recluster([0])
-    """
-    print(s.clusters)
-    print(s.clusterTime)
-    quit()
-    s.getNumberOfCluster()
-    points = s.getListPointsByID(s.clusters.keys())
-    driving_path, driving_time = s.getHamiltonianCycle(points)
-
-    global_path = []
-    total_time = driving_time
-
-    for index_center in driving_path[:-1]:
-        walking_points = s.getListPointsByID(s.clusters[index_center])
-        walking_path, walking_time = s.getHamiltonianCycle(walking_points, mode="walking")
-        global_path += walking_path
-        total_time += walking_time
-    global_path.append(driving_path[-1])
-
-    print(total_time)
+    print(s.solve())
 

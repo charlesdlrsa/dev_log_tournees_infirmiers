@@ -9,10 +9,10 @@ param distance{V, V};
 # decision variable
 var center{V}, binary;
 
-# office if a center
-param office = 0;
-subject to officeIsCenter:
-	center[office] = 1.0;
+# office is a center
+param office := 0;
+subject to officeIsCenter{v in V}:
+	v <> office or center[v] = 1;
 	
 # there are at most k centers
 subject to maxKCenter:

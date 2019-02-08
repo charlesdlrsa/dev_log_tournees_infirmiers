@@ -11,15 +11,14 @@ param n := card(V);
 
 set A within{V, V};
 param time{A};
-param office := 0;
 
 # decision variable
-var center{V  union {office}}, binary;
+var center{V}, binary;
 
 # office is a center
-subject to officeIsCenter:
-	#if office in V then 
-	center[office] = 1.0;
+param office := 0;
+subject to officeIsCenter{v in V}:
+	v <> office or center[v] = 1.0;
 
 # clustering variable
 var closestCenter{V cross V}, binary;
