@@ -153,7 +153,7 @@ def check_appointments_nurses(care_id, date, halfday):
         data["appointments"].append(app_data)
     # response = solve_boolean(data)
     response = True
-    
+
     return response
 
 
