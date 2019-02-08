@@ -722,7 +722,7 @@ class Space :
         return res
 
     def formatTime(self, time):
-        h = time // 3600
+        h = int(time // 3600)
         time %= 3600
         m = int(time/60.)
         s = str(h) + ":" + str(m)
