@@ -8,9 +8,9 @@
 """
 
 TODO: 
-    assignNurse
+    recluster -> issue with office
+    assignNurse -> do LP
     solve
-    LP pour split les nurses
     mettre en forme les sorties
     functions solve_boolean(data) and solve_complete(data)
     GoogleMaps gestion des exceptions
@@ -21,8 +21,10 @@ function naming:
 solve_boolean(data)
 solve_complete(data)
 
-Output:
+Output: list of two dicts
 [{"nurse_id":"id", "app_id":"id", "hour":"hh:mm"}]
+[{"app_id:"id, "travel_mode":["driving"/"walking"]}]
+
 
 
 Use of the Distance Matrix service for existing Premium Plan customers
@@ -54,6 +56,9 @@ import numpy as np
 import googlemaps
 from key import key
 googlekey = key
+
+class GmapApiError(Exception):
+    pass
 
 class Space :
     
@@ -586,6 +591,7 @@ class Space :
         ampl.readData('models/clustering.dat')
 
         # Solve
+        print("Get number of clusters")
         ampl.solve()
 
         # Get objective entity by AMPL name
@@ -632,6 +638,7 @@ class Space :
         ampl.readData('models/kmedian.dat')
 
         # Solve
+        print("cluster space")
         ampl.solve()
 
         # Get objective entity by AMPL name
@@ -673,9 +680,12 @@ class Space :
         for c in toRecluster:
             unclusteredPoints = self.getListPointsByID(self.clusters.pop(c)[:-1])
             n = len(unclusteredPoints)
-            time = self.getGoogleTravelTimes(unclusteredPoints, "walking")
+            try:
+                time = self.getGoogleTravelTimes(unclusteredPoints, "walking")
+            except:
+                raise GmapApiError
             ctime = self.clusterTime.pop(c)
-            k = math.ceil(0.5 * self.duration / ctime)
+            k = math.ceil(8./7. * ctime / self.duration)
 
             # gmaps walking time is approximately 4.8km/hr and 3600/4.8 = 
             threshold = int(self.walkingThreshold*750)
@@ -727,6 +737,7 @@ class Space :
             ampl.readData('models/clusteringWithVertexValues.dat')
 
             # Solve
+            print("reclustering")
             ampl.solve()
 
             # Get objective entity by AMPL name
@@ -778,7 +789,10 @@ class Space :
                 path, travel_time = points, 0
             
             else:
-                travel_times = self.getGoogleTravelTimes(points, mode)
+                try:
+                    travel_times = self.getGoogleTravelTimes(points, mode)
+                except:
+                    raise GmapApiError
             
                 if n == 2:
                     path, travel_time = [points[0], points[1], points[0]], travel_times[0][1] + travel_times[1][0]
@@ -813,6 +827,7 @@ class Space :
                     ampl.readData('models/travellingSalesman.dat')
 
                     # Solve
+                    print("get Hamiltonian cycle in recompute")
                     ampl.solve()
                     
                     #regenerate the path
@@ -835,6 +850,7 @@ class Space :
             ampl.readData('models/travellingSalesman.dat')
 
             # Solve
+            print("get Hamiltonian cycle out of recompute")
             ampl.solve()
 
             # Get objective entity by AMPL name
@@ -872,13 +888,18 @@ class Space :
         => cluster is a dictionnary with:
             - key = center (its index)
             - value = hamiltonian path in the cluster (always starting with the center)
-        => cluster_time is a dictionnary with:
+        => clusterTime is a dictionnary with:
             - key = center (its index)
             - value = time to go through the path stored in cluster
         """
 
-        centers = self.getListPointsByID(self.cluster_time.keys())
-        time = self.getGoogleTravelTimes(centers, "driving")
+        centers = self.getListPointsByID(self.clusterTime.keys())
+        n = len(centers)
+        print(n)
+        try:
+            time = self.getGoogleTravelTimes(centers, "driving")
+        except:
+            raise GmapApiError
         
         with open("models/vrp.dat", "w") as vrp:
             # number of nurses
@@ -892,30 +913,25 @@ class Space :
             vrp.write("param maxt := {};\n".format(self.duration))
 
             vrp.write("\n")
-            
-            vrp.write("# nombre de sommets {}\n".format(len(centers)))
+
+            vrp.write("# nombre de sommets {}\n".format(n))
             vrp.write("param: V: duration :=\n")
-            for p in centers:
-                p_ID = p.getID()
-                vrp.write("\t{} {}\n".format(p_ID,self.cluster_time[p_ID]))
+            for k in range(n):
+                p_ID = centers[k].getID()
+                vrp.write("\t{} {}\n".format(k+1,self.clusterTime[p_ID]))
             vrp.write(";\n")
 
             vrp.write("\n")
 
             vrp.write("# id_sommet1, id_sommet2, time\n")
             vrp.write("param: A: time :=\n")
-            for p in centers:
-                p_ID = p.getID()
-                vrp.write("\t{} {} 0\n".format(p_ID, p_ID))
-            for i in range(len(centers)):
+            for i in range(n):
                 for j in range(i+1, n):
-                    p_ID1 = centers[i].getID()
-                    p_ID2 = centers[j].getID()
-                    vrp.write("\t{} {} {}\n".format(p_ID1, p_ID2, int(time[i][j])))
-                    vrp.write("\t{} {} {}\n".format(p_ID2, p_ID1, int(time[j][i])))
+                    vrp.write("\t{} {} {}\n".format(i+1, j+1, int(time[i][j])))
+                    vrp.write("\t{} {} {}\n".format(j+1, i+1, int(time[j][i])))
             vrp.write(";\n")
 
-
+        return None
             # TODO: Write LP
 
         # set up ampl
@@ -926,6 +942,7 @@ class Space :
         ampl.readData('models/vrp.dat')
 
         # Solve
+        print("VRP")
         ampl.solve()
 
         # Get objective entity by AMPL name
@@ -953,31 +970,34 @@ class Space :
             walking_time += sum(self.care_duration[app_id] for app_id in walking_path)
             self.clusters[c] = walking_path
             self.clusterTime[c] = walking_time
-        return
+
         """
         at this point: 
         => cluster is a dictionnary with:
             - key = center (its index)
             - value = hamiltonian path in the cluster (always starting with the center)
-        => cluster_time is a dictionnary with:
+        => clusterTime is a dictionnary with:
             - key = center (its index)
             - value = time to go through the path stored in cluster
         """
 
         # recluster the patients to avoid having clusters with too important time to process
         toRecluster = []
+        print("before reclustering:", len(self.clusters.keys()))
         for c,t in self.clusterTime.items():
-            if t >=  0.5 * self.duration:
+            if t >  7./8. * self.duration:
                 toRecluster.append(c)
         while(len(toRecluster) > 0):   
             self.recluster(toRecluster)
             toRecluster = []
             for c,t in self.clusterTime.items():
-                if t >=  0.5 * self.duration:
+                if t >=  7./8. * self.duration:
                     toRecluster.append(c)
+        
+        print("after reclustering:", len(self.clusters.keys()))
 
         # split the clusters among the nurses
-        #appointment_distribution = self.splitAmongNurse()
+        appointment_distribution = self.splitAmongNurse()
 
         # TODO: mettre en forme la sortie.
 
@@ -1008,8 +1028,9 @@ if __name__ == "__main__":
         lat = latRef + random() * latRange
         patientDict[k+1] = (lat,lon)
 
+    nurses = [1,2,3,4]
     s = Space()
-    s.buildSpaceFromDB(office, patientDict)
+    s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses) 
     s.solve()
     """
     s.clusters = dict()
