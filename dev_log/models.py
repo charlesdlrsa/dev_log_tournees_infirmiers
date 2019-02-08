@@ -26,6 +26,11 @@ class Base(db.Model):
 
 
 class BasePerson(Base):
+    """
+    Class model for persons : Nurses and Patients.
+    Attributes:
+         Basic information about a person.
+    """
     __abstract__ = True
 
     last_name = db.Column(

@@ -129,8 +129,10 @@ def check_appointments_nurses(care_id, date, halfday):
     appointment that the administrator wants to schedule by calling the optimizer function """
 
     # TODO : Ne pas oublier d'envoyer la position du cabinet
-    # nurses = Nurse.query.filter(Nurse.office_id == session['office_id'])
-    # office = Office.query.filter(Office.id == session['office_id'])
+    # nurses_office = Nurse.query.filter(Nurse.office_id == session['office_id']).all()
+    # nurses_absent = Nurse.query.filter(Nurse.nurse_absence.any(date=date)).all()
+    # nurses = list(set(nurses_office) - set(nurses_absent))
+    # office = Office.query.filter(Office.id == session['office_id']).first()
     # data = {}
     # data["nurse_ids"] = [str(nurse.id) for nurse in nurses]
     # data["office_lat"] = str(office[0].latitude)
@@ -165,7 +167,6 @@ def check_appointments_patient(patient_id, date, halfday):
     appointment = Appointment.query.filter(Appointment.date == date,
                                            Appointment.halfday == halfday,
                                            Appointment.patient_id == patient_id).first()
-
     if appointment is None:
         return None
 
