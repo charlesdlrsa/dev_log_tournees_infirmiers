@@ -722,10 +722,8 @@ class Space :
         return res
 
     def formatTime(self, time):
-        h = int(time // 3600)
-        time %= 3600
-        m = int(time/60.)
-        s = str(h) + ":" + str(m)
+        t = int(time)
+        s = "%s%d.%s%d"%("0" if t % 3600 < 10 else "", t // 3600, "0" if (t % 3600)//60 < 10 else "", (t % 3600)//60)
         return s
  
 
