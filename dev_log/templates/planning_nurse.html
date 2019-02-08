@@ -59,12 +59,12 @@
                 <td width=5%
                     style="font-size:12px; vertical-align:middle;">
                     {% if i==0 %}
-                        {% if schedules[0].appointment %}
-                        <a onclick="seeMyPointOfDeparture({{schedules[0].appointment.patient.latitude}}, {{schedules[0].appointment.patient.longitude}})"
-                           href="#departure" class="btn btn-primary"> RDV 0 </a>
-                        {% else %}
-                        <a onclick="seeMyPointOfDeparture({{schedules[0].latitude}}, {{schedules[0].longitude}})"
-                           href="#departure" class="btn btn-primary"> Your Office </a>
+                    {% if schedules[0].appointment %}
+                    <a onclick="seeMyPointOfDeparture({{schedules[0].appointment.patient.latitude}}, {{schedules[0].appointment.patient.longitude}})"
+                       href="#departure" class="btn btn-primary"> RDV 0 </a>
+                    {% else %}
+                    <a onclick="seeMyPointOfDeparture({{schedules[0].latitude}}, {{schedules[0].longitude}})"
+                       href="#departure" class="btn btn-primary"> Your Office </a>
                     {% endif %}
                     {% elif i==nb_schedules-1 and halfday=="Afternoon"%}
                     <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
@@ -72,19 +72,19 @@
                        href="#{{i-1}}->{{i}}"
                        class="btn btn-primary">Your Office</a>
                     {% else %}
-                        {% if schedules[i-1].latitude %}
-                        <a onclick="drawMap({{schedules[i-1].latitude}}, {{schedules[i-1].longitude}},
+                    {% if schedules[i-1].latitude %}
+                    <a onclick="drawMap({{schedules[i-1].latitude}}, {{schedules[i-1].longitude}},
                               {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
-                           href="#{{i-1}}->{{i}}"
-                           class="btn btn-primary">RDV
-                            {{i}}</a>
-                        {% else %}
-                        <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
+                       href="#{{i-1}}->{{i}}"
+                       class="btn btn-primary">RDV
+                        {{i}}</a>
+                    {% else %}
+                    <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
                               {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
-                           href="#{{i-1}}->{{i}}"
-                           class="btn btn-primary">RDV
-                            {{i}}</a>
-                        {% endif %}
+                       href="#{{i-1}}->{{i}}"
+                       class="btn btn-primary">RDV
+                        {{i}}</a>
+                    {% endif %}
                     {% endif %}
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
@@ -155,9 +155,12 @@
 </div>
 
 <div id="map"
-     style="height:70%; width:37%; float:right; margin-left:0%; margin-right:2%; vertical-align:middle; padding:150px;">
+     style="height:70%; width:37%; float:right; margin-left:0%; margin-right:2%; margin-bottom:1%; vertical-align:middle; padding:150px;">
     <a onclick="initMap()" href="#alltrajects" class="btn btn-danger"> See all your journeys on a map ! </a>
 </div>
+
+<div id="directionsPanel" style="width:37%; float:right; margin-left:0%; padding-left:2%; margin-right:2%;"></div>
+
 
 {% endif %}
 
@@ -221,9 +224,18 @@ function drawMap(lat_depart, lng_depart, lat_arrival, lng_arrival, travel_mode='
     directionsService.route(request, function(result, status) {
         if (status == 'OK') {
             directionsDisplay.setDirections(result);
+            var route = result.routes[0];
+            var summaryPanel = document.getElementById('directionsPanel');
+            summaryPanel.innerHTML += '<strong>Departure:</strong> ' + route.legs[0].start_address + '<br>';
+            summaryPanel.innerHTML += '<strong>Arrival:</strong> ' + route.legs[0].end_address + '<br>';
+            summaryPanel.innerHTML += '<strong>Distance:</strong> ' + route.legs[0].distance.text + ' ---- ';
+            summaryPanel.innerHTML += '<strong>Duration:</strong> ' + route.legs[0].duration.text + ' ---- ';
+            summaryPanel.innerHTML += '<strong>Mode:</strong> ' + route.legs[0].steps[0].travel_mode.toLowerCase();
         }
     });
 };
+
+
 
 
 
