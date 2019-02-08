@@ -11,6 +11,9 @@ patients = Blueprint('patients', __name__, url_prefix='/patients')
 @patients.route('/', methods=['GET', 'POST'])
 @admin_required
 def home():
+    """ Patients' home page allowing to see all the office's patients and their information,
+    to edit them or add a new one """
+
     if request.method == "POST":
         research = request.form['research']
         error = None
@@ -31,6 +34,8 @@ def home():
 @patients.route('/results/<research>', methods=['GET', 'POST'])
 @admin_required
 def search_patients(research):
+    """ Function allowing to search for a precise patient's information """
+
     if request.method == "POST":
         new_research = request.form['research']
         error = None
@@ -63,6 +68,8 @@ def search_patients(research):
 @patients.route('/add_patient', methods=['GET', 'POST'])
 @admin_required
 def add_patient():
+    """ Add a new patient in the database """
+
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
@@ -106,6 +113,8 @@ def add_patient():
 @patients.route('/edit/<int:patient_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_patient(patient_id):
+    """ Edit patient information in database """
+
     if request.method == "POST":
         print(request.form)
         last_name = request.form['last_name']
@@ -149,6 +158,8 @@ def edit_patient(patient_id):
 @patients.route('/delete_patient/<int:patient_id>')
 @admin_required
 def delete_patient(patient_id):
+    """ Delete patient from database """
+
     patient = Patient.query.get(patient_id)
     db.session.delete(patient)
     db.session.commit()

@@ -9,10 +9,8 @@ auth = Blueprint('auth', __name__)
 @auth.route('/', methods=('GET', 'POST'))
 @auth.route('/auth/login', methods=('GET', 'POST'))
 def login():
-    """
-    View of the login page, handles the users connections
-    :return:
-    """
+    """ View of the login page, handles the users connections """
+
     if request.method == 'GET':
         pass
         # init_db()
@@ -76,11 +74,7 @@ def login():
 
 
 def login_required(view):
-    """
-    Decorator that will check if a user is signed in and redirect him to the sign in page if not
-    :param view:
-    :return:
-    """
+    """ Decorator that will check if a nurse or an admin is signed in and redirect him to the sign in page if not """
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
@@ -95,11 +89,7 @@ def login_required(view):
 
 
 def admin_required(view):
-    """
-    Decorator that will check if a user is signed in and redirect him to the sign in page if not
-    :param view:
-    :return:
-    """
+    """ Decorator that will check if an admin is signed in and redirect him to the sign in page if not """
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
@@ -114,9 +104,7 @@ def admin_required(view):
 @auth.route('/auth/logout')
 @login_required
 def logout():
-    """
-    Logs out the user by cleaning the session user and redirects to the homepage
-    :return:
-    """
+    """ Logs out the user by cleaning the session user and redirects to the homepage """
+
     session.clear()
     return redirect(url_for('auth.login'))

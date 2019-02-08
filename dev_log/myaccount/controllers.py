@@ -12,6 +12,9 @@ account = Blueprint('account', __name__, url_prefix='/account')
 @account.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
+    """ Account's home page allowing to see your account information and edit them.
+    If your are logged in as a nurse, you can also see and edit your vacations """
+
     if session.get('office_id') is None:
         return redirect(url_for('account.nurse_info', nurse_id=session['nurse_id']))
     else:
@@ -23,6 +26,8 @@ def home():
 @account.route('/nurse/<int:nurse_id>', methods=['GET', 'POST'])
 @login_required
 def nurse_info(nurse_id):
+    """ Function requesting the database to get the nurse information """
+
     nurse = Nurse.query.get(nurse_id)
     absences = Absence.query.filter(Absence.nurse_id == nurse_id).all()
     cares = Care.query.all()
@@ -32,6 +37,8 @@ def nurse_info(nurse_id):
 @account.route('/edit/nurse/<int:nurse_id>', methods=['GET', 'POST'])
 @login_required
 def edit_nurse_account(nurse_id):
+    """ Function allowing to edit the nurse information """
+
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
@@ -83,6 +90,8 @@ def edit_nurse_account(nurse_id):
 @account.route('/edit/office/<int:office_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_office_account(office_id):
+    """ Function allowing to edit the office account information """
+
     if request.method == "POST":
         name = request.form['name']
         email = request.form['email']
@@ -123,6 +132,8 @@ def edit_office_account(office_id):
 @account.route('/absence/<int:nurse_id>', methods=['GET', 'POST'])
 @login_required
 def add_absence(nurse_id):
+    """ Function allowing to add one or several vacations for a nurse """
+
     # TODO : drop old absences
     nurse = Nurse.query.get(nurse_id)
     if request.method == "POST":
@@ -161,6 +172,8 @@ def add_absence(nurse_id):
 @account.route('/delete_nurse/<int:absence_id>')
 @login_required
 def delete_absence(absence_id):
+    """ Delete an absence with its id """
+
     absence = Absence.query.get(absence_id)
     db.session.delete(absence)
     db.session.commit()

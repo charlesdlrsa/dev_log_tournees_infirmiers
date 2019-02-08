@@ -12,10 +12,9 @@ nurses = Blueprint('nurses', __name__, url_prefix='/nurses')
 @nurses.route('/', methods=['GET', 'POST'])
 @admin_required
 def home():
-    """
-    Shows all nurses information and search option.
-    :return:
-    """
+    """ Nurses' home page allowing to see all the office's nurses and their information,
+    to edit them or add a new one """
+
     if request.method == "POST":
         research = request.form['research']
         error = None
@@ -36,11 +35,8 @@ def home():
 @nurses.route('/results/<research>', methods=['GET', 'POST'])
 @admin_required
 def search_nurses(research):
-    """
-    Search for a precise nurse's information.
-    :param research: Input from the user.
-    :return:
-    """
+    """ Function allowing to search for a precise nurse's information """
+
     if request.method == "POST":
         new_research = request.form['research']
         error = None
@@ -53,6 +49,7 @@ def search_nurses(research):
         else:
             return redirect(url_for('nurses.search_nurses', research=new_research))
 
+    # make a different research according to the user's way to write its request
     if len(research.split()) >= 2:
         first_name, last_name = research.split()[0], " ".join(research.split()[1:])
         nurses = Nurse.query.filter(or_(Nurse.last_name.like('%' + last_name + '%'),
@@ -73,10 +70,8 @@ def search_nurses(research):
 @nurses.route('/add_nurse', methods=['GET', 'POST'])
 @admin_required
 def add_nurse():
-    """
-    Add a new nurse in the database, table nurse.
-    :return:
-    """
+    """ Add a new nurse in the database """
+
     if request.method == 'POST':
         last_name = request.form['last_name']
         first_name = request.form['first_name']
@@ -125,11 +120,8 @@ def add_nurse():
 @nurses.route('/edit/<int:nurse_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_nurse(nurse_id):
-    """
-    Edit nurse information in database.
-    :param nurse_id:
-    :return:
-    """
+    """ Edit nurse information in database """
+
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
@@ -180,9 +172,8 @@ def edit_nurse(nurse_id):
 @nurses.route('/delete_nurse/<int:nurse_id>')
 @admin_required
 def delete_nurse(nurse_id):
-    """
-    Delete nurse from database.
-    """
+    """ Delete nurse from database """
+
     nurse = Nurse.query.get(nurse_id)
     db.session.delete(nurse)
     db.session.commit()
