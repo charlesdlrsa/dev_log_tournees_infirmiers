@@ -1,0 +1,238 @@
+{% extends 'base_template.html' %}
+{% block content %}
+
+<div class="card-header" style="margin-bottom:30px;">
+    {% if session['nurse_id'] %}
+    <h3> Your planning on {{date.strftime("%d/%m/%y")}} in the {{halfday}} </h3>
+    {% else %}
+    <h3> {{nurse.first_name}} {{nurse.last_name}}'s planning on {{date.strftime("%d/%m/%y")}} in
+        the
+        {{halfday}} </h3>
+    {% endif %}
+</div>
+
+{% if schedules[1] %}
+<div style="font-size:18px; font-weight: bold; color:#0F94FF; text-align:center; margin-bottom:2%;">
+    Please click on one of the blue buttons to see how to go to the appointment from the previous appointment.
+</div>
+{% else %}
+<div style="font-size:18px; font-weight: bold; color:#FF124F; text-align:center; margin-bottom:2%;">
+    No appointments are planned for
+    the moment ! <br>
+    Maybe, you should come back to see your schedule 24 hours before the day you are interested in.
+</div>
+{%endif%}
+
+{% if schedules[1] %}
+<div style="float:left; width:57%; vertical-align:middle; margin-left:2%; margin-right:2%;">
+    <div class="table-responsive" style="border-radius:10px;">
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+            <tr style="text-align:center; font-size:14px;" class="table-secondary">
+                <th scope="col" style="vertical-align:middle;">RDV
+                </th>
+                <th scope="col" style="vertical-align:middle;">Last Name
+                </th>
+                <th scope="col" style="vertical-align:middle;">First Name
+                </th>
+                <th scope="col" style="vertical-align:middle;">Hour of visit
+                </th>
+                <th scope="col" style="vertical-align:middle;">Care
+                </th>
+                <th scope="col" style="vertical-align:middle;">Duration
+                </th>
+                <th scope="col" style="vertical-align:middle;">Address
+                </th>
+                <th scope="col" style="vertical-align:middle;">Digicode
+                </th>
+                <th scope="col" style="vertical-align:middle;">Other information
+                </th>
+                <th scope="col" style="vertical-align:middle;">Phone
+                </th>
+            </tr>
+            </thead>
+
+
+            <tbody style="text-align:center;">
+            {% for i in range(0, nb_schedules) %}
+            <tr>
+                <td width=5%
+                    style="font-size:12px; vertical-align:middle;">
+                    {% if i==0 %}
+                        {% if schedules[0].appointment %}
+                        <a onclick="seeMyPointOfDeparture({{schedules[0].appointment.patient.latitude}}, {{schedules[0].appointment.patient.longitude}})"
+                           href="#departure" class="btn btn-primary"> RDV 0 </a>
+                        {% else %}
+                        <a onclick="seeMyPointOfDeparture({{schedules[0].latitude}}, {{schedules[0].longitude}})"
+                           href="#departure" class="btn btn-primary"> Your Office </a>
+                    {% endif %}
+                    {% elif i==nb_schedules-1 and halfday=="Afternoon"%}
+                    <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
+                          {{schedules[i].latitude}}, {{schedules[i].longitude}})"
+                       href="#{{i-1}}->{{i}}"
+                       class="btn btn-primary">Your Office</a>
+                    {% else %}
+                        {% if schedules[i-1].latitude %}
+                        <a onclick="drawMap({{schedules[i-1].latitude}}, {{schedules[i-1].longitude}},
+                              {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
+                           href="#{{i-1}}->{{i}}"
+                           class="btn btn-primary">RDV
+                            {{i}}</a>
+                        {% else %}
+                        <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
+                              {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
+                           href="#{{i-1}}->{{i}}"
+                           class="btn btn-primary">RDV
+                            {{i}}</a>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td width=10% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.patient.last_name}}
+                    {% else %}
+                    {{schedules[i].name}}
+                    {% endif %}
+                </td>
+                <td width=10% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.patient.first_name}}
+                    {% endif %}
+                </td>
+                <td width=5% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].hour %}
+                    {{schedules[i].hour}}
+                    {% elif halfday=="Morning"%}
+                    07:45:00
+                    {% else %}
+                    18:00:00
+                    {% endif %}
+                </td>
+                <td width=10% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.care.description}}
+                    {% endif %}
+                </td>
+                <td width=5% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.care.duration}} min
+                    {% else %}
+                    15 min
+                    {% endif %}
+                </td>
+                <td width=45% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.patient.address}}
+                    {% else %}
+                    {{schedules[i].address}}
+                    {% endif %}
+                </td>
+                <td width=2% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.patient.digicode}}
+                    {% endif %}
+                </td>
+                <td width=5% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.patient.additional_postal_information}}
+                    {% endif %}
+                </td>
+                <td width=10% style="font-size:12px; vertical-align:middle;">
+                    {% if schedules[i].appointment %}
+                    {{schedules[i].appointment.patient.phone}}
+                    {% else %}
+                    {{schedules[i].phone}}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+<div id="map"
+     style="height:70%; width:37%; float:right; margin-left:0%; margin-right:2%; vertical-align:middle; padding:150px;">
+    <a onclick="initMap()" href="#alltrajects" class="btn btn-danger"> See all your journeys on a map ! </a>
+</div>
+
+{% endif %}
+
+<script>
+
+function seeMyPointOfDeparture(lat_depart, lng_depart){
+    var office = {'lat': lat_depart , 'lng': lng_depart};
+    var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: office});
+    var marker = new google.maps.Marker({position: office, map: map, label: {text: 'Your departure', fontSize:"18px",fontWeight:"bold", color:'black'}});
+    var directionsDisplay = new google.maps.DirectionsRenderer();
+    directionsDisplay.setMap(map);
+};
+
+var schedules_js = [];
+{% for i in range(0, nb_schedules) %}
+{% if schedules[i].appointment %}
+schedules_js.push( {'latitude':{{schedules[i].appointment.patient.latitude}}, 'longitude':{{schedules[i].appointment.patient.longitude}} } )
+{% else %}
+schedules_js.push( {'latitude':{{schedules[i].latitude}}, 'longitude':{{schedules[i].longitude}} } )
+{% endif %}
+{% endfor %}
+
+function initMap(schedules=schedules_js, travel_mode='DRIVING'){
+    var departure = {'lat': schedules[0]['latitude'], 'lng': schedules[0]['longitude']};
+    var arrival = {'lat': schedules[schedules.length-1]['latitude'], 'lng': schedules[schedules.length-1]['longitude']};
+    var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: departure});
+    var directionsService = new google.maps.DirectionsService();
+    var directionsDisplay = new google.maps.DirectionsRenderer();
+    directionsDisplay.setMap(map);
+    var request = {
+        origin: departure,
+        destination: arrival,
+        waypoints: [],
+        travelMode: travel_mode,
+    };
+    for (var i=1; i<schedules.length-1; i++){
+        request.waypoints.push({
+          location: {'lat':schedules[i]['latitude'], 'lng':schedules[i]['longitude'] },
+          stopover: true,
+          });
+    };
+    directionsService.route(request, function(result, status) {
+        if (status == 'OK') {
+            directionsDisplay.setDirections(result);
+        }
+    });
+};
+
+function drawMap(lat_depart, lng_depart, lat_arrival, lng_arrival, travel_mode='DRIVING') {
+    var departure = {'lat': lat_depart, 'lng': lng_depart};
+    var arrival = {'lat': lat_arrival, 'lng': lng_arrival};
+    var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: departure});
+    var directionsService = new google.maps.DirectionsService();
+    var directionsDisplay = new google.maps.DirectionsRenderer();
+    directionsDisplay.setMap(map);
+    var request = {
+    origin: departure,
+    destination: arrival,
+    travelMode: travel_mode,
+    };
+    directionsService.route(request, function(result, status) {
+        if (status == 'OK') {
+            directionsDisplay.setDirections(result);
+        }
+    });
+};
+
+
+
+
+
+</script>
+
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoozmkZ8_YSofc8Hb7nqnG3cWcJSlY6gQ">
+</script>
+
+{% endblock %}

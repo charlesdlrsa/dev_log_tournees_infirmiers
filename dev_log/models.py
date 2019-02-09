@@ -1,8 +1,7 @@
 import googlemaps
-from werkzeug.security import check_password_hash, generate_password_hash
 from dev_log import db
-from dev_log.key import key
-import datetime
+from dev_log.utils.key import key
+
 
 class Base(db.Model):
     __abstract__ = True
@@ -10,9 +9,28 @@ class Base(db.Model):
         db.Integer,
         primary_key=True,
         nullable=False)
+    
+
+    def _geolocation(self):
+        """
+        Set the attributes latitude and longitude of an address using Google Maps API.
+
+        :param classe:
+        :param key: Google Maps API key
+        :return: latitude and
+        """
+        gmaps = googlemaps.Client(key=str(key))
+        distance = gmaps.geocode(self.address)[0]['geometry']['location']
+        self.latitude = distance['lat']
+        self.longitude = distance['lng']
 
 
 class BasePerson(Base):
+    """
+    Class model for persons : Nurses and Patients.
+    Attributes:
+         Basic information about a person.
+    """
     __abstract__ = True
 
     last_name = db.Column(
@@ -37,36 +55,62 @@ class BasePerson(Base):
 
 
 class Patient(BasePerson):
+    """
+    Store the information of patients.
+
+    Attributes:
+          office_id : id of the office the patient is linked to.
+          digicode, additional_postal_information : additional info to the address.
+          latitude, longitude : Coordinates of the patient home, determined with geolocation function.
+    """
     id = db.Column(
         'patient_id',
         db.Integer,
         primary_key=True,
         nullable=False)
 
+    digicode = db.Column(
+        db.Integer)
+
+    additional_postal_information = db.Column(
+        db.String(50))
+
     latitude = db.Column(
-        db.Float
-    )
+        db.Float)
 
     longitude = db.Column(
-        db.Float
-    )
+        db.Float)
 
-    def __init__(self, last_name, first_name, email, address, phone, latitude=None, longitude=None):
+    office_id = db.Column(
+        db.Integer,
+        db.ForeignKey('office.office_id'),
+        nullable=False)
+
+    office = db.relationship(
+        "Office",
+        backref="office_patient")
+
+    def __init__(self, last_name, first_name, email, address, phone, digicode,
+                 additional_postal_information, office_id):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
         self.address = address
+        self.digicode = digicode
+        self.additional_postal_information = additional_postal_information
         self.phone = phone
-        Patient.geolocation(self, key)
-
-    def geolocation(self, key):
-        gmaps = googlemaps.Client(key=str(key))
-        distance = gmaps.geocode(self.address)[0]['geometry']['location']
-        self.latitude = distance['lat']
-        self.longitude = distance['lng']
+        self.office_id = office_id
+        self._geolocation()
 
 
 class Nurse(BasePerson):
+    """
+    Store the information of nurses.
+
+    Attributes:
+          office_id : id of the office the nurse works at.
+          cares : string that contains the id of the cares the nurse can do.
+    """
     id = db.Column(
         'nurse_id',
         db.Integer,
@@ -78,40 +122,50 @@ class Nurse(BasePerson):
         db.String(20),
         nullable=False)
 
-    office = db.Column(
-        db.String(20),
+    office_id = db.Column(
+        db.Integer,
+        db.ForeignKey('office.office_id'),
         nullable=False)
 
     cares = db.Column(
-        db.String(50),
-    )
+        db.String(50))
 
-    def __init__(self, last_name, first_name, email, password, phone, address, office, cares):
+    office = db.relationship(
+        "Office",
+        backref="office_nurse")
+
+    def __init__(self, last_name, first_name, email, password, phone,
+                 address, office_id, cares):
         self.last_name = last_name
         self.first_name = first_name
         self.email = email
         self.phone = phone
         self.password = password
         self.address = address
-        self.office = office
+        self.office_id = office_id
         self.cares = cares
 
 
 class Appointment(Base):
+    """
+    Store the information linked to an appointment request.
+
+    Attributes:
+          patient_id : id of the patient that needs an appointment.
+          care_id : care requested by the patient.
+          date, halfday : moment requested.
+    """
     id = db.Column(
         'appointment_id',
         db.Integer,
-        primary_key=True)
+        primary_key=True,
+        nullable=False,
+        autoincrement=True)
 
     patient_id = db.Column(
         db.Integer,
         db.ForeignKey('patient.patient_id'),
         nullable=False,
-        unique=False)
-
-    nurse_id = db.Column(
-        db.Integer,
-        db.ForeignKey('nurse.nurse_id'),
         unique=False)
 
     care_id = db.Column(
@@ -125,30 +179,72 @@ class Appointment(Base):
         nullable=False)
 
     halfday = db.Column(
-        db.String
-    )
+        db.String)
 
     patient = db.relationship(
         "Patient",
         backref="patient")
 
-    nurse = db.relationship(
-        "Nurse",
-        backref="nurse")
-
     care = db.relationship(
         "Care",
         backref="care")
 
-    def __init__(self, nurse_id, patient_id, date, care_id, halfday=None):
-        self.nurse_id = nurse_id
+    def __init__(self, patient_id, date, care_id, halfday):
         self.patient_id = patient_id
         self.date = date
         self.halfday = halfday
         self.care_id = care_id
 
 
+class Schedule(Base):
+    """
+    Store the result given by the optmizer.
+
+    Attributes:
+        appointment_id : id of the appointment in table Appointment.
+        nurse_id : nurse in charge of the appointment.
+        hour : optimized hour of the appointment.
+    """
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        nullable=False)
+
+    appointment_id = db.Column(
+        db.Integer,
+        db.ForeignKey('appointment.appointment_id'),
+        unique=False)
+
+    nurse_id = db.Column(
+        db.Integer,
+        db.ForeignKey('nurse.nurse_id'),
+        unique=False)
+
+    hour = db.Column(
+        db.Time)
+
+    appointment = db.relationship(
+        "Appointment",
+        backref="appointment")
+
+    nurse = db.relationship(
+        "Nurse",
+        backref="nurse")
+
+    def __init__(self, appointment_id, hour, nurse_id):
+        self.appointment_id = appointment_id
+        self.hour = hour
+        self.nurse_id = nurse_id
+
+
 class Care(Base):
+    """
+    Store the cares provided by the nurses.
+
+    Attributes:
+        description : Description of the care.
+        duration : Time (in minutes) needed to provide this care.
+    """
     id = db.Column(
         'care_id',
         db.Integer,
@@ -158,7 +254,7 @@ class Care(Base):
     description = db.Column(
         db.String(200))
 
-    duration = db.Column(  # duration in minutes
+    duration = db.Column(
         db.Integer,
         nullable=False)
 
@@ -168,6 +264,13 @@ class Care(Base):
 
 
 class Office(Base):
+    """
+    Store the information of the offices.
+
+    Attributes:
+        name, phone address, email, password : Information of the office.
+        latitude, longitude : Coordinates of the office, determined with geolocation function.
+    """
     id = db.Column(
         'office_id',
         db.Integer,
@@ -194,7 +297,11 @@ class Office(Base):
         db.String(20),
         nullable=False)
 
-    nurses = db.relationship("AssociationOfficeNurse")
+    latitude = db.Column(
+        db.Float)
+
+    longitude = db.Column(
+        db.Float)
 
     def __init__(self, name, address, email, phone, password):
         self.name = name
@@ -202,64 +309,40 @@ class Office(Base):
         self.email = email
         self.phone = phone
         self.password = password
+        self._geolocation()
 
 
-# Many to Many relation
-class AssociationOfficeNurse(Base):
-    office_id = db.Column(
+class Absence(Base):
+    """
+        Store the absences by nurse, by date and halfday.
+
+        Attributes:
+              nurse_id : nurse that is absent
+              date : date of absence.
+              halfday : Morning or Afternoon.
+        """
+    id = db.Column(
         db.Integer,
-        db.ForeignKey('office.office_id'),
         primary_key=True,
         nullable=False)
 
     nurse_id = db.Column(
         db.Integer,
         db.ForeignKey('nurse.nurse_id'),
-        primary_key=True,
+        unique=False)
+
+    date = db.Column(
+        db.Date,
         nullable=False)
 
-    nurse = db.relationship("Nurse")
+    halfday = db.Column(
+        db.String)
 
-    office = db.relationship("Office")
+    nurse = db.relationship(
+        "Nurse",
+        backref="nurse_absence")
 
-
-def init_db():
-    import logging as lg
-    db.drop_all()
-    db.create_all()
-    password = generate_password_hash("password")
-    db.session.add(Office(name="Doctissimo", phone="0647859648", address="2 Rue Christophe Colomb, 91300 Massy",
-                          email="doctissimo@hotmail.fr", password=password))
-    db.session.add(Nurse(last_name="Cabaret", first_name="Laurent", email="laurent.cabaret@hotmail.fr",
-                         phone="0699458758", password=password, address="35 rue Bobigny", office="Paris",
-                         cares="-1-"))
-    db.session.add(Nurse(last_name="Poli", first_name="Jean-Philippe", email="jpp@hotmail.fr",
-                         phone="0699458758", password=password, address="48 rue Clovis", office="Paris",
-                         cares="-1-2-"))
-    db.session.add(Nurse(last_name="Hudelot", first_name="Celine", email="celine.hudelot@hotmail.fr",
-                         phone="0699469858", password=password, address="76 rue Paul André", office="Paris",
-                         cares="-1-2-3-"))
-    db.session.add(Nurse(last_name="Detriche", first_name="Jean-Marie", email="jeanmarie.detriche@hotmail.fr",
-                         phone="0694699858", password=password, address="24 rue Terrence", office="Paris",
-                         cares="-1-2-"))
-    db.session.add(Patient(last_name="De la roche", first_name="Charles", email="charles.dlrsa@hotmail.fr",
-                           address="40 rue Victor Hugo 91300 Massy", phone="0699497758"))
-    db.session.add(Patient(last_name="Mallard", first_name="Alix", email="alix.mallard@hotmail.fr",
-                           address="25 rue Pasteur 91300 Massy", phone="0699265758"))
-    db.session.add(Patient(last_name="Dieudonné", first_name="Maxime", email="maxime.dieudo@hotmail.fr",
-                           address="79 rue Léonard de Vinci 92160 Antony", phone="0649697758"))
-    db.session.add(Patient(last_name="Pascual", first_name="Romain", email="romain.pascual@hotmail.fr",
-                           address="1 Rue du Canal, 91160 Longjumeau", phone="0678697758"))
-    db.session.add(Patient(last_name="Leveque", first_name="Hippolyte", email="hippolyte.leveque@hotmail.fr",
-                           address="13 Rue Blaise Pascal, 91120 Palaiseau", phone="0674697758"))
-    db.session.add(Patient(last_name="Cassedanne", first_name="Louis", email="louis.cassedanne@hotmail.fr",
-                           address="20 Rue du Dr Roux 91370 Verrières-le-Buisson", phone="0674695898"))
-    db.session.add(Care(description="Pansement", duration=60))
-    db.session.add(Care(description="Piqûre", duration=60))
-    db.session.add(Care(description="Post opératoire", duration=60))
-
-    ## Appointment : nurse_id, patient_id, date, care_id
-    for pID in range(1,7):
-        db.session.add(Appointment(nurse_id=1,patient_id=pID,date=datetime.date(2018,1,22),care_id=1))
-    db.session.commit()
-    lg.warning('Database initialized!')
+    def __init__(self, nurse_id, date, halfday):
+        self.nurse_id = nurse_id
+        self.date = date
+        self.halfday = halfday

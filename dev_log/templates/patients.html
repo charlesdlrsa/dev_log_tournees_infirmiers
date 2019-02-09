@@ -3,62 +3,99 @@
 
 <div class="container-fluid">
 
-  <div class="row">
+    <div class="card" style="margin-bottom:30px;">
+        <div class="card-header">
+            <h1>Search a patient </h1>
+        </div>
+        <div class="card-body">
 
-      <div class="col-md-4 col-md-offset-3">
-          <form method='post' class="search-form">
-              <div class="form-group has-feedback">
-              <label for="search" class="sr-only">Search Patient Name</label>
-              <input type="text" class="form-control" name="research" id="search" placeholder="search">
-                <span class="glyphicon glyphicon-search form-control-feedback"></span>
-            </div>
-          </form>
-      </div>
-      <div class="col-lg-8 col-lg-8">
-        <a href="{{ url_for('patients.add_patient')}}" class="btn btn-secondary btn-md active"
-          role="button">Add Patient</a>
-      </div>
+            <form method="post">
+                <div class="row">
+                    <div class="col">
+                        <input id="research" class="form-control"
+                               placeholder="Search (patient first-name then last-name)" required="required"
+                               name="research">
+                    </div>
+                    <div style="float:right;">
+                        <a href="{{ url_for('patients.add_patient')}}" class="btn btn-primary">Add
+                            Patient</a>
+                    </div>
+                </div>
+            </form>
+
+
+        </div>
     </div>
 
-<div class="card-body">
-<div class="table-responsive">
-  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-    <div class="card-header">
-      <h1>Patients</h1>
+    {% if patients[0] %}
+    <div class="table-responsive" style="border-radius:10px;">
+        <table class="table table-bordered" width="100%" cellspacing="0">
+            <thead>
+            <tr style="text-align:center;" class="table-secondary">
+                <th scope="col" style="vertical-align:middle;">Last Name
+                </th>
+                <th scope="col" style="vertical-align:middle;">First Name
+                </th>
+                <th scope="col" style="vertical-align:middle;">Email
+                </th>
+                <th scope="col" style="vertical-align:middle;">Phone number
+                </th>
+                <th scope="col" style="vertical-align:middle;">Address
+                </th>
+                <th scope="col" style="vertical-align:middle;">Office
+                </th>
+                <th scope="col" style="vertical-align:middle;">Edit
+                </th>
+                <th scope="col" style="vertical-align:middle;">Delete
+                </th>
+            </tr>
+            </thead>
+
+
+            <tbody style="text-align:center;">
+            {% for patient in patients %}
+            <tr>
+                <td width="20%" style="font-size:16px; vertical-align:middle;">
+                    {{patient.last_name}}
+                </td>
+                <td width="10%" style="font-size:16px; vertical-align:middle;">
+                    {{patient.first_name}}
+                </td>
+                <td width="15%" style="font-size:14px; vertical-align:middle;">
+                    {{ patient.email }}
+                </td>
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
+                    {{ patient.phone }}
+                </td>
+                <td width="20%" style="font-size:14px; vertical-align:middle;">
+                    {{ patient.address }}
+                </td>
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
+                    {{ patient.office.name }}
+                </td>
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
+                    <a href="{{ url_for('patients.edit_patient',patient_id=patient.id)}}"
+                       class="btn btn-outline-danger">Edit</a>
+                </td>
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
+                    <a href="{{ url_for('patients.delete_patient',patient_id=patient.id)}}"
+                       class="btn btn-danger">Delete</a>
+
+                </td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
     </div>
 
-    <thead>
-      <tr>
-        <th>Last Name</th>
-        <th>First Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Adress</th>
-        <th>ID</th>
-        <th></th>
-      </tr>
-    </thead>
+    {% else %}
 
-    <tbody>
-      {% for patient in patients %}
-      <tr>
-        <td>{{ patient.last_name }}</td>
-        <td> {{ patient.first_name }}</td>
-        <td> {{ patient.email }}</td>
-        <td> {{ patient.phone }}</td>
-        <td> {{ patient.address }}</td>
-        <td> {{ patient.id }}</td>
+    <p style="font-size:15px; font-weight: bold; color:#FF124F; text-align:center;"> No patients found for
+        this research ! Please, enter a request respecting this format : first-name and then last-name.</p>
 
-        <td> <a href="{{ url_for('patients.edit_patient',patient_id=patient.id)}}" class="btn btn-secondary btn-sm active"
-          role="button">Edit</a>
-        </td>
-      <tr>
-      {% endfor %}
+    {% endif %}
 
-
-    </tbody>
-  </table>
-</div>
-</div>
 </div>
 {% endblock %}

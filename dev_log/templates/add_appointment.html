@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin - Register</title>
+    <title>Nursissimo website</title>
 
     <!-- Bootstrap core CSS-->
     <link href="{{ url_for('static', filename='bootstrap.min.css')}}" rel="stylesheet">
@@ -36,42 +36,28 @@
         <div class="card-body">
             <form method="post">
 
-
             <div class="form-group">
-
-                <select id="inputpatient" class="form-control" placeholder="patient" required="required" name="patient">
-                  <option selected>Choose Patient</option>
-
-                  {% for patient in patients %}
-                  <option>
+                <select id="input_patient" class="form-control" required="required" name="input_patient">
+                  <option value="{{patient.id}}" selected>
                   {{patient.last_name}} - {{patient.first_name}}
                   </option>
-                  {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-
-                <select id="inputnurse" class="form-control" placeholder="nurse" required="required" name="nurse">
-                  <option selected>Choose Nurse</option>
-
-                  {% for nurse in nurses %}
-                  <option>
-                  {{nurse.last_name}} - {{nurse.first_name}}
-                  </option>
-                  {% endfor %}
                 </select>
             </div>
 
-
             <div class="form-group">
-
-                <select id="inputcare" class="form-control" placeholder="nurse" required="required" name="care">
-                  <option selected>Select care</option>
+                <select id="inputcare" class="form-control" placeholder="care" required="required" name="care" value="{{care_research}}">
+                  <option>Select care</option>
 
                   {% for care in cares %}
+                  {% if care.description == care_research %}
+                  <option selected>
+                  {{ care.description }}
+                  </option>
+                  {% else %}
                   <option>
                   {{ care.description }}
                   </option>
+                  {% endif %}
                   {% endfor %}
                 </select>
             </div>
@@ -83,13 +69,19 @@
             </div>
                 <div class="form-group">
 
-                <select id="inputhalfday" class="form-control" required="required" name="halfday">
-                  <option selected>Choose halfday</option>
+                <select id="inputhalfday" class="form-control" required="required" name="halfday" value="{{halfday}}">
+                  <option>Choose halfday</option>
 
                   {% for i in ['Morning', 'Afternoon'] %}
+                  {% if i==halfday %}
+                  <option selected>
+                  {{i}}
+                  </option>
+                  {% else %}
                   <option>
                   {{i}}
                   </option>
+                  {% endif %}
                   {% endfor %}
                 </select>
             </div>

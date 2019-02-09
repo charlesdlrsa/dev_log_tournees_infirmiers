@@ -1,11 +1,12 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 from sqlalchemy.sql import or_
-from datetime import datetime
-from dev_log.utils.calendar import *
+import datetime
+from dev_log.utils import calendar
 from dev_log import db
-from dev_log.models import Appointment, Patient, Nurse, Care
-from dev_log.auth.controllers import login_required
+from dev_log.models import Appointment, Patient, Nurse, Care, Office
 from dev_log.auth.controllers import admin_required
+
+# from dev_log.opti.space import solve_boolean
 
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
@@ -14,128 +15,101 @@ appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 @appointments.route('/', methods=['GET', 'POST'])
 @admin_required
 def home():
+    """ Appointments'home page allowing to set a new appointment for a patient
+    or to view the appointments already taken for a patient """
+
     if request.method == "POST":
-        research = request.form['research']
-        error = None
-        if not research:
-            error = 'Please enter the name of our patient.'
-        if error is not None:
+        if request.form.get('input_patient') is not None:
+            patient_id = request.form['input_patient']
+            date = request.form['date']
+            date_selected = calendar.get_dates_from_form(date)[0]
+            # Function available in the module "calendar" in devlog.utils
+            # It returns, in date format, the date of the selected day.
+            care_id = request.form['input_care']
+            error = None
+
+            if patient_id == "":
+                error = "You need to select a nurse to view a planning"
+            elif care_id == "":
+                error = "You need to select a care"
+            elif date_selected <= datetime.date.today() + datetime.timedelta(1):
+                error = "You cannot add an appointment less than 24 hours before the desired date."
+                # To be able to set the nurses' planning 24 hours before each day, we forbidden the admin to add
+                # appointments after this delay. See planning's controllers for more explications.
+            if error is not None:
+                flash(error)
+            else:
+                return redirect(url_for('appointments.availabilities', patient_id=patient_id, date=date,
+                                        care_id=care_id))
+        elif request.form.get('patient_appointments_research') is not None:
+            research = request.form['patient_appointments_research']
+            # we call the function "search_patient_appointments"
+            return redirect(url_for('appointments.search_patient_appointments', research=research))
+        else:
+            error = 'You must choose a patient.'
+            flash(error)
+
+    patients = Patient.query.filter(Patient.office_id == session['office_id']).order_by(Patient.last_name)
+    cares = Care.query.all()
+
+    return render_template("appointments_home.html", patients=patients, cares=cares)
+
+
+@appointments.route('/availabilities/patient-<int:patient_id>/date-<date>/care-<care_id>', methods=['GET', 'POST'])
+@admin_required
+def availabilities(patient_id, date, care_id):
+    """ Function returning the nurses'availabilities for all the half-days of the week of the day selected """
+
+    if request.method == "POST":
+        patient_id = request.form['input_patient']
+        date = request.form['date']
+        date_selected = calendar.get_dates_from_form(date)[0]
+        care_id = request.form['input_care']
+
+        if date_selected <= datetime.date.today():
+            error = "You cannot add an appointment 24 hours before the wanted date."
+            # To be able to set the nurses' planning 24 hours before each day, we forbidden the admin to add
+            # appointments after this delay. See planning's controllers for more explications.
             flash(error)
         else:
-            return redirect(url_for('appointments.search_appointments', research=research))
+            return redirect(url_for('appointments.availabilities', patient_id=patient_id, date=date, care_id=care_id))
 
-    # appointments = dict()
-    # for i in range(1, 8):
-    #     appointments[i] = []
-    # appointments_list = db.session.query(Appointment).order_by(Appointment.date).all()
-    # for appointment in appointments_list:
-    #     appointments[appointment.date.weekday()].append(appointment)
+    date_selected, date_start_week, date_end_week = calendar.get_dates_from_form(date)
+    # Function available in the module "calendar" in devlog.utils
+    # It returns, in date format, the dates of the selected day, the first day and the last day
+    # of the week of the selected day
 
-    if "week" in request.args:
-        week = int(request.args['week'])
-        year = int(request.args['year'])
-        if week == 0:
-            week = 52
-            year = year-1
-        elif week == 53:
-            week = 1
-            year = year+1
-    else:
-        current_date = datetime.datetime.now()
-        week = current_date.isocalendar()[1]
-        year = current_date.isocalendar()[0]
+    availabilities = [{} for _ in range(7)]
+    for week_day in range(7):
+        date = date_start_week + datetime.timedelta(week_day)
+        availabilities[week_day]['date'] = date
+        for halfday in ['Morning', 'Afternoon']:
+            # for each half-day of the week, we check if a nurse is available and if the patient doesn't already have
+            # an appointment by calling the functions : check_appointments_patient and check_appointments_nurses
+            appointment = check_appointments_patient(patient_id, date, halfday=halfday)
+            if appointment is None:
+                if check_appointments_nurses(care_id, date, halfday=halfday) is True:
+                    availabilities[week_day][halfday] = "A nurse is available"
+                else:
+                    availabilities[week_day][halfday] = "No nurse is available"
+            else:
+                availabilities[week_day][halfday] = "Appointment already scheduled: -- {} --".format(appointment)
 
-    availabilities = [[] for k in range(7)]
-    i = 1
-    care_id = 1
-    for day in availabilities:
-        date = iso_to_gregorian(year, week, i)
-        day.append(check_availability(date=date, halfday="Morning", care_id=care_id))
-        day.append(check_availability(date=date, halfday="Afternoon", care_id=care_id))
-        i += 1
+    patient = Patient.query.get(patient_id)
+    care = Care.query.get(care_id)
 
-    start_week = iso_to_gregorian(year, week, 1)
-    end_week = iso_to_gregorian(year, week, 7)
-    start_week = str(start_week.day) + '/' + str(start_week.month)
-    end_week = str(end_week.day) + '/' + str(end_week.month)
-
-    return render_template("appointments.html", availabilities=availabilities, start_week=start_week,
-                           end_week=end_week, year=year, week=week)
+    return render_template("availabilities.html", availabilities=availabilities, date_selected=date_selected,
+                           date_start_week=date_start_week, date_end_week=date_end_week, patient=patient,
+                           care=care)
 
 
-@appointments.route('/add_appointment', methods=['GET', 'POST'])
-def add_appointment():
-    """
-    Add a new appointment
-    :return:
-    """
-    if "week" in request.args:
-        day = int(request.args["day"])
-        week = int(request.args["week"])
-        year = int(request.args["year"])
-        time = iso_to_gregorian(year, week, day)
-        time = time.strftime('%Y-%m-%d')
-    else:
-        time = None
+@appointments.route('/research-<research>', methods=['GET', 'POST'])
+def search_patient_appointments(research):
+    """ Function allowing to search the patient's appointments """
 
-    if request.method == 'POST':
-        patient = request.form['patient'].split(' - ')
-        nurse = request.form['nurse'].split(' - ')
-        patient_id = db.session.query(Patient).filter(Patient.first_name == patient[1]).filter(
-            Patient.last_name == patient[0]).first().id
-
-        # en principe à enlever car l'attribution se fait avec l'optimiseur
-        nurse_id = db.session.query(Nurse).filter(Nurse.first_name == nurse[1]).filter(
-            Nurse.last_name == nurse[0]).first().id
-
-        date = datetime.datetime.strptime(request.form['date'], '%Y-%m-%d').date()
-        halfday = request.form['halfday']
-        care = Care.query.filter(Care.description == request.form['care']).first().id
-        error = None
-
-        if not patient:
-            error = 'Please select a patient.'
-        elif not date:
-            error = 'A date is required.'
-        elif date < date.today():
-            error = 'You selected a day already passed.'
-        elif not care:
-            error = 'A care is required.'
-        elif not halfday:
-            error = 'Please give a halfday'
-        elif Appointment.query.filter(Appointment.date == date).count() == db.session.query(Nurse).count() * 3:
-            error = 'You cannot add an appointment on %s, all the nurses are already affected.' \
-                    '\n You must choose another date. Please look at the calendar to see the available slots.'.format(
-                date)
-        else:
-            # storing the new appointment information in the db
-            appointment = Appointment(nurse_id, patient_id, date, care, halfday)
-            db.session.add(appointment)
-            db.session.commit()
-            flash('The appointment was successfully added')
-            return redirect(url_for('appointments.home'))
-        flash(error)
-
-    patients = db.session.query(Patient).order_by(Patient.last_name).all()
-    nurses = db.session.query(Nurse).order_by(Nurse.last_name).all()
-    cares = db.session.query(Care).all()
-
-    return render_template('add_appointment.html', patients=patients, nurses=nurses, cares=cares, time=time)
-
-
-@appointments.route('/get_appointments/<research>', methods=['GET', 'POST'])
-def search_appointments(research):
     if request.method == "POST":
-        error = None
-        new_research = request.form['research']
-
-        if not new_research:
-            error = 'Please enter the name of a patient.'
-
-        if error is not None:
-            flash(error)
-        else:
-            return redirect(url_for('appointment.search_appointment', research=new_research))
+        research = request.form['patient_appointments_research']
+        return redirect(url_for('appointments.search_patient_appointments', research=research))
 
     if len(research.split()) >= 2:
         first_name, last_name = research.split()[0], " ".join(research.split()[1:])
@@ -150,19 +124,76 @@ def search_appointments(research):
     return render_template('appointments.html', appointments=appointments)
 
 
-def check_availability(date, halfday, care_id):
-    nb_appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).count()
-    nb_nurses = db.session.query(Nurse).count()
+def check_appointments_nurses(care_id, date, halfday):
+    """ Function checking if the nurses are able to do all the appointments of the selected half-day, plus the new
+    appointment that the administrator wants to schedule by calling the optimizer function """
 
-    if nb_appointments >= nb_nurses * 4:
-        return False
+    # TODO : Ne pas oublier d'envoyer la position du cabinet
+    nurses_office = Nurse.query.filter(Nurse.office_id == session['office_id']).all()
+    nurses_absent = Nurse.query.filter(Nurse.nurse_absence.any(date=date)).all()
+    nurses = list(set(nurses_office) - set(nurses_absent))
+    office = Office.query.filter(Office.id == session['office_id']).first()
+    data = {}
+    data["nurse_ids"] = [str(nurse.id) for nurse in nurses]
+    data["office_lat"] = str(office.latitude)
+    data["office_lon"] = str(office.longitude)
+    if halfday == "Morning":
+        data["start"] = "08:00"
+        data["end"] = "12:00"
+    if halfday == "Afternoon":
+        data["start"] = "14:00"
+        data["end"] = "18:00"
+
+    appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).all()
+    data["appointments"] = []
+    for app in appointments:
+        app_data = {}
+        app_data["app_id"] = str(app.id)
+        app_data["app_lat"] = str(app.patient.latitude)
+        app_data["app_lon"] = str(app.patient.longitude)
+        app_data["app_length"] = str(app.care.duration)
+        data["appointments"].append(app_data)
+    # response = solve_boolean(data)
+    response = True
+
+    return response
+
+
+def check_appointments_patient(patient_id, date, halfday):
+    """ Function checking the existing appointments on a specific half-day for a patient
+    and returns associated care """
+
+    appointment = Appointment.query.filter(Appointment.date == date,
+                                           Appointment.halfday == halfday,
+                                           Appointment.patient_id == patient_id).first()
+    if appointment is None:
+        return None
+
     else:
-        nb_specific_appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday,
-                                                            Appointment.care_id == care_id).count()
-        nb_specific_nurses = Nurse.query.filter(Nurse.cares.contains("-{}-".format(care_id))).count()
-        print(nb_specific_nurses)
-        if nb_specific_appointments >= nb_specific_nurses * 4:
-            return False
-        else:
-            return True
+        care_description = appointment.care.description
+        return care_description
 
+
+@appointments.route('/add_appointment/patient-<int:patient_id>/date-<date>/care-<care_id>/halfday-<halfday>',
+                    methods=['GET', 'POST'])
+def add_appointment(patient_id, date, care_id, halfday):
+    """ Add a new appointment defined by its patient, care and date in the database """
+
+    date_selected = calendar.get_dates_from_form(date)[0]
+    appointment = Appointment(patient_id=patient_id, date=date_selected, care_id=care_id, halfday=halfday)
+    db.session.add(appointment)
+    db.session.commit()
+    flash('The appointment was successfully added on {} in the morning'.format(date_selected.strftime("%d/%m/%y")))
+    return redirect(url_for('appointments.home'))
+
+
+@appointments.route('/delete_appointment/<int:appointment_id>')
+@admin_required
+def delete_appointment(appointment_id):
+    """ Delete an appointment with its id from the database """
+
+    appointment = Appointment.query.get(appointment_id)
+    db.session.delete(appointment)
+    db.session.commit()
+    flash("The appointment was successfully deleted.")
+    return redirect(url_for('appointments.home'))

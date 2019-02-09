@@ -3,77 +3,112 @@
 
 <div class="container-fluid">
 
-    <!-- Page Content -->
-
-  <div class="row">
-
-      <div class="col-md-4 col-md-offset-3">
-          <form method='post' class="search-form">
-              <div class="form-group has-feedback">
-              <label for="search" class="sr-only">Search Nurse Name</label>
-              <input type="text" class="form-control" name="research" id="search" placeholder="search">
-                <span class="glyphicon glyphicon-search form-control-feedback"></span>
-            </div>
-          </form>
-      </div>
-      <div class="col-lg-8 col-lg-8">
-        <a href="{{ url_for('nurses.add_nurse')}}" class="btn btn-secondary btn-md active"
-          role="button">Add Nurse</a>
-      </div>
-    </div>
-
-
-    <div class="card mb-3">
-
-  <div class="card-body">
-    <div class="table-responsive">
-      <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-
+    <div class="card" style="margin-bottom:30px;">
         <div class="card-header">
-          <div class="row">
-            <h1>Nurses</h1>
+            <h1>Search a nurse </h1>
         </div>
+        <div class="card-body">
+
+            <form method="post">
+                <div class="row">
+                    <div class="col">
+                        <input id="research" class="form-control"
+                               placeholder="Search (nurse first-name then last-name)" required="required"
+                               name="research">
+                    </div>
+                    <div style="float:right;">
+                        <a href="{{ url_for('nurses.add_nurse')}}" class="btn btn-primary">Add
+                            Nurse</a>
+                    </div>
+                </div>
+            </form>
+
         </div>
-
-        <thead>
-
-          <tr>
-            <th>Last Name</th>
-            <th>First Name</th>
-            <th>Cares</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Adress</th>
-            <th>ID</th>
-            <th></th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {% for nurse in nurses %}
-
-            <tr>
-              <td>{{ nurse.last_name }}</td>
-              <td> {{ nurse.first_name }}</td>
-              <td> {{ nurse.cares }}</td>
-              <td> {{ nurse.email }}</td>
-              <td> {{ nurse.phone }}</td>
-              <td> {{ nurse.address }}</td>
-              <td> {{ nurse.id }}</td>
-              <td> <a href="{{ url_for('nurses.edit_nurse',nurse_id=nurse.id)}}" class="btn btn-secondary btn-sm active"
-                role="button">Edit</a>
-              </td>
-            <tr>
-
-
-          {% endfor %}
-
-
-        </tbody>
-      </table>
     </div>
-  </div>
-</div>
+
+    {% if nurses[0] %}
+    <div class="table-responsive" style="border-radius:10px;">
+        <table class="table table-bordered" width="100%" cellspacing="0">
+            <thead>
+            <tr style="text-align:center; vertical-align:middle;" class="table-secondary">
+                <th style="vertical-align:middle;">Last Name
+                </th>
+                <th style="vertical-align:middle;">First Name
+                </th>
+                <th style="vertical-align:middle;">Handled Cares
+                </th>
+                <th style="vertical-align:middle;">Email
+                </th>
+                <th style="vertical-align:middle;">Phone number
+                </th>
+                <th style="vertical-align:middle;">Address
+                </th>
+                <th style="vertical-align:middle;">Office
+                </th>
+                <th style="vertical-align:middle;">Edit
+                </th>
+                <th style="vertical-align:middle;">Delete
+                </th>
+                <th style="vertical-align:middle;">Vacations
+                </th>
+            </tr>
+            </thead>
+
+
+            <tbody style="text-align:center;">
+            {% for nurse in nurses %}
+            <tr>
+                <td width="20%" style="font-size:16px; vertical-align:middle; ">
+                    {{nurse.last_name}}
+                </td>
+                <td width="10%" style="font-size:16px; vertical-align:middle; ">
+                    {{nurse.first_name}}
+                </td>
+                <td width="15%" style="font-size:14px; vertical-align:middle;">
+                    {% for care in cares %}
+                    {% if "-{}-".format(care.id) in nurse.cares %}
+                    - {{ care.description }} <br>
+                    {% endif %}
+                    {% endfor %}
+                </td>
+                <td width="15%" style="font-size:14px; vertical-align:middle;">
+                    {{ nurse.email }}
+                </td>
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
+                    {{ nurse.phone }}
+                </td>
+                <td width="20%" style="font-size:14px; vertical-align:middle;">
+                    {{ nurse.address }}
+                </td>
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
+                    {{ nurse.office.name }}
+                </td>
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
+                    <a href="{{ url_for('nurses.edit_nurse', nurse_id=nurse.id)}}"
+                       class="btn btn-outline-danger">Edit</a>
+                </td>
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
+                    <a href="{{ url_for('nurses.delete_nurse', nurse_id=nurse.id)}}"
+                       class="btn btn-danger">Delete</a>
+                </td>
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
+                    <a href="{{url_for('account.nurse_info', nurse_id=nurse.id)}}"
+                       class="btn">See vacations</a>
+                </td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+    {% else %}
+
+    <p style="font-size:15px; font-weight: bold; color:#FF124F; text-align:center;"> No nurses found for
+        this research ! Please, enter a request respecting this format : first-name and then last-name.</p>
+
+    {% endif %}
 
 </div>
 {% endblock %}

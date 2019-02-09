@@ -1,45 +1,100 @@
-from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
-from dev_log.models import init_db
-from datetime import datetime, timedelta
-from dev_log.auth.controllers import login_required
-from dev_log.auth.controllers import admin_required
-from dev_log.utils.calendar import *
-from dev_log.utils.calendar import *
+from flask import Blueprint, request, render_template, flash, session, redirect, url_for
+from dev_log.init_database import init_db
+from dev_log.auth.controllers import login_required, admin_required
+from dev_log.models import Nurse, Schedule, Office
+from dev_log.utils import calendar
+import datetime
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
 
 @planning.route("/", methods=['GET', 'POST'])
+@login_required
 def home():
+    """ Planning's home page allowing to search a nurse planning or your planning if your are logged in as a nurse """
+
     if request.method == "POST":
-        init_db()
-    if "week" in request.args:
-        week=int(request.args['week'])
-        year=int(request.args['year'])
-        if week==0:
-            week=52
-            year=year-1
-        elif week==53:
-            week=1
-            year=year+1
+        if session.get('nurse_id') is not None:
+            nurse_id = session.get('nurse_id')
+        else:
+            nurse_id = request.form['input_nurse']
+        date = request.form['date']
+        date_selected = calendar.get_dates_from_form(date)[0]
+        # Function available in the module "calendar" in devlog.utils
+        # It returns, in date format, the date of the selected day.
+        halfday = request.form['halfday']
+        error = None
+
+        if nurse_id == "":
+            error = "You need to select a nurse to view a planning"
+        elif halfday == "":
+            error = "You need to select a halfday"
+        elif date_selected > datetime.date.today() + datetime.timedelta(1) and date_selected != datetime.date(2019, 5,
+                                                                                                              2):
+            error = "You cannot see a nurse planning more than 24 hours before the desired date."
+            # This is due to our optimizer. To set all the appointments to the nurses and optimize their journeys,
+            # we need to have all the appointments of the selected half-day. But, we can add appointments until 24 hours
+            # before a day. Therefore, we must wait that all the possible appointments had been added to launch
+            # the optimizer and show the planning of each nurse.
+
+        if error is not None:
+            flash(error)
+        else:
+            return redirect(url_for('planning.get_nurse_planning', nurse_id=nurse_id, date=date, halfday=halfday))
+
+    if session.get('office_id'):
+        nurses = Nurse.query.filter(Nurse.office_id == session['office_id'])
     else:
-        current_date = datetime.datetime.now()
-        week = current_date.isocalendar()[1]
-        year = current_date.isocalendar()[0]
-    start_week=iso_to_gregorian(year,week,1)
-    end_week=iso_to_gregorian(year,week,7)
-    start_week = str(start_week.day) + '/' + str(start_week.month)
-    end_week = str(end_week.day) + '/' + str(end_week.month)
-    return render_template("landing.html",
-    start_week=start_week,
-    end_week=end_week,
-    year=year,
-    week=week)
+        nurses = None
+
+    return render_template("planning_home.html", nurses=nurses)
 
 
+@planning.route('/nurse-<int:nurse_id>/date-<date>/<halfday>', methods=['GET', 'POST'])
+@login_required
+def get_nurse_planning(nurse_id, date, halfday):
+    """ Function allowing to get the appointments of a nurse for a specific half-day """
+
+    if request.method == 'POST':
+        pass
+
+    nurse = Nurse.query.get(nurse_id)
+    date_selected = calendar.get_dates_from_form(date)[0]
+    # Function available in the module "calendar" in devlog.utils
+    # It returns, in date format, the date of the selected day.
+
+    office = Office.query.filter(Office.id == nurse.office_id).all()
+    schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
+                                      Schedule.appointment.has(date=date_selected),
+                                      Schedule.appointment.has(halfday=halfday)).all()
+
+    # If no schedules are planned, it means that it's the first time that the nurse can see its planning.
+    # Consequently, we have to run the optimizer to attribute all the appointments to the available nurses
+    # and optimize their journeys. If schedules are already planned, this means that the optimizer had already been
+    # launched, so the schedules are set for the half-day and we don't need to call the optimizer.
+    if len(schedules) == 0:
+        # TODO : à changer par la vraie fonction de Romu
+        schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
+                                          Schedule.appointment.has(date=date_selected),
+                                          Schedule.appointment.has(halfday=halfday)).all()
+    if halfday == "Morning":
+        schedules = office + schedules
+        nb_schedules = len(schedules)
+    else:
+        schedules = schedules + office
+        nb_schedules = len(schedules)
+
+    return render_template("planning_nurse.html", nurse=nurse, date=date_selected, halfday=halfday,
+                           schedules=schedules, nb_schedules=nb_schedules)
 
 
+@planning.route("/init", methods=['GET', 'POST'])
+@admin_required
+def reinit_db():
+    """ Initializes the database on click """
 
-
-
-
+    # TODO : to be deleted
+    init_db()
+    message = "The database has been reinitialised"
+    flash(message)
+    return redirect(url_for("planning.home"))

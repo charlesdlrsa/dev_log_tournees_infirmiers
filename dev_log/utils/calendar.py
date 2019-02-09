@@ -1,12 +1,15 @@
 import datetime
 
-def iso_year_start(iso_year):
-    "The gregorian calendar date of the first day of the given ISO year"
-    fourth_jan = datetime.date(iso_year, 1, 4)
-    delta = datetime.timedelta(fourth_jan.isoweekday()-1)
-    return fourth_jan - delta
+def get_dates_from_form(string_date_from_the_form):
+    """ Function returning, in date format, the dates of the selected day, the first day and the last day
+    of the week of the selected day """
 
-def iso_to_gregorian(iso_year, iso_week, iso_day):
-    "Gregorian calendar date for the given ISO year, week and day"
-    year_start = iso_year_start(iso_year)
-    return year_start + datetime.timedelta(days=iso_day-1, weeks=iso_week-1)
+    year = int(string_date_from_the_form[:4])
+    month = int(string_date_from_the_form[5:7])
+    day = int(string_date_from_the_form[8:10])
+    date_selected = datetime.date(year, month, day)
+    day_date_selected = date_selected.weekday()
+    date_start_week = date_selected - datetime.timedelta(day_date_selected)
+    date_end_week = date_start_week + datetime.timedelta(6)
+
+    return date_selected, date_start_week, date_end_week

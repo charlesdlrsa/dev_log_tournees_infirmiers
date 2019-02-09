@@ -30,57 +30,41 @@
 
     <div class="container">
       <div class="card card-register mx-auto mt-5">
-        <div class="card-header">Edit Patient</div>
+        <div class="card-header">Edit Office</div>
         <div class="card-body">
             <form method="post">
-            <div class="form-group">
-              <div class="form-row">
-                <div class="col-md-6">
-                  <div class="form-label-group">
-                    <input type="text" id="first_name" class="form-control" placeholder="{{patient.first_name}}" required="required" autofocus="autofocus" name="first_name" value="{{patient.first_name}}" >
-                    <label for="first_name">First Name</label>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-label-group">
-                    <input type="text" id="last_name" class="form-control" placeholder="{{patient.last_name}}" required="required" name="last_name" value="{{patient.last_name}}">
-                    <label for="last_name">Last Name</label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="email" id="email" class="form-control" placeholder="{{patient.email}}" required="required" name="email" value="{{patient.email}}" readonly>
-                <label for="email">Email</label>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="text" id="phone_number" class="form-control" pattern="(0|\\+33|0033)[1-9][0-9]{8}" required="required" name="phone_number" value="{{patient.phone}}">
-                <label for="phone_number">Phone Number</label>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="text" id="address" class="form-control" placeholder="{{patient.address}}" required="required" name="address" value="{{patient.address}}">
-                <label for="address">Postal Address</label>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="form-label-group">
-                <input type="text" id="digicode" class="form-control" value="{{patient.digicode}}" name="digicode">
-                <label for="digicode">Digicode</label>
-              </div>
-            </div>
-            <div class="form-group">
-             <div class="form-label-group">
-              <input type="text" id="additional_postal_information" class="form-control" value="{{patient.additional_postal_information}}" name="additional_postal_information">
-              <label for="additional_postal_information">Additional postal information : floor, door...</label>
-              </div>
-            </div>
-            <div id="map"></div>
-            <button class="btn btn-primary btn-block" type="submit">Save changes</button>
+             <div class="form-group">
+               <div class="form-label-group">
+                 <input type="name" id="name" class="form-control" placeholder="{{office.name}}" required="required" name="name" value="{{office.name}}" readonly>
+                 <label for="name">Name</label>
+               </div>
+             </div>
+             <div class="form-group">
+               <div class="form-label-group">
+                 <input type="email" id="email" class="form-control" placeholder="{{office.email}}" required="required" name="email" value="{{office.email}}" readonly>
+                 <label for="email">Email</label>
+               </div>
+             </div>
+             <div class="form-group">
+               <div class="form-label-group">
+                 <input type="text" id="phone_number" class="form-control" pattern="(0|\\+33|0033)[1-9][0-9]{8}" placeholder="{{office.phone}}" required="required" name="phone_number" value="{{office.phone}}">
+                 <label for="phone_number">Phone</label>
+               </div>
+             </div>
+             <div class="form-group">
+               <div class="form-label-group">
+                 <input type="password" id="password" class="form-control" placeholder="Enter a new password" name="password" required="required">
+                 <label for="password">Password</label>
+               </div>
+             </div>
+             <div class="form-group">
+               <div class="form-label-group">
+                 <input type="text" id="address" class="form-control" placeholder="Postal Address" value="{{office.address}}" required="required" name="address">
+                 <label for="address">Postal address</label>
+               </div>
+             </div>
+             <div id="map"></div>
+             <button class="btn btn-primary btn-block" type="submit">Save changes</button>
           </form>
 
         </div>

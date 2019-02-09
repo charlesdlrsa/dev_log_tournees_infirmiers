@@ -1,0 +1,54 @@
+{% extends 'base_template.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="card" style="margin-bottom:30px;">
+        <div class="card-header">
+            {% if session['office_id'] %}
+            <h1>Get a nurse planning </h1>
+            {% elif session['nurse_id'] %}
+            <h1>Get your planning, {{session['nurse_first_name']}} {{session['nurse_last_name']}} </h1>
+            {% endif %}
+        </div>
+        <div class="card-body">
+
+            <form method="post">
+                <div class="row">
+                    {% if session['office_id'] %}
+                    <div class="col">
+                        <select id="input_nurse" class="form-control" required="required" name="input_nurse">
+                            <option value="">Choose Nurse</option>
+                            {% for nurse in nurses %}
+                            <option value="{{nurse.id}}">
+                                {{nurse.last_name}} - {{nurse.first_name}}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="col">
+                        <input type="date" id="date" class="form-control" required="required" name="date">
+                    </div>
+                    <div class="col">
+
+                        <select id="halfday" class="form-control" required="required" name="halfday">
+                            <option value="" selected>Choose Halfday</option>
+                            <option value="Morning"> Morning</option>
+                            <option value="Afternoon"> Afternoon</option>
+                        </select>
+
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-primary" type="submit">View planning</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}
