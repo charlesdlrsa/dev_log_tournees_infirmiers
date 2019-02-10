@@ -39,11 +39,16 @@ googlemaps.exceptions.ApiError: MAX_ELEMENTS_EXCEEDED
 """
 
 import os
+
+"""
+>>>>>>> optim
 dir_path =  os.path.dirname(os.path.abspath(__file__))
 curr_path = os.getcwd()
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 print(dir_path)
 print(curr_path)
+<<<<<<< HEAD
+"""
 
 
 import sys
@@ -617,7 +622,7 @@ class Space :
     def setDrivingTimes(self,time):
         self.driving_mat = time
 
-    def solve(self, addApp=False, ft = 1):
+    def solve(self, mode="path"):
         """
 
         """
@@ -637,7 +642,7 @@ class Space :
 
         # compute time to see patients in each cluster
         self.clusterTime = dict()
-        for c,p in self.clusters.items():
+        for c, p in self.clusters.items():
             walking_points = self.getListPointsByID(p)
             walking_path, walking_time = self.getHamiltonianCycle(walking_points, c)
             walking_time += sum(self.care_duration[app_id] for app_id in walking_path)
@@ -681,28 +686,63 @@ class Space :
         n_id = self.nurse_ids[i]
         officeIndex = centers.index(0)
         res = []
+        path_index = 0
 
         for [path,_] in appointment_distribution:
             current_time = self.start[0]*3600 + self.start[1] * 60
             previous_index = officeIndex
             for c in range(1, len(path) -1):
-                current_pointID = path[c].getID()
+                current_point = path[c]
+                current_pointID = current_point.getID()
                 point_index = centers.index(current_pointID)
                 current_time += self.driving_mat[previous_index,point_index]
+                if mode == "path":
+                    source = path[c-1]
+                    order = str(path_index)
+                    s_lat = str(source.getLatitude())
+                    s_lon = str(source.getLongitude())
+                    t_lat = str(current_point.getLatitude())
+                    t_lon = str(current_point.getLongitude())
+                    res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon,"mode": "driving"})
+                    path_index += 1
                 
                 walking_path = self.clusters[current_pointID]
-                walking_point = [self.getPointByID(p_id) for p_id in walking_path[:-1]]
-                
-                try:
-                    travel_times = self.getGoogleTravelTimes(walking_point, "walking")
-                except:
-                    raise GmapApiError
-                for k in range(len(walking_path)-2):
-                    res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time, ft=ft)})
-                    current_time += self.care_duration[current_pointID] + travel_times[k,k+1]
-                    current_pointID = walking_path[k+1]
-                res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time, ft=ft)})
-                current_time += self.care_duration[current_pointID] + travel_times[len(walking_path)-2,0]
+                if len(walking_path) > 1:
+                    walking_point = [self.getPointByID(p_id) for p_id in walking_path[:-1]]
+                    try:
+                        travel_times = self.getGoogleTravelTimes(walking_point, "walking")
+                    except:
+                        raise GmapApiError
+                    for k in range(len(walking_path)-2):
+                        next_pointID = walking_path[k+1]
+                        next_point = self.getPointByID(walking_path)
+                        if mode == "schedule":
+                            res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                        elif mode == "path":
+                            order = str(path_index)
+                            s_lat = str(current_point.getLatitude())
+                            s_lon = str(current_point.getLongitude())
+                            t_lat = str(next_point.getLatitude())
+                            t_lon = str(next_point.getLongitude())
+                            res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
+                            path_index += 1
+                        current_time += self.care_duration[current_pointID] + travel_times[k,k+1]
+                        current_pointID = next_pointID
+                        current_point = next_point
+                    if mode == "schedule":
+                        res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                    elif mode == "path":
+                            order = str(path_index)
+                            s_lat = str(current_point.getLatitude())
+                            s_lon = str(current_point.getLongitude())
+                            t_lat = str(path[c].getLatitude())
+                            t_lon = str(path[c].getLongitude())
+                            res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
+                            path_index += 1
+                    current_time += self.care_duration[current_pointID] + travel_times[len(walking_path)-2,0]
+                else:
+                    if mode == "schedule":
+                        res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
                 previous_index = point_index
             current_time += self.driving_mat[previous_index,officeIndex]
 
@@ -712,10 +752,10 @@ class Space :
             except:
                 return False
 
-            if addApp and current_time > self.end[0]*3600 + self.end[1] * 60:
+            if mode=="addAppointment" and current_time > self.end[0] * 3600 + self.end[1] * 60:
                 return False
 
-        if addApp:
+        if mode=="addAppointment":
             return True
 
         return res
