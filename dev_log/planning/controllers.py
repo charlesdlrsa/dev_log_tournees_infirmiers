@@ -77,7 +77,6 @@ def get_nurse_planning(nurse_id, date, halfday):
     if len(schedules) == 0:
         nurses_and_appointments = build_data_for_optimizer(date, halfday)
         schedules_information = solve_complete(nurses_and_appointments)
-        print(solve_complete(nurses_and_appointments))
         for info in schedules_information:
             travel_mode = 'DRIVING'
         #     for mode in travel_modes:
@@ -89,17 +88,13 @@ def get_nurse_planning(nurse_id, date, halfday):
                          hour=datetime.time(int(info["hour"][:2]), int(info["hour"][3:5])),
                          nurse_id=int(info["nurse_id"]), travel_mode=travel_mode))
             db.session.commit()
-    else:
-        schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
+
+    schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
                                           Schedule.appointment.has(date=date_selected),
                                           Schedule.appointment.has(halfday=halfday)).all()
 
-    if halfday == "Morning":
-        schedules = office + schedules
-        nb_schedules = len(schedules)
-    else:
-        schedules = schedules + office
-        nb_schedules = len(schedules)
+    schedules = office + schedules + office
+    nb_schedules = len(schedules)
 
     return render_template("planning_nurse.html", nurse=nurse, date=date_selected, halfday=halfday,
                            schedules=schedules, nb_schedules=nb_schedules)
