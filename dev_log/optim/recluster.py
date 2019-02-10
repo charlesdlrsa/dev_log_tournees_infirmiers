@@ -74,7 +74,7 @@ def recluster(self, toRecluster):
                 clustering.write(";\n")
 
             # set up ampl
-            ampl = AMPL(Environment('ampl'))
+            ampl = AMPL(Environment('dev_log/optim/ampl'))
 
             # Interpret the two files
             ampl.read('dev_log/optim/models/clusteringWithVertexValues.mod')
