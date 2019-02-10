@@ -127,9 +127,8 @@ def check_appointments_nurses(care_id, patient_id, date, halfday):
     """ Function checking if the nurses are able to do all the appointments of the selected half-day, plus the new
     appointment that the administrator wants to schedule by calling the optimizer function """
 
-    new_appointment = Appointment(patient_id=patient_id, date=date, care_id=care_id, halfday=halfday)
     appointments_and_available_nurses_for_this_date = build_data_for_optimizer(date, halfday, care_id,
-                                                                               new_appointment=new_appointment)
+                                                                               patient_id=patient_id)
     print(appointments_and_available_nurses_for_this_date)
     response = solve_boolean(appointments_and_available_nurses_for_this_date)
 
