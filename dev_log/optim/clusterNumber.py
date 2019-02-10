@@ -23,7 +23,7 @@ def numberOfClusters(s):
     @return: the minimal number of clusters
     """
     threshold = min(s.walkingThreshold, (s.dmax+s.dmin)/2.0)
-    with open("models/clustering.dat", "w") as clustering:
+    with open("dev_log/optim/models/clustering.dat", "w") as clustering:
         clustering.write("# threshold for walking distance\n")
         clustering.write("param d:= {};\n".format(threshold))
         
@@ -51,11 +51,11 @@ def numberOfClusters(s):
         clustering.write(";\n")
 
     # set up ampl
-    ampl = AMPL(Environment('ampl'))
+    ampl = AMPL(Environment('dev_log/optim/ampl'))
 
     # Interpret the two files
-    ampl.read('models/clustering.mod')
-    ampl.readData('models/clustering.dat')
+    ampl.read('dev_log/optim/models/clustering.mod')
+    ampl.readData('dev_log/optim/models/clustering.dat')
 
     # Solve
     print("Get number of clusters")
