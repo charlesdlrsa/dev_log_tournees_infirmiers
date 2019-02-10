@@ -23,12 +23,12 @@ class Point :
     def __init__(
             self,
             id = 0,
-            latitude = 0, # y axis
-            longitude = 0): # x axis
+            lat = 0, # y axis
+            lon = 0): # x axis
         
         self.id = id
-        self.longitude = longitude
-        self.latitude = latitude
+        self.longitude = lon
+        self.latitude = lat
         
     def getID(self):
         return self.id
