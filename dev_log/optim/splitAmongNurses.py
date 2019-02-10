@@ -60,8 +60,8 @@ def vrp(s, centers):
     ampl = AMPL(Environment('ampl'))
 
     # Interpret the two files
-    ampl.read('models/vrp.mod')
-    ampl.readData('models/vrp.dat')
+    ampl.read('dev_log/optim/models/vrp.mod')
+    ampl.readData('dev_log/optim/models/vrp.dat')
 
     # Solve
     ampl.solve()

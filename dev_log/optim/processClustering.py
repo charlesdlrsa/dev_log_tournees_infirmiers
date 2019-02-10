@@ -22,8 +22,8 @@ def runClustering(s):
         - key = center
         - value = list of the points in the cluster (always starting with the center)
     """
-    with open("models/clustering.dat", "r") as clustering:
-        with open("models/kmedian.dat", "w") as kmedian:
+    with open("dev_log/optim/models/clustering.dat", "r") as clustering:
+        with open("dev_log/optim/models/kmedian.dat", "w") as kmedian:
             kmedian.write("# number of clusters\n")
             kmedian.write("param k := {};\n".format(s.clusterNumber))
 
@@ -40,8 +40,8 @@ def runClustering(s):
     ampl = AMPL(Environment('ampl'))
 
     # Interpret the two files
-    ampl.read('models/kmedian.mod')
-    ampl.readData('models/kmedian.dat')
+    ampl.read('dev_log/optim/models/kmedian.mod')
+    ampl.readData('dev_log/optim/models/kmedian.dat')
 
     # Solve
     print("cluster space")
