@@ -175,9 +175,12 @@ def delete_appointment(appointment_id):
     """ Delete an appointment with its id from the database """
 
     appointment = Appointment.query.get(appointment_id)
-    schedule = Schedule.query.get(appointment_id=appointment_id)
+    schedule = Schedule.query.filter(Schedule.appointment_id==appointment_id).first()
     db.session.delete(appointment)
-    db.session.delete(schedule)
+    try:
+        db.session.delete(schedule)
+    except:
+        pass
     db.session.commit()
     flash("The appointment was successfully deleted.")
     return redirect(url_for('appointments.home'))
