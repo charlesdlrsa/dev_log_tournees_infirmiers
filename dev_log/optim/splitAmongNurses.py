@@ -17,9 +17,7 @@ def vrp(s, centers):
     """
     centers = s.getListPointsByID(centers)
     n = len(centers)
-    k = min(len(s.nurse_ids), n-1)
-    if k < 1:
-        k = 1
+    k = len(s.nurse_ids)
     try:
         time = s.getGoogleTravelTimes(centers, "driving")
         s.setDrivingTimes(time)
