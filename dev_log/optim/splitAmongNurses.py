@@ -26,7 +26,7 @@ def vrp(s, centers):
     except:
         raise GmapApiError
     
-    with open("models/vrp.dat", "w") as vrp:
+    with open("dev_log/optim/models/vrp.dat", "w") as vrp:
         # number of nurses
         vrp.write("# number of clusters\n")
         vrp.write("param k := {};\n".format(k))
@@ -57,7 +57,7 @@ def vrp(s, centers):
         vrp.write(";\n")
 
     # set up ampl
-    ampl = AMPL(Environment('ampl'))
+    ampl = AMPL(Environment('dev_log/optim/ampl'))
 
     # Interpret the two files
     ampl.read('dev_log/optim/models/vrp.mod')

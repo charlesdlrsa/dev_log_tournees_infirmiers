@@ -37,7 +37,7 @@ def runClustering(s):
                 kmedian.write(line)
 
     # set up ampl
-    ampl = AMPL(Environment('ampl'))
+    ampl = AMPL(Environment('dev_log/optim/ampl'))
 
     # Interpret the two files
     ampl.read('dev_log/optim/models/kmedian.mod')
