@@ -59,14 +59,9 @@
                 <td width=5%
                     style="font-size:12px; vertical-align:middle;">
                     {% if i==0 %}
-                    {% if schedules[0].appointment %}
-                    <a onclick="seeMyPointOfDeparture({{schedules[0].appointment.patient.latitude}}, {{schedules[0].appointment.patient.longitude}})"
-                       href="#departure" class="btn btn-primary"> RDV 0 </a>
-                    {% else %}
                     <a onclick="seeMyPointOfDeparture({{schedules[0].latitude}}, {{schedules[0].longitude}})"
                        href="#departure" class="btn btn-primary"> Your Office </a>
-                    {% endif %}
-                    {% elif i==nb_schedules-1 and halfday=="Afternoon"%}
+                    {% elif i==nb_schedules-1%}
                     <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
                           {{schedules[i].latitude}}, {{schedules[i].longitude}})"
                        href="#{{i-1}}->{{i}}"
@@ -102,9 +97,13 @@
                 <td width=5% style="font-size:12px; vertical-align:middle;">
                     {% if schedules[i].hour %}
                     {{schedules[i].hour}}
-                    {% elif halfday=="Morning"%}
+                    {% elif halfday=="Morning" and i == 0%}
                     07:45:00
-                    {% else %}
+                    {% elif halfday=="Afternoon" and i == 0%}
+                    12:00:00
+                    {% elif halfday=="Morning" and i == nb_schedules-1 %}
+                    12:00:00
+                    {% elif halfday=="Afternoon" and i == nb_schedules-1 %}
                     18:00:00
                     {% endif %}
                 </td>
@@ -116,8 +115,14 @@
                 <td width=5% style="font-size:12px; vertical-align:middle;">
                     {% if schedules[i].appointment %}
                     {{schedules[i].appointment.care.duration}} min
-                    {% else %}
+                    {% elif halfday=="Morning" and i == 0%}
                     15 min
+                    {% elif halfday=="Afternoon" and i == 0%}
+                    2h
+                    {% elif halfday=="Morning" and i == nb_schedules-1 %}
+                    2h
+                    {% else %}
+                    --
                     {% endif %}
                 </td>
                 <td width=45% style="font-size:12px; vertical-align:middle;">
