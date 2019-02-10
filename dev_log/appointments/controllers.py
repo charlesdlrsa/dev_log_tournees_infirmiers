@@ -165,7 +165,7 @@ def add_appointment(patient_id, date, care_id, halfday):
     appointment = Appointment(patient_id=patient_id, date=date_selected, care_id=care_id, halfday=halfday)
     db.session.add(appointment)
     db.session.commit()
-    flash('The appointment was successfully added on {} in the morning'.format(date_selected.strftime("%d/%m/%y")))
+    flash('The appointment was successfully added on {} in the {}'.format(date_selected.strftime("%d/%m/%y"), halfday))
     return redirect(url_for('appointments.home'))
 
 

@@ -1,4 +1,5 @@
 DEBUG = True
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # Define the application directory
 import os
