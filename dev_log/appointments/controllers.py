@@ -8,7 +8,6 @@ from dev_log.auth.controllers import admin_required
 from dev_log.optim.space import solve_boolean
 from dev_log.utils.optimizer_functions import build_data_for_optimizer
 
-
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 
 
@@ -128,15 +127,10 @@ def check_appointments_nurses(care_id, patient_id, date, halfday):
     """ Function checking if the nurses are able to do all the appointments of the selected half-day, plus the new
     appointment that the administrator wants to schedule by calling the optimizer function """
 
-    appointment = Appointment(patient_id=patient_id, date=date, care_id=care_id, halfday=halfday)
-    db.session.add(appointment)
-    db.session.commit()
-    appointments_and_available_nurses_for_this_date = build_data_for_optimizer(date, halfday, care_id)
+    new_appointment = Appointment(patient_id=patient_id, date=date, care_id=care_id, halfday=halfday)
+    appointments_and_available_nurses_for_this_date = build_data_for_optimizer(date, halfday, care_id,
+                                                                               new_appointment=new_appointment)
     response = solve_boolean(appointments_and_available_nurses_for_this_date)
-    if response is False:
-        appointment = Appointment.query.all()[-1]
-        db.session.delete(appointment)
-        db.session.commit()
 
     return response
 
@@ -175,7 +169,7 @@ def delete_appointment(appointment_id):
     """ Delete an appointment with its id from the database """
 
     appointment = Appointment.query.get(appointment_id)
-    schedule = Schedule.query.filter(Schedule.appointment_id==appointment_id).first()
+    schedule = Schedule.query.filter(Schedule.appointment_id == appointment_id).first()
     db.session.delete(appointment)
     try:
         db.session.delete(schedule)

@@ -96,7 +96,7 @@ def init_db():
                                    halfday="Morning"))
         # To be deleted
         # db.session.add(Schedule(appointment_id=pID, hour=datetime.time(8 + pID-1, 30),
-        #                         nurse_id=1, travel_mode='driving'))
+        #                         nurse_id =1, travel_mode='driving'))
     for pID in range(5, 9):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
                                    halfday="Morning"))

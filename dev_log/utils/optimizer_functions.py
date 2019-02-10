@@ -2,7 +2,7 @@ from flask import session
 from dev_log.models import Appointment, Patient, Nurse, Care, Office
 
 
-def build_data_for_optimizer(date, halfday, care_id=None):
+def build_data_for_optimizer(date, halfday, care_id=None, new_appointment=None):
     """ A function that put in form the data for the optimizer """
 
     nurses_office = Nurse.query.filter(Nurse.office_id == session['office_id']).all()
@@ -29,5 +29,12 @@ def build_data_for_optimizer(date, halfday, care_id=None):
         app_data["app_lon"] = str(app.patient.longitude)
         app_data["app_length"] = str(app.care.duration)
         data["appointments"].append(app_data)
+    if new_appointment is not None:
+        new_app_data = {}
+        new_app_data["app_id"] = str(new_appointment.id)
+        new_app_data["app_lat"] = str(new_appointment.patient.latitude)
+        new_app_data["app_lon"] = str(new_appointment.patient.longitude)
+        new_app_data["app_length"] = str(new_appointment.care.duration)
+        data["appointments"].append(new_app_data)
 
     return data

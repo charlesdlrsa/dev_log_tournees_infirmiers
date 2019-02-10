@@ -77,17 +77,17 @@ def get_nurse_planning(nurse_id, date, halfday):
     # launched, so the schedules are set for the half-day and we don't need to call the optimizer.
     if len(schedules) == 0:
         nurses_and_appointments = build_data_for_optimizer(date, halfday)
-        # schedules_information = solve_complete(nurses_and_appointments)
+        schedules_information = solve_complete(nurses_and_appointments)
         print(solve_complete(nurses_and_appointments))
-        # for info in schedules_information:
-        #     travel_mode = 'DRIVING'
-        #     for mode in travel_modes:
-        #         if mode["app_id"] == info["app_id"]:
-        #             travel_mode = mode["travel_mode"]
-        #             break
-        #     db.session.add(
-        #         Schedule(appointment_id=int(info["app_id"]), hour=datetime.time(info["hour"][:2], info["hour"][3:5]),
-        #                  nurse_id=int(info["nurse_id"]), travel_mode=travel_mode))
+        for info in schedules_information:
+            # travel_mode = 'DRIVING'
+            # for mode in travel_modes:
+            #     if mode["app_id"] == info["app_id"]:
+            #         travel_mode = mode["travel_mode"]
+            #         break
+            db.session.add(
+                Schedule(appointment_id=int(info["app_id"]), hour=datetime.time(info["hour"][:2], info["hour"][3:5]),
+                         nurse_id=int(info["nurse_id"]), travel_mode=travel_mode))
 
     if halfday == "Morning":
         schedules = office + schedules
