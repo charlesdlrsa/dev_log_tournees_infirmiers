@@ -77,7 +77,7 @@
                     {{appointment.halfday}}
                 </td>
                 <td width="8%" style="font-size:14px; vertical-align:middle;">
-                    {{appointment.schedule.hour}}
+                    {{appointment.schedule[0].hour}}
                 </td>
                 <td width="10%" style="font-size:14px; vertical-align:middle;">
                     <a href="{{ url_for('appointments.delete_appointment',appointment_id=appointment.id)}}"

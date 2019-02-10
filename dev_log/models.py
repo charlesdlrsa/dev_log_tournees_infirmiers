@@ -191,7 +191,7 @@ class Appointment(Base):
 
     schedule = db.relationship(
         "Schedule",
-        backref="appointment_schedule")
+        backref="schedule")
 
     def __init__(self, patient_id, date, care_id, halfday):
         self.patient_id = patient_id
