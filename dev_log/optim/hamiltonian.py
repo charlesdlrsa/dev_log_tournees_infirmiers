@@ -38,7 +38,7 @@ def hamiltonian(s, points, starting_point):
             For the solver to work, the points has to be numbered from 1 to n
             """
 
-            with open("models/travellingSalesman.dat", "w") as hamiltonian:
+            with open("dev_log/optim/models/travellingSalesman.dat", "w") as hamiltonian:
                 hamiltonian.write("# nombre de sommets {}\n".format(n))
                 hamiltonian.write("set V :=\n")
                 for k in range(1, n+1):
@@ -59,8 +59,8 @@ def hamiltonian(s, points, starting_point):
             ampl = AMPL(Environment('ampl'))
 
             # Interpret the two files
-            ampl.read('models/travellingSalesman.mod')
-            ampl.readData('models/travellingSalesman.dat')
+            ampl.read('dev_log/optim/models/travellingSalesman.mod')
+            ampl.readData('dev_log/optim/models/travellingSalesman.dat')
 
             # Solve
             print("get Hamiltonian cycle")
