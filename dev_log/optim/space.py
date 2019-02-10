@@ -769,12 +769,18 @@ class Space :
 def solve_complete(data):
     s = Space()
     s.buildSpaceFromDic(data)
-    return s.solve()
+    return s.solve(mode="schedule")
+
 
 def solve_boolean(data):
     s = Space()
     s.buildSpaceFromDic(data)
-    return s.solve(addApp=True)
+    return s.solve(mode="addAppointment")
+
+def solve_path(data):
+    s = Space()
+    s.buildSpaceFromDic(data)
+    return s.solve(mode="path")
 
 if __name__ == "__main__":
     from random import random, seed
