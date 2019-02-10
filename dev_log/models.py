@@ -189,6 +189,10 @@ class Appointment(Base):
         "Care",
         backref="care")
 
+    schedule = db.relationship(
+        "Schedule",
+        backref="appointment_schedule")
+
     def __init__(self, patient_id, date, care_id, halfday):
         self.patient_id = patient_id
         self.date = date
@@ -213,7 +217,7 @@ class Schedule(Base):
     appointment_id = db.Column(
         db.Integer,
         db.ForeignKey('appointment.appointment_id'),
-        unique=False)
+        unique=True)
 
     nurse_id = db.Column(
         db.Integer,
