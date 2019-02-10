@@ -40,17 +40,6 @@ googlemaps.exceptions.ApiError: MAX_ELEMENTS_EXCEEDED
 
 import os
 
-"""
->>>>>>> optim
-dir_path =  os.path.dirname(os.path.abspath(__file__))
-curr_path = os.getcwd()
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-print(dir_path)
-print(curr_path)
-<<<<<<< HEAD
-"""
-
-
 import sys
 import math
 import time
@@ -685,29 +674,20 @@ class Space :
         officeIndex = centers.index(0)
         res = []
         path_index = 0
-
-        print(self.driving_mat)
+        isOfficeDone = False
 
         for [path,_] in appointment_distribution:
             try:
                 n_id = self.nurse_ids[i]
             except:
                 return False
-
-            print("\n\n\n###########")
-            print("n_id")
-            print(n_id)
             current_time = self.start[0]*3600 + self.start[1] * 60
-            print(self.formatTime(current_time))
             previous_index = officeIndex
             for c in range(1, len(path) -1):
                 current_point = path[c]
                 current_pointID = current_point.getID()
                 point_index = centers.index(current_pointID)
                 current_time += self.driving_mat[previous_index,point_index]
-                print("\n")
-                print("c",c)
-                print(self.formatTime(current_time), current_point)
                 if mode == "path":
                     source = path[c-1]
                     order = str(path_index)
@@ -763,12 +743,49 @@ class Space :
                 return False
 
             # try and affect office cluster
-            #print(clusterTime)
-            
-
+            if not isOfficeDone:
+                walking_path = self.clusters[0]
+                if len(walking_path) < 2:
+                    isOfficeDone = True
+                elif current_time + self.clusterTime[0] < self.end[0] * 3600 + self.end[1] * 60:
+                    # add office cluster
+                    walking_point = [self.getPointByID(p_id) for p_id in walking_path[:-1]]
+                    try:
+                        travel_times = self.getGoogleTravelTimes(walking_point, "walking")
+                    except:
+                        raise GmapApiError
+                    for k in range(len(walking_path)-2):
+                        next_pointID = walking_path[k+1]
+                        next_point = self.getPointByID(next_pointID)
+                        if mode == "schedule":
+                            res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                        elif mode == "path":
+                            order = str(path_index)
+                            s_lat = str(current_point.getLatitude())
+                            s_lon = str(current_point.getLongitude())
+                            t_lat = str(next_point.getLatitude())
+                            t_lon = str(next_point.getLongitude())
+                            res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
+                            path_index += 1
+                        current_time += self.care_duration[current_pointID] + travel_times[k,k+1]
+                        current_pointID = next_pointID
+                        current_point = next_point
+                    if mode == "schedule":
+                        res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                    elif mode == "path":
+                            order = str(path_index)
+                            s_lat = str(current_point.getLatitude())
+                            s_lon = str(current_point.getLongitude())
+                            t_lat = str(path[c].getLatitude())
+                            t_lon = str(path[c].getLongitude())
+                            res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
+                            path_index += 1
+                    current_time += self.care_duration[current_pointID] + travel_times[len(walking_path)-2,0]
+                    isOfficeDone = True
+          
             i += 1
         if mode=="addAppointment":
-            return True
+            return isOfficeDone
 
         return res
 
