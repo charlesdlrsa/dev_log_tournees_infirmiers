@@ -67,8 +67,7 @@ def get_nurse_planning(nurse_id, date, halfday):
     # It returns, in date format, the date of the selected day.
 
     office = Office.query.filter(Office.id == nurse.office_id).all()
-    schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
-                                      Schedule.appointment.has(date=date_selected),
+    schedules = Schedule.query.filter(Schedule.appointment.has(date=date_selected),
                                       Schedule.appointment.has(halfday=halfday)).all()
 
     # If no schedules are planned, it means that it's the first time that the nurse can see its planning.
@@ -80,7 +79,7 @@ def get_nurse_planning(nurse_id, date, halfday):
         schedules_information = solve_complete(nurses_and_appointments)
         print(solve_complete(nurses_and_appointments))
         for info in schedules_information:
-        #    travel_mode = 'DRIVING'
+            travel_mode = 'DRIVING'
         #     for mode in travel_modes:
         #         if mode["app_id"] == info["app_id"]:
         #             travel_mode = mode["travel_mode"]
@@ -90,6 +89,10 @@ def get_nurse_planning(nurse_id, date, halfday):
                          hour=datetime.time(int(info["hour"][:2]), int(info["hour"][3:5])),
                          nurse_id=int(info["nurse_id"]), travel_mode=travel_mode))
             db.session.commit()
+    else:
+        schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
+                                          Schedule.appointment.has(date=date_selected),
+                                          Schedule.appointment.has(halfday=halfday)).all()
 
     if halfday == "Morning":
         schedules = office + schedules
