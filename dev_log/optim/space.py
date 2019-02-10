@@ -44,9 +44,6 @@ googlemaps.exceptions.ApiError: MAX_ELEMENTS_EXCEEDED
 
 """
 
-import os
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
 import math
 from dev_log.optim.point import Point
 from operator import attrgetter

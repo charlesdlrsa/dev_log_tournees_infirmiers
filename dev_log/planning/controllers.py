@@ -5,14 +5,14 @@ from dev_log.models import Nurse, Schedule, Office
 from dev_log.utils import calendar
 import datetime
 from dev_log import db
-from dev_log.utils.optimizer_functions import build_data_for_optimizer, add_schedules_from_optimizer_response
+from dev_log.utils.optimizer_functions import build_data_for_optimizer
 from dev_log.optim.space import solve_complete
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
 
 @planning.route("/", methods=['GET', 'POST'])
-@login_required
+# @login_required
 def home():
     """ Planning's home page allowing to search a nurse planning or your planning if your are logged in as a nurse """
 
@@ -100,7 +100,7 @@ def get_nurse_planning(nurse_id, date, halfday):
 
 
 @planning.route("/init_db", methods=['GET', 'POST'])
-@admin_required
+# @admin_required
 def reinit_db():
     """ Initializes the database on click """
 

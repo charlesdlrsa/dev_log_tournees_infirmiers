@@ -10,7 +10,7 @@ def build_data_for_optimizer(date, halfday, care_id=None):
     nurses = list(set(nurses_office) - set(nurses_absent))
     office = Office.query.filter(Office.id == session['office_id']).first()
     data = {}
-    data["nurse_ids"] = [str(nurse.id) for nurse in nurses]
+    data["nurse_id"] = [str(nurse.id) for nurse in nurses]
     data["office_lat"] = str(office.latitude)
     data["office_lon"] = str(office.longitude)
     if halfday == "Morning":
@@ -31,8 +31,3 @@ def build_data_for_optimizer(date, halfday, care_id=None):
         data["appointments"].append(app_data)
 
     return data
-
-
-def add_schedules_from_optimizer_response():
-
-    return True
