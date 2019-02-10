@@ -686,18 +686,28 @@ class Space :
         res = []
         path_index = 0
 
+        print(self.driving_mat)
+
         for [path,_] in appointment_distribution:
             try:
                 n_id = self.nurse_ids[i]
             except:
                 return False
+
+            print("\n\n\n###########")
+            print("n_id")
+            print(n_id)
             current_time = self.start[0]*3600 + self.start[1] * 60
+            print(self.formatTime(current_time))
             previous_index = officeIndex
             for c in range(1, len(path) -1):
                 current_point = path[c]
                 current_pointID = current_point.getID()
                 point_index = centers.index(current_pointID)
                 current_time += self.driving_mat[previous_index,point_index]
+                print("\n")
+                print("c",c)
+                print(self.formatTime(current_time), current_point)
                 if mode == "path":
                     source = path[c-1]
                     order = str(path_index)
@@ -745,14 +755,18 @@ class Space :
                 else:
                     if mode == "schedule":
                         res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                    current_time += self.care_duration[current_pointID]
                 previous_index = point_index
             current_time += self.driving_mat[previous_index,officeIndex]
-
-            i += 1
 
             if mode=="addAppointment" and current_time > self.end[0] * 3600 + self.end[1] * 60:
                 return False
 
+            # try and affect office cluster
+            #print(clusterTime)
+            
+
+            i += 1
         if mode=="addAppointment":
             return True
 
@@ -805,8 +819,8 @@ if __name__ == "__main__":
 
     nurses = [1,2,3,4]
 
-    test_dict = {'nurse_id': ['4', '1', '2', '3'], 'office_lat': '48.7263802', 'office_lon': '2.2643467', 'start': '14:00', 'end': '18:00', 'appointments': [{'app_id': '16', 'app_lat': '48.73590189999999', 'app_lon': '2.2591394', 'app_length': '30'}]}
+    test_dict = {'nurse_id': ['2', '1'], 'office_lat': '48.7263802', 'office_lon': '2.2643467', 'start': '08:00', 'end': '12:00', 'appointments': [{'app_id': '1', 'app_lat': '48.73590189999999', 'app_lon': '2.2591394', 'app_length': '35'}, {'app_id': '2', 'app_lat': '48.7317076', 'app_lon': '2.2807308', 'app_length': '20'}, {'app_id': '3', 'app_lat': '48.7400286', 'app_lon': '2.3156139', 'app_length': '20'}, {'app_id': '4', 'app_lat': '48.6961912', 'app_lon': '2.2900446', 'app_length': '35'}, {'app_id': '5', 'app_lat': '48.7086557', 'app_lon': '2.241912', 'app_length': '25'}, {'app_id': '6', 'app_lat': '48.7450455', 'app_lon': '2.2664304', 'app_length': '20'}, {'app_id': '7', 'app_lat': '48.8224412', 'app_lon': '2.2857558', 'app_length': '25'}, {'app_id': '8', 'app_lat': '48.8249728', 'app_lon': '2.2756178', 'app_length': '35'}]}
     s = Space()
-    s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses)
-    #s.buildSpaceFromDic(test_dict)
+    #s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses)
+    s.buildSpaceFromDic(test_dict)
     print(s.solve())
