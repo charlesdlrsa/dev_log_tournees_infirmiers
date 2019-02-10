@@ -1,4 +1,4 @@
-from space import Space, GmapApiError
+from dev_log.optim.space import Space, GmapApiError
 from amplpy import AMPL, Environment
 import math
 
