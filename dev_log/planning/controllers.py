@@ -80,7 +80,7 @@ def get_nurse_planning(nurse_id, date, halfday):
         schedules_information = solve_complete(nurses_and_appointments)
         print(solve_complete(nurses_and_appointments))
         for info in schedules_information:
-            travel_mode = 'DRIVING'
+        #    travel_mode = 'DRIVING'
         #     for mode in travel_modes:
         #         if mode["app_id"] == info["app_id"]:
         #             travel_mode = mode["travel_mode"]
