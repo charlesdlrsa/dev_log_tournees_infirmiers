@@ -128,7 +128,6 @@ def check_appointments_nurses(care_id, date, halfday):
     """ Function checking if the nurses are able to do all the appointments of the selected half-day, plus the new
     appointment that the administrator wants to schedule by calling the optimizer function """
 
-    # TODO : Ne pas oublier d'envoyer la position du cabinet
     nurses_office = Nurse.query.filter(Nurse.office_id == session['office_id']).all()
     nurses_absent = Nurse.query.filter(Nurse.nurse_absence.any(date=date)).all()
     nurses = list(set(nurses_office) - set(nurses_absent))
@@ -183,7 +182,7 @@ def add_appointment(patient_id, date, care_id, halfday):
     appointment = Appointment(patient_id=patient_id, date=date_selected, care_id=care_id, halfday=halfday)
     db.session.add(appointment)
     db.session.commit()
-    flash('The appointment was successfully added on {} in the morning'.format(date_selected.strftime("%d/%m/%y")))
+    flash('The appointment was successfully added on {} in the {}'.format(date_selected.strftime("%d/%m/%y"), halfday))
     return redirect(url_for('appointments.home'))
 
 
