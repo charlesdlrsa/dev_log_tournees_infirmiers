@@ -22,6 +22,8 @@ def build_data_for_optimizer(date, halfday, care_id=None, patient_id=None):
 
     appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).all()
     data["appointments"] = []
+    print(date)
+    print(type(date))
     for app in appointments:
         app_data = {}
         app_data["app_id"] = str(app.id)
