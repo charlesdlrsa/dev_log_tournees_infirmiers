@@ -611,7 +611,7 @@ class Space :
     def setDrivingTimes(self,time):
         self.driving_mat = time
 
-    def solve(self, mode="path"):
+    def solve(self, mode="schedule"):
         """
 
         """
@@ -681,6 +681,9 @@ class Space :
                 n_id = self.nurse_ids[i]
             except:
                 return False
+            if n_id == 1:
+                print("***\nn_id")
+                print(path)
             current_time = self.start[0]*3600 + self.start[1] * 60
             previous_index = officeIndex
             for c in range(1, len(path) -1):
@@ -745,6 +748,8 @@ class Space :
             # try and affect office cluster
             if not isOfficeDone:
                 walking_path = self.clusters[0]
+                print("####")
+                print(self.clusters[0])
                 if len(walking_path) < 2:
                     isOfficeDone = True
                 elif current_time + self.clusterTime[0] < self.end[0] * 3600 + self.end[1] * 60:
@@ -754,7 +759,9 @@ class Space :
                         travel_times = self.getGoogleTravelTimes(walking_point, "walking")
                     except:
                         raise GmapApiError
-                    for k in range(len(walking_path)-2):
+                    current_pointID = walking_path[1]
+                    current_point = self.getPointByID(next_pointID)
+                    for k in range(1,len(walking_path)-2):
                         next_pointID = walking_path[k+1]
                         next_point = self.getPointByID(next_pointID)
                         if mode == "schedule":
@@ -787,6 +794,7 @@ class Space :
         if mode=="addAppointment":
             return isOfficeDone
 
+        print(self.clusters)
         return res
 
     def formatTime(self, time, ft=1):
