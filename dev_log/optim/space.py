@@ -10,18 +10,12 @@
 TODO: 
     recluster -> issue with office
     assignNurse -> do LP
-    solve
     mettre en forme les sorties
-    functions solve_boolean(data) and solve_complete(data)
     clean le code
 
 ISSUES:
     reclustering -> some solutions are infeasible
 
-
-function naming:
-solve_boolean(data)
-solve_complete(data)
 
 Output: list of two dicts
 [{"nurse_id":"id", "app_id":"id", "hour":"hh:mm"}]
@@ -43,9 +37,17 @@ In order to switch over to the new pay as you go pricing plan, you must create a
 googlemaps.exceptions.ApiError: MAX_ELEMENTS_EXCEEDED
 
 """
+def setup():
+    import os
+    dir_path =  os.path.dirname(os.path.abspath(__file__))
+    curr_path = os.getcwd()
+    #os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    print(dir_path)
+    print(curr_path)
+    return dir_path, curr_path
 
-import os
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+setup()
+exit()
 
 import sys
 import math
