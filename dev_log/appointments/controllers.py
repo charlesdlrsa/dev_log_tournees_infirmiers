@@ -130,6 +130,7 @@ def check_appointments_nurses(care_id, patient_id, date, halfday):
     new_appointment = Appointment(patient_id=patient_id, date=date, care_id=care_id, halfday=halfday)
     appointments_and_available_nurses_for_this_date = build_data_for_optimizer(date, halfday, care_id,
                                                                                new_appointment=new_appointment)
+    print(appointments_and_available_nurses_for_this_date)
     response = solve_boolean(appointments_and_available_nurses_for_this_date)
 
     return response
