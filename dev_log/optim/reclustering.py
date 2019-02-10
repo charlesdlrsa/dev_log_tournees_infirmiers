@@ -91,7 +91,7 @@ def runReclustering(s, toRecluster):
             clustering.write(";\n")
 
         # set up ampl
-        ampl = AMPL(Environment('ampl'))
+        ampl = AMPL(Environment('dev_log/models/ampl'))
 
         # Interpret the two files
         ampl.read('dev_log/models/clusteringWithVertexValues.mod')
