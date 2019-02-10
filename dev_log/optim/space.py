@@ -125,9 +125,9 @@ class Space:
         self.duration = (self.end[0] - self.start[0]) * 3600 + (self.end[1] - self.start[1]) * 60
         self.nurse_ids = [int(x) for x in dataDict["nurse_id"]]
         self.points = [Point(id=0, lat=float(dataDict["office_lat"]), lon=float(dataDict["office_lon"]))]
-        self.care_duration[0] = 0
         self.nb_points = 1
         self.care_duration = dict()
+        self.care_duration[0] = 0
         for app in dataDict["appointments"]:
             self.points.append(Point(id=int(app["app_id"]), lat=float(app["app_lat"]), lon=float(app["app_lon"])))
             self.nb_points += 1
