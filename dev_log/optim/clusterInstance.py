@@ -4,9 +4,9 @@
 
 # @class ClusteringInstance
 
-from point import Point
 import matplotlib.pyplot as plt
 import random
+
 
 class ClusteringInstance:
     """
@@ -212,9 +212,11 @@ class ClusteringInstance:
         for c in self.C:
             if center in c:
                 pass
+
+
 """
 TODO:
     - hamiltonian cycle in a cluster
     - hamiltonian cycle on the centers
     - find the appropriate cluster instance in "space"
-    
+"""

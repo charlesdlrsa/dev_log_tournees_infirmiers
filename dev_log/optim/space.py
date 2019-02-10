@@ -25,7 +25,7 @@ solve_complete(data)
 
 Output: list of two dicts
 [{"nurse_id":"id", "app_id":"id", "hour":"hh:mm"}]
-[{"app_id:"id, "travel_mode":["driving"/"walking"]}]
+[{"app_id:"id," "travel_mode":["driving"/"walking"]}]
 
 
 
@@ -47,16 +47,12 @@ googlemaps.exceptions.ApiError: MAX_ELEMENTS_EXCEEDED
 import os
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-import sys
 import math
-import time
-import re
-from point import Point
+from dev_log.optim.point import Point
 from operator import attrgetter
-from amplpy import AMPL, Environment
 import numpy as np
 import googlemaps
-from key import key
+from dev_log.utils.key import key
 googlekey = key
 
 class GmapApiError(Exception):
