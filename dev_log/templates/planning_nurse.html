@@ -96,15 +96,15 @@
                 </td>
                 <td width=5% style="font-size:12px; vertical-align:middle;">
                     {% if schedules[i].hour %}
-                    {{schedules[i].hour}}
+                    {{schedules[i].hour.strftime('%H:%M')}}
                     {% elif halfday=="Morning" and i == 0%}
-                    07:45:00
+                    07:45
                     {% elif halfday=="Afternoon" and i == 0%}
-                    12:00:00
+                    12:00
                     {% elif halfday=="Morning" and i == nb_schedules-1 %}
-                    12:00:00
+                    12:00
                     {% elif halfday=="Afternoon" and i == nb_schedules-1 %}
-                    18:00:00
+                    18:00
                     {% endif %}
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
