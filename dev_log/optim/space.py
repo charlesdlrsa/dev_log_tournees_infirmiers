@@ -709,7 +709,7 @@ class Space:
                         raise GmapApiError
                     for k in range(len(walking_path)-2):
                         next_pointID = walking_path[k+1]
-                        next_point = self.getPointByID(walking_path)
+                        next_point = self.getPointByID(next_pointID)
                         if mode == "schedule":
                             res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
                         elif mode == "path":
