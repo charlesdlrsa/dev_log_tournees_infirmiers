@@ -674,12 +674,12 @@ class Space:
         # split the clusters among the nurses
         centers = list(self.clusters.keys())
         appointment_distribution = self.splitAmongNurse(centers)
-        # TODO: mettre en forme la sortie.
 
         i = 0
         officeIndex = centers.index(0)
         res = []
         path_index = 0
+        isOfficeDone = False
 
         for [path,_] in appointment_distribution:
             try:
@@ -740,16 +740,59 @@ class Space:
                 else:
                     if mode == "schedule":
                         res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                    current_time += self.care_duration[current_pointID]
                 previous_index = point_index
             current_time += self.driving_mat[previous_index,officeIndex]
 
-            i += 1
-            
             if mode=="addAppointment" and current_time > self.end[0] * 3600 + self.end[1] * 60:
                 return False
 
+            # try and affect office cluster
+            if not isOfficeDone:
+                walking_path = self.clusters[0]
+                if len(walking_path) < 2:
+                    isOfficeDone = True
+                elif current_time + self.clusterTime[0] < self.end[0] * 3600 + self.end[1] * 60:
+                    # add office cluster
+                    walking_point = [self.getPointByID(p_id) for p_id in walking_path[:-1]]
+                    try:
+                        travel_times = self.getGoogleTravelTimes(walking_point, "walking")
+                    except:
+                        raise GmapApiError
+                    current_pointID = walking_path[1]
+                    current_point = self.getPointByID(next_pointID)
+                    for k in range(1,len(walking_path)-2):
+                        next_pointID = walking_path[k+1]
+                        next_point = self.getPointByID(next_pointID)
+                        if mode == "schedule":
+                            res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                        elif mode == "path":
+                            order = str(path_index)
+                            s_lat = str(current_point.getLatitude())
+                            s_lon = str(current_point.getLongitude())
+                            t_lat = str(next_point.getLatitude())
+                            t_lon = str(next_point.getLongitude())
+                            res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
+                            path_index += 1
+                        current_time += self.care_duration[current_pointID] + travel_times[k,k+1]
+                        current_pointID = next_pointID
+                        current_point = next_point
+                    if mode == "schedule":
+                        res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                    elif mode == "path":
+                            order = str(path_index)
+                            s_lat = str(current_point.getLatitude())
+                            s_lon = str(current_point.getLongitude())
+                            t_lat = str(path[c].getLatitude())
+                            t_lon = str(path[c].getLongitude())
+                            res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
+                            path_index += 1
+                    current_time += self.care_duration[current_pointID] + travel_times[len(walking_path)-2,0]
+                    isOfficeDone = True
+          
+            i += 1
         if mode=="addAppointment":
-            return True
+            return isOfficeDone
 
         return res
 
