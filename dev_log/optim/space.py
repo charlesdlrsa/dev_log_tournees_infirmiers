@@ -680,15 +680,17 @@ class Space :
         # split the clusters among the nurses
         centers = list(self.clusters.keys())
         appointment_distribution = self.splitAmongNurse(centers)
-        # TODO: mettre en forme la sortie.
 
         i = 0
-        n_id = self.nurse_ids[i]
         officeIndex = centers.index(0)
         res = []
         path_index = 0
 
         for [path,_] in appointment_distribution:
+            try:
+                n_id = self.nurse_ids[i]
+            except:
+                return False
             current_time = self.start[0]*3600 + self.start[1] * 60
             previous_index = officeIndex
             for c in range(1, len(path) -1):
@@ -747,10 +749,6 @@ class Space :
             current_time += self.driving_mat[previous_index,officeIndex]
 
             i += 1
-            try:
-                n_id = self.nurse_ids[i]
-            except:
-                return False
 
             if mode=="addAppointment" and current_time > self.end[0] * 3600 + self.end[1] * 60:
                 return False
