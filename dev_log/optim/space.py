@@ -740,6 +740,7 @@ class Space:
                 else:
                     if mode == "schedule":
                         res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                    current_time += self.care_duration[current_pointID]
                 previous_index = point_index
             current_time += self.driving_mat[previous_index,officeIndex]
 
