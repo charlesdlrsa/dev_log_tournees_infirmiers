@@ -22,10 +22,11 @@ ISSUES:
 function naming:
 solve_boolean(data)
 solve_complete(data)
+solve_path(data)
 
-Output: list of two dicts
-[{"nurse_id":"id", "app_id":"id", "hour":"hh:mm"}]
-[{"app_id:"id," "travel_mode":["driving"/"walking"]}]
+Output: 
+[{"order":"i", "s_lat":"lat", "s_lon":"lon", "t_lat":"lat", "t_lon":"lon","mode":["driving"/"walking"]}]
+order : from 0 to n
 
 
 
@@ -125,9 +126,9 @@ class Space:
         self.duration = (self.end[0] - self.start[0]) * 3600 + (self.end[1] - self.start[1]) * 60
         self.nurse_ids = [int(x) for x in dataDict["nurse_id"]]
         self.points = [Point(id=0, lat=float(dataDict["office_lat"]), lon=float(dataDict["office_lon"]))]
+        self.nb_points = 1
         self.care_duration = dict()
         self.care_duration[0] = 0
-        self.nb_points = 1
         for app in dataDict["appointments"]:
             self.points.append(Point(id=int(app["app_id"]), lat=float(app["app_lat"]), lon=float(app["app_lon"])))
             self.nb_points += 1
@@ -615,7 +616,7 @@ class Space:
     def setDrivingTimes(self, time):
         self.driving_mat = time
 
-    def solve(self, addApp=False, ft=1):
+    def solve(self, mode="path"):
         """
 
         """
@@ -676,52 +677,83 @@ class Space:
         # TODO: mettre en forme la sortie.
 
         i = 0
-        n_id = self.nurse_ids[i]
         officeIndex = centers.index(0)
         res = []
+        path_index = 0
 
         for [path,_] in appointment_distribution:
+            try:
+                n_id = self.nurse_ids[i]
+            except:
+                return False
             current_time = self.start[0]*3600 + self.start[1] * 60
             previous_index = officeIndex
             for c in range(1, len(path) -1):
-                current_pointID = path[c].getID()
+                current_point = path[c]
+                current_pointID = current_point.getID()
                 point_index = centers.index(current_pointID)
                 current_time += self.driving_mat[previous_index,point_index]
+                if mode == "path":
+                    source = path[c-1]
+                    order = str(path_index)
+                    s_lat = str(source.getLatitude())
+                    s_lon = str(source.getLongitude())
+                    t_lat = str(current_point.getLatitude())
+                    t_lon = str(current_point.getLongitude())
+                    res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon,"mode": "driving"})
+                    path_index += 1
                 
                 walking_path = self.clusters[current_pointID]
                 if len(walking_path) > 1:
                     walking_point = [self.getPointByID(p_id) for p_id in walking_path[:-1]]
-                    
                     try:
                         travel_times = self.getGoogleTravelTimes(walking_point, "walking")
                     except:
                         raise GmapApiError
                     for k in range(len(walking_path)-2):
-                        res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time, ft=ft)})
+                        next_pointID = walking_path[k+1]
+                        next_point = self.getPointByID(next_pointID)
+                        if mode == "schedule":
+                            res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                        elif mode == "path":
+                            order = str(path_index)
+                            s_lat = str(current_point.getLatitude())
+                            s_lon = str(current_point.getLongitude())
+                            t_lat = str(next_point.getLatitude())
+                            t_lon = str(next_point.getLongitude())
+                            res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
+                            path_index += 1
                         current_time += self.care_duration[current_pointID] + travel_times[k,k+1]
-                        current_pointID = walking_path[k+1]
-                    res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time, ft=ft)})
+                        current_pointID = next_pointID
+                        current_point = next_point
+                    if mode == "schedule":
+                        res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                    elif mode == "path":
+                            order = str(path_index)
+                            s_lat = str(current_point.getLatitude())
+                            s_lon = str(current_point.getLongitude())
+                            t_lat = str(path[c].getLatitude())
+                            t_lon = str(path[c].getLongitude())
+                            res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
+                            path_index += 1
                     current_time += self.care_duration[current_pointID] + travel_times[len(walking_path)-2,0]
                 else:
-                    res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time, ft=ft)})
+                    if mode == "schedule":
+                        res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
                 previous_index = point_index
             current_time += self.driving_mat[previous_index,officeIndex]
 
             i += 1
-            try:
-                n_id = self.nurse_ids[i]
-            except:
+            
+            if mode=="addAppointment" and current_time > self.end[0] * 3600 + self.end[1] * 60:
                 return False
 
-            if addApp and current_time > self.end[0] * 3600 + self.end[1] * 60:
-                return False
-
-        if addApp:
+        if mode=="addAppointment":
             return True
 
         return res
 
-    def formatTime(self, time, ft=1):
+    def formatTime(self, time):
         t = int(time)
         s = "%s%d.%s%d" % (
         "0" if t // 3600 < 10 else "", t // 3600, "0" if (t % 3600) // 60 < 10 else "", (t % 3600) // 60)
@@ -731,13 +763,18 @@ class Space:
 def solve_complete(data):
     s = Space()
     s.buildSpaceFromDic(data)
-    return s.solve()
+    return s.solve(mode="schedule")
 
 
 def solve_boolean(data):
     s = Space()
     s.buildSpaceFromDic(data)
-    return s.solve(addApp=True)
+    return s.solve(mode="addAppointment")
+
+def solve_path(data):
+    s = Space()
+    s.buildSpaceFromDic(data)
+    return s.solve(mode="path")
 
 
 if __name__ == "__main__":
