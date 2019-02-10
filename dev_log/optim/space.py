@@ -37,17 +37,14 @@ In order to switch over to the new pay as you go pricing plan, you must create a
 googlemaps.exceptions.ApiError: MAX_ELEMENTS_EXCEEDED
 
 """
-def setup():
-    import os
-    dir_path =  os.path.dirname(os.path.abspath(__file__))
-    curr_path = os.getcwd()
-    #os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    print(dir_path)
-    print(curr_path)
-    return dir_path, curr_path
 
-setup()
-exit()
+import os
+dir_path =  os.path.dirname(os.path.abspath(__file__))
+curr_path = os.getcwd()
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+print(dir_path)
+print(curr_path)
+
 
 import sys
 import math
@@ -132,9 +129,9 @@ class Space :
         self.duration = (self.end[0] - self.start[0])*3600 + (self.end[1] - self.start[1]) * 60
         self.nurse_ids = [int(x) for x in dataDict["nurse_id"]]
         self.points = [Point(id=0, lat=float(dataDict["office_lat"]), lon=float(dataDict["office_lon"]))]
-        self.care_duration[0] = 0
         self.nb_points = 1
         self.care_duration = dict()
+        self.care_duration[0] = 0
         for app in dataDict["appointments"]:
             self.points.append(Point(id=int(app["app_id"]), lat=float(app["app_lat"]), lon=float(app["app_lon"])))
             self.nb_points += 1
@@ -763,7 +760,9 @@ if __name__ == "__main__":
         patientDict[k+1] = (lat,lon)
 
     nurses = [1,2,3,4]
+
+    test_dict = {'nurse_id': ['4', '1', '2', '3'], 'office_lat': '48.7263802', 'office_lon': '2.2643467', 'start': '14:00', 'end': '18:00', 'appointments': [{'app_id': '16', 'app_lat': '48.73590189999999', 'app_lon': '2.2591394', 'app_length': '30'}]}
     s = Space()
-    s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses)
-    
+    #s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses)
+    s.buildSpaceFromDic(test_dict)
     print(s.solve())
