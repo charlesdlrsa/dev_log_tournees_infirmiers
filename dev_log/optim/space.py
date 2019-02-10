@@ -715,7 +715,7 @@ class Space :
                         raise GmapApiError
                     for k in range(len(walking_path)-2):
                         next_pointID = walking_path[k+1]
-                        next_point = self.getPointByID(walking_path)
+                        next_point = self.getPointByID(next_pointID)
                         if mode == "schedule":
                             res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
                         elif mode == "path":
@@ -809,6 +809,6 @@ if __name__ == "__main__":
 
     test_dict = {'nurse_id': ['4', '1', '2', '3'], 'office_lat': '48.7263802', 'office_lon': '2.2643467', 'start': '14:00', 'end': '18:00', 'appointments': [{'app_id': '16', 'app_lat': '48.73590189999999', 'app_lon': '2.2591394', 'app_length': '30'}]}
     s = Space()
-    #s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses)
-    s.buildSpaceFromDic(test_dict)
+    s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses)
+    #s.buildSpaceFromDic(test_dict)
     print(s.solve())
