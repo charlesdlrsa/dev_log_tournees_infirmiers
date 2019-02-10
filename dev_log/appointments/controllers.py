@@ -3,10 +3,10 @@ from sqlalchemy.sql import or_
 import datetime
 from dev_log.utils import calendar
 from dev_log import db
-from dev_log.models import Appointment, Patient, Nurse, Care, Office
+from dev_log.models import Appointment, Patient, Nurse, Care, Office, Schedule
 from dev_log.auth.controllers import admin_required
-
-# from dev_log.opti.space import solve_boolean
+from dev_log.optim.space import solve_boolean
+from dev_log.utils.optimizer_functions import build_data_for_optimizer
 
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
@@ -88,7 +88,7 @@ def availabilities(patient_id, date, care_id):
             # an appointment by calling the functions : check_appointments_patient and check_appointments_nurses
             appointment = check_appointments_patient(patient_id, date, halfday=halfday)
             if appointment is None:
-                if check_appointments_nurses(care_id, date, halfday=halfday) is True:
+                if check_appointments_nurses(care_id, patient_id, date, halfday=halfday) is True:
                     availabilities[week_day][halfday] = "A nurse is available"
                 else:
                     availabilities[week_day][halfday] = "No nurse is available"
@@ -124,36 +124,19 @@ def search_patient_appointments(research):
     return render_template('appointments.html', appointments=appointments)
 
 
-def check_appointments_nurses(care_id, date, halfday):
+def check_appointments_nurses(care_id, patient_id, date, halfday):
     """ Function checking if the nurses are able to do all the appointments of the selected half-day, plus the new
     appointment that the administrator wants to schedule by calling the optimizer function """
 
-    nurses_office = Nurse.query.filter(Nurse.office_id == session['office_id']).all()
-    nurses_absent = Nurse.query.filter(Nurse.nurse_absence.any(date=date)).all()
-    nurses = list(set(nurses_office) - set(nurses_absent))
-    office = Office.query.filter(Office.id == session['office_id']).first()
-    data = {}
-    data["nurse_ids"] = [str(nurse.id) for nurse in nurses]
-    data["office_lat"] = str(office.latitude)
-    data["office_lon"] = str(office.longitude)
-    if halfday == "Morning":
-        data["start"] = "08:00"
-        data["end"] = "12:00"
-    if halfday == "Afternoon":
-        data["start"] = "14:00"
-        data["end"] = "18:00"
-
-    appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).all()
-    data["appointments"] = []
-    for app in appointments:
-        app_data = {}
-        app_data["app_id"] = str(app.id)
-        app_data["app_lat"] = str(app.patient.latitude)
-        app_data["app_lon"] = str(app.patient.longitude)
-        app_data["app_length"] = str(app.care.duration)
-        data["appointments"].append(app_data)
-    # response = solve_boolean(data)
-    response = True
+    appointment = Appointment(patient_id=patient_id, date=date, care_id=care_id, halfday=halfday)
+    db.session.add(appointment)
+    db.session.commit()
+    appointments_and_available_nurses_for_this_date = build_data_for_optimizer(date, halfday, care_id)
+    response = solve_boolean(appointments_and_available_nurses_for_this_date)
+    if response is False:
+        appointment = Appointment.query.all()[-1]
+        db.session.delete(appointment)
+        db.session.commit()
 
     return response
 
@@ -192,7 +175,9 @@ def delete_appointment(appointment_id):
     """ Delete an appointment with its id from the database """
 
     appointment = Appointment.query.get(appointment_id)
+    schedule = Schedule.query.get(appointment_id=appointment_id)
     db.session.delete(appointment)
+    db.session.delete(schedule)
     db.session.commit()
     flash("The appointment was successfully deleted.")
     return redirect(url_for('appointments.home'))

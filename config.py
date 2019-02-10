@@ -24,11 +24,6 @@ CSRF_ENABLED = True
 CSRF_SESSION_KEY = "secret"
 
 # Secret key for signing cookies
-SECRET_KEY = "secret"
-
-# To generate a new secret key:
-# import random, string
-# "".join([random.choice(string.printable) for _ in range(24)])
 SECRET_KEY = 'dVys\n8D%M{o{&Tr3n*f2l3@\r'
 
 APP_ID = 1200420960103822

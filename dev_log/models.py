@@ -223,6 +223,9 @@ class Schedule(Base):
     hour = db.Column(
         db.Time)
 
+    travel_mode = db.Column(
+        db.String)
+
     appointment = db.relationship(
         "Appointment",
         backref="appointment")
@@ -231,10 +234,11 @@ class Schedule(Base):
         "Nurse",
         backref="nurse")
 
-    def __init__(self, appointment_id, hour, nurse_id):
+    def __init__(self, appointment_id, hour, nurse_id, travel_mode):
         self.appointment_id = appointment_id
         self.hour = hour
         self.nurse_id = nurse_id
+        self.travel_mode = travel_mode
 
 
 class Care(Base):

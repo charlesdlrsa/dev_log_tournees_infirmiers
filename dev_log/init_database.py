@@ -71,30 +71,38 @@ def init_db():
                            address="36 rue Varengue, 92340 Bourg-la-Reine", phone="0674695898",
                            digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
 
-    db.session.add(Care(description="Bandage", duration=60))
+    db.session.add(Care(description="Bandage", duration=35))
     db.session.add(Care(description="Sting", duration=30))
     db.session.add(Care(description="Post operative", duration=20))
     db.session.add(Care(description="Injection", duration=35))
     db.session.add(Care(description="Auscultation", duration=20))
-    db.session.add(Care(description="Assistance", duration=60))
+    db.session.add(Care(description="Assistance", duration=25))
 
     db.session.add(Absence(1, datetime.date(2019, 1, 10), "Afternoon"))
     db.session.add(Absence(2, datetime.date(2019, 2, 25), "Afternoon"))
+    db.session.add(Absence(3, datetime.date(2019, 4, 30), "Afternoon"))
+    db.session.add(Absence(4, datetime.date(2019, 4, 30), "Afternoon"))
     db.session.add(Absence(3, datetime.date(2019, 5, 2), "Morning"))
     db.session.add(Absence(4, datetime.date(2019, 5, 2), "Morning"))
+
+    # i = 0
+    # while i < 10:
+    #     db.session.add(Appointment(patient_id=8, date=datetime.date(2019, 4, 30), care_id=random.randint(1, 6),
+    #                                halfday="Afternoon"))
+    #     i += 1
 
     for pID in range(1, 5):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
                                    halfday="Morning"))
         # To be deleted
-        db.session.add(Schedule(appointment_id=pID, hour=datetime.time(8 + pID-1, 30),
-                                nurse_id=1))
+        # db.session.add(Schedule(appointment_id=pID, hour=datetime.time(8 + pID-1, 30),
+        #                         nurse_id=1, travel_mode='driving'))
     for pID in range(5, 9):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
                                    halfday="Morning"))
         # To be deleted
-        db.session.add(Schedule(appointment_id=pID, hour=datetime.time(8 + pID-4-1, 30),
-                                nurse_id=2))
+        # db.session.add(Schedule(appointment_id=pID, hour=datetime.time(8 + pID-4-1, 30),
+        #                         nurse_id=2, travel_mode='driving'))
     db.session.commit()
 
     lg.warning('Database initialized!')

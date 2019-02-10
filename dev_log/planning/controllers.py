@@ -4,12 +4,15 @@ from dev_log.auth.controllers import login_required, admin_required
 from dev_log.models import Nurse, Schedule, Office
 from dev_log.utils import calendar
 import datetime
+from dev_log import db
+from dev_log.utils.optimizer_functions import build_data_for_optimizer
+from dev_log.optim.space import solve_complete
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
 
 @planning.route("/", methods=['GET', 'POST'])
-@login_required
+# @login_required
 def home():
     """ Planning's home page allowing to search a nurse planning or your planning if your are logged in as a nurse """
 
@@ -73,10 +76,18 @@ def get_nurse_planning(nurse_id, date, halfday):
     # and optimize their journeys. If schedules are already planned, this means that the optimizer had already been
     # launched, so the schedules are set for the half-day and we don't need to call the optimizer.
     if len(schedules) == 0:
-        # TODO : à changer par la vraie fonction de Romu
-        schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
-                                          Schedule.appointment.has(date=date_selected),
-                                          Schedule.appointment.has(halfday=halfday)).all()
+        nurses_and_appointments = build_data_for_optimizer(date, halfday)
+        schedules_information, travel_modes = solve_complete(nurses_and_appointments)
+        for info in schedules_information:
+            travel_mode = 'DRIVING'
+            for mode in travel_modes:
+                if mode["app_id"] == info["app_id"]:
+                    travel_mode = mode["travel_mode"]
+                    break
+            db.session.add(
+                Schedule(appointment_id=int(info["app_id"]), hour=datetime.time(info["hour"][:2], info["hour"][3:5]),
+                         nurse_id=int(info["nurse_id"]), travel_mode=travel_mode))
+
     if halfday == "Morning":
         schedules = office + schedules
         nb_schedules = len(schedules)
@@ -88,13 +99,28 @@ def get_nurse_planning(nurse_id, date, halfday):
                            schedules=schedules, nb_schedules=nb_schedules)
 
 
-@planning.route("/init", methods=['GET', 'POST'])
-@admin_required
+@planning.route("/init_db", methods=['GET', 'POST'])
+# @admin_required
 def reinit_db():
     """ Initializes the database on click """
 
     # TODO : to be deleted
     init_db()
     message = "The database has been reinitialised"
+    flash(message)
+    return redirect(url_for("planning.home"))
+
+
+@planning.route("/delete_schedules", methods=['GET', 'POST'])
+@admin_required
+def delete_schedules():
+    """ Initializes the database on click """
+
+    # TODO : to be deleted
+    schedules = Schedule.query.filter(Schedule.nurse.office_id == session["office_id"]).all()
+    db.session.delete(schedules)
+    db.session.commit()
+    flash("The appointment was successfully deleted.")
+    message = "The schedules have been deleted"
     flash(message)
     return redirect(url_for("planning.home"))
