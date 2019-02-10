@@ -12,7 +12,7 @@ planning = Blueprint('planning', __name__, url_prefix='/planning')
 
 
 @planning.route("/", methods=['GET', 'POST'])
-# @login_required
+@login_required
 def home():
     """ Planning's home page allowing to search a nurse planning or your planning if your are logged in as a nurse """
 
@@ -88,6 +88,7 @@ def get_nurse_planning(nurse_id, date, halfday):
             db.session.add(
                 Schedule(appointment_id=int(info["app_id"]), hour=datetime.time(info["hour"][:2], info["hour"][3:5]),
                          nurse_id=int(info["nurse_id"]), travel_mode=travel_mode))
+            db.session.commit()
 
     if halfday == "Morning":
         schedules = office + schedules
@@ -101,7 +102,7 @@ def get_nurse_planning(nurse_id, date, halfday):
 
 
 @planning.route("/init_db", methods=['GET', 'POST'])
-# @admin_required
+@admin_required
 def reinit_db():
     """ Initializes the database on click """
 
