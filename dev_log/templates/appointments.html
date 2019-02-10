@@ -44,6 +44,8 @@
                 </th>
                 <th scope="col" style="vertical-align:center;">Halfday
                 </th>
+                <th scope="col" style="vertical-align:center;">Hour
+                </th>
                 <th scope="col" style="vertical-align:center;">Delete
                 </th>
             </tr>
@@ -73,6 +75,9 @@
                 </td>
                 <td width="10%" style="font-size:14px; vertical-align:middle;">
                     {{appointment.halfday}}
+                </td>
+                <td width="8%" style="font-size:14px; vertical-align:middle;">
+                    {{appointment.schedule.hour}}
                 </td>
                 <td width="10%" style="font-size:14px; vertical-align:middle;">
                     <a href="{{ url_for('appointments.delete_appointment',appointment_id=appointment.id)}}"
