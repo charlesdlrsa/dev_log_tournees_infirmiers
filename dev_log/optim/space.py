@@ -680,31 +680,32 @@ class Space:
         officeIndex = centers.index(0)
         res = []
 
-        for [path, _] in appointment_distribution:
-            current_time = self.start[0] * 3600 + self.start[1] * 60
+        for [path,_] in appointment_distribution:
+            current_time = self.start[0]*3600 + self.start[1] * 60
             previous_index = officeIndex
-            for c in range(1, len(path) - 1):
+            for c in range(1, len(path) -1):
                 current_pointID = path[c].getID()
                 point_index = centers.index(current_pointID)
-                current_time += self.driving_mat[previous_index, point_index]
-
+                current_time += self.driving_mat[previous_index,point_index]
+                
                 walking_path = self.clusters[current_pointID]
-                walking_point = [self.getPointByID(p_id) for p_id in walking_path[:-1]]
-
-                try:
-                    travel_times = self.getGoogleTravelTimes(walking_point, "walking")
-                except:
-                    raise GmapApiError
-                for k in range(len(walking_path) - 2):
-                    res.append({"nurse_id": str(n_id), "app_id": str(current_pointID),
-                                "hour": self.formatTime(current_time, ft=ft)})
-                    current_time += self.care_duration[current_pointID] + travel_times[k, k + 1]
-                    current_pointID = walking_path[k + 1]
-                res.append({"nurse_id": str(n_id), "app_id": str(current_pointID),
-                            "hour": self.formatTime(current_time, ft=ft)})
-                current_time += self.care_duration[current_pointID] + travel_times[len(walking_path) - 2, 0]
+                if len(walking_path) > 1:
+                    walking_point = [self.getPointByID(p_id) for p_id in walking_path[:-1]]
+                    
+                    try:
+                        travel_times = self.getGoogleTravelTimes(walking_point, "walking")
+                    except:
+                        raise GmapApiError
+                    for k in range(len(walking_path)-2):
+                        res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time, ft=ft)})
+                        current_time += self.care_duration[current_pointID] + travel_times[k,k+1]
+                        current_pointID = walking_path[k+1]
+                    res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time, ft=ft)})
+                    current_time += self.care_duration[current_pointID] + travel_times[len(walking_path)-2,0]
+                else:
+                    res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time, ft=ft)})
                 previous_index = point_index
-            current_time += self.driving_mat[previous_index, officeIndex]
+            current_time += self.driving_mat[previous_index,officeIndex]
 
             i += 1
             try:
