@@ -24,7 +24,7 @@ subject to isCenter{v in V, c in V}:
 subject to hasCenter{v in V}:
 	sum{c in V} closestCenter[v,c] = 1;
 
-# the radius of a cluster has to be smaller than the thresold distance
+# the cluster value has to be smaller than the thresold
 subject to maxDistance{v in V, c in V}:
 	distance[v,c] * closestCenter[v,c] <= d;
 
