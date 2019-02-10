@@ -759,7 +759,9 @@ class Space:
                         travel_times = self.getGoogleTravelTimes(walking_point, "walking")
                     except:
                         raise GmapApiError
-                    for k in range(len(walking_path)-2):
+                    current_pointID = walking_path[1]
+                    current_point = self.getPointByID(next_pointID)
+                    for k in range(1,len(walking_path)-2):
                         next_pointID = walking_path[k+1]
                         next_point = self.getPointByID(next_pointID)
                         if mode == "schedule":
