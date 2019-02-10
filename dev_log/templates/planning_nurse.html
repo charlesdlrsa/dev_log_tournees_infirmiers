@@ -154,7 +154,7 @@
 
 </div>
 
-<div style="width:37%; float:right; margin-left:0%; margin-right:2%; margin-bottom:1%; padding:150px;"><a
+<div style="width:37%; float:right; margin-left:0%; margin-right:2%; margin-bottom:1%; padding:5px;"><a
         onclick="initMap()" href="#alltrajects" class="btn btn-danger"> See all your journeys on a map ! </a>
 </div>
 <div id="map"
@@ -227,8 +227,10 @@ function drawMap(lat_depart, lng_depart, lat_arrival, lng_arrival, travel_mode='
         if (status == 'OK') {
             directionsDisplay.setDirections(result);
             var route = result.routes[0];
-            document.getElementById('directionsPanel').value = "";
             var summaryPanel = document.getElementById('directionsPanel');
+            while(summaryPanel.firstChild){
+                summaryPanel.removeChild(summaryPanel.firstChild);
+            };  
             summaryPanel.innerHTML += '<strong>Departure:</strong> ' + route.legs[0].start_address + '<br>';
             summaryPanel.innerHTML += '<strong>Arrival:</strong> ' + route.legs[0].end_address + '<br>';
             summaryPanel.innerHTML += '<strong>Distance:</strong> ' + route.legs[0].distance.text + ' ---- ';
