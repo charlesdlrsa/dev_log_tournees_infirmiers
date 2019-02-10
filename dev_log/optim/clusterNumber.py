@@ -1,4 +1,4 @@
-from space import Space
+from dev_log.optim.space import Space
 from amplpy import AMPL, Environment
 
 """

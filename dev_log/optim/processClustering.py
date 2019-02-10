@@ -1,4 +1,3 @@
-from space import Space
 from amplpy import AMPL, Environment
 
 """
