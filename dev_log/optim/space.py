@@ -677,6 +677,7 @@ class Space :
         isOfficeDone = False
 
         for [path,_] in appointment_distribution:
+            print([p.getID() for p in path])
             try:
                 n_id = self.nurse_ids[i]
             except:
@@ -745,8 +746,6 @@ class Space :
             # try and affect office cluster
             if not isOfficeDone:
                 walking_path = self.clusters[0]
-                print("####")
-                print(self.clusters[0])
                 if len(walking_path) < 2:
                     isOfficeDone = True
                 elif current_time + self.clusterTime[0] < self.end[0] * 3600 + self.end[1] * 60:
@@ -853,5 +852,5 @@ if __name__ == "__main__":
             nurses[app['nurse_id']].append(app['app_id'])
         except:
             nurses[app['nurse_id']] = [app['app_id']]
-    print(nurses)
+    #print(nurses)
     
