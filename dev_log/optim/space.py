@@ -605,9 +605,9 @@ class Space:
         from dev_log.optim.reclustering import runReclustering
         runReclustering(self, toRecluster)
 
-    def getHamiltonianCycle(self, points, starting_point):
-        from dev_log.optim.hamiltonian import hamiltonian
-        return hamiltonian(self, points, starting_point)
+    def getHamiltonianCycle(self, points, starting_point, mode="walking"):
+        from hamiltonian import hamiltonian
+        return hamiltonian(self, points, starting_point, mode)
 
     def splitAmongNurse(self, centers):
         from dev_log.optim.splitAmongNurses import vrp
