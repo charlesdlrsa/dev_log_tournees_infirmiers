@@ -1,16 +1,6 @@
 from dev_log.optim.space import Space, GmapApiError
 from amplpy import AMPL, Environment
 import math
-from sys import platform as _platform
-if _platform == "linux" or _platform == "linux2":
-   # linux
-   ampl_path = "dev_log/optim/ampl/linux"
-elif _platform == "darwin":
-   # MAC OS X
-   ampl_path = "dev_log/optim/ampl/macos"
-elif _platform == "win32" or _platform == "win64":
-    # Windows
-    ampl_path = "dev_log/optim/ampl/windows"
 
 """
 Need: 
@@ -101,7 +91,7 @@ def runReclustering(s, toRecluster):
             clustering.write(";\n")
 
         # set up ampl
-        ampl = AMPL(Environment(ampl_path))
+        ampl = AMPL(Environment('dev_log/models/ampl'))
 
         # Interpret the two files
         ampl.read('dev_log/models/clusteringWithVertexValues.mod')

@@ -1,14 +1,4 @@
 from amplpy import AMPL, Environment
-from sys import platform as _platform
-if _platform == "linux" or _platform == "linux2":
-   # linux
-   ampl_path = "dev_log/optim/ampl/linux"
-elif _platform == "darwin":
-   # MAC OS X
-   ampl_path = "dev_log/optim/ampl/macos"
-elif _platform == "win32" or _platform == "win64":
-    # Windows
-    ampl_path = "dev_log/optim/ampl/windows"
 
 """
 Need: 
@@ -47,7 +37,7 @@ def runClustering(s):
                 kmedian.write(line)
 
     # set up ampl
-    ampl = AMPL(Environment(ampl_path))
+    ampl = AMPL(Environment('dev_log/optim/ampl'))
 
     # Interpret the two files
     ampl.read('dev_log/optim/models/kmedian.mod')
