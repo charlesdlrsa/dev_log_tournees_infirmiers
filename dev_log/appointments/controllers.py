@@ -40,7 +40,8 @@ def home():
             else:
                 return redirect(url_for('appointments.availabilities', patient_id=patient_id, date=date,
                                         care_id=care_id))
-        elif request.form.get('date_appointments_research') or request.form.get('patient_appointments_research') is not None:
+        elif request.form.get('date_appointments_research') or request.form.get(
+                'patient_appointments_research') is not None:
             date_research = request.form['date_appointments_research']
             if date_research == "":
                 date_research = "all"
@@ -136,11 +137,13 @@ def search_patient_appointments(date, patient):
             first_name, last_name = patient.split()[0], " ".join(patient.split()[1:])
             appointments = Appointment.query \
                 .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
-                                                      Patient.first_name.like('%' + first_name + '%')))
+                                                      Patient.first_name.like('%' + first_name + '%'))).order_by(
+                Appointment.date)
         else:
             appointments = Appointment.query \
                 .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + patient + '%'),
-                                                      Patient.first_name.like('%' + patient + '%')))
+                                                      Patient.first_name.like('%' + patient + '%'))).order_by(
+                Appointment.date)
     else:
         date_selected = calendar.get_dates_from_form(date)[0]
         if len(patient.split()) >= 2:
@@ -148,7 +151,7 @@ def search_patient_appointments(date, patient):
             appointments = Appointment.query \
                 .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
                                                       Patient.first_name.like('%' + first_name + '%')),
-                                                 Appointment.date == date_selected)
+                                                  Appointment.date == date_selected)
         else:
             appointments = Appointment.query \
                 .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + patient + '%'),
