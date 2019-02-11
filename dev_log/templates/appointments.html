@@ -13,8 +13,14 @@
                 <div class="row">
                     <div class="col">
                         <input id="patient_appointments_research" class="form-control"
-                               placeholder="Search (patient first-name then last-name)" required="required"
+                               placeholder="Search (patient first-name then last-name)"
+                               value=""
                                name="patient_appointments_research">
+                    </div>
+                    <div class="col">
+                        <input type="date" id="date_appointments_research" class="form-control"
+                               value=""
+                               name="date_appointments_research">
                     </div>
                     <div class="col">
                         <button class="btn btn-primary" type="submit">Search appointments</button>
