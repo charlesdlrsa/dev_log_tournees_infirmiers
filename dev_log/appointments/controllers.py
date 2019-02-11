@@ -40,12 +40,18 @@ def home():
             else:
                 return redirect(url_for('appointments.availabilities', patient_id=patient_id, date=date,
                                         care_id=care_id))
-        elif request.form.get('patient_appointments_research') is not None:
-            research = request.form['patient_appointments_research']
+        elif request.form.get('date_appointments_research') or request.form.get('patient_appointments_research') is not None:
+            date_research = request.form['date_appointments_research']
+            if date_research == "":
+                date_research = "all"
+            patient_research = request.form['patient_appointments_research']
+            if patient_research == "":
+                patient_research = "all"
             # we call the function "search_patient_appointments"
-            return redirect(url_for('appointments.search_patient_appointments', research=research))
+            return redirect(
+                url_for('appointments.search_patient_appointments', patient=patient_research, date=date_research))
         else:
-            error = 'You must choose a patient.'
+            error = 'You must choose a patient or a date.'
             flash(error)
 
     patients = Patient.query.filter(Patient.office_id == session['office_id']).order_by(Patient.last_name)
@@ -102,23 +108,52 @@ def availabilities(patient_id, date, care_id):
                            care=care)
 
 
-@appointments.route('/research-<research>', methods=['GET', 'POST'])
-def search_patient_appointments(research):
+@appointments.route('/research/date-<date>/patient-<patient>', methods=['GET', 'POST'])
+def search_patient_appointments(date, patient):
     """ Function allowing to search the patient's appointments """
 
     if request.method == "POST":
-        research = request.form['patient_appointments_research']
-        return redirect(url_for('appointments.search_patient_appointments', research=research))
+        if request.form.get('date_appointments_research') or request.form.get(
+                'patient_appointments_research') is not None:
+            date_research = request.form['date_appointments_research']
+            if date_research == "":
+                date_research = "all"
+            patient_research = request.form['patient_appointments_research']
+            if patient_research == "":
+                patient_research = "all"
+            # we call the function "search_patient_appointments"
+            return redirect(
+                url_for('appointments.search_patient_appointments', patient=patient_research, date=date_research))
+        else:
+            error = 'You must choose a patient or a date.'
+            flash(error)
 
-    if len(research.split()) >= 2:
-        first_name, last_name = research.split()[0], " ".join(research.split()[1:])
-        appointments = Appointment.query \
-            .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
-                                                  Patient.first_name.like('%' + first_name + '%')))
+    if patient == "all":
+        date_selected = calendar.get_dates_from_form(date)[0]
+        appointments = Appointment.query.filter(Appointment.date == date_selected)
+    elif date == "all":
+        if len(patient.split()) >= 2:
+            first_name, last_name = patient.split()[0], " ".join(patient.split()[1:])
+            appointments = Appointment.query \
+                .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
+                                                      Patient.first_name.like('%' + first_name + '%')))
+        else:
+            appointments = Appointment.query \
+                .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + patient + '%'),
+                                                      Patient.first_name.like('%' + patient + '%')))
     else:
-        appointments = Appointment.query \
-            .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + research + '%'),
-                                                  Patient.first_name.like('%' + research + '%')))
+        date_selected = calendar.get_dates_from_form(date)[0]
+        if len(patient.split()) >= 2:
+            first_name, last_name = patient.split()[0], " ".join(patient.split()[1:])
+            appointments = Appointment.query \
+                .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
+                                                      Patient.first_name.like('%' + first_name + '%')),
+                                                 Appointment.date == date_selected)
+        else:
+            appointments = Appointment.query \
+                .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + patient + '%'),
+                                                      Patient.first_name.like('%' + patient + '%')),
+                                                  Appointment.date == date_selected)
 
     return render_template('appointments.html', appointments=appointments)
 

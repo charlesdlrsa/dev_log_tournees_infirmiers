@@ -87,10 +87,12 @@ def init_db():
     db.session.add(Absence(3, datetime.date(2019, 5, 2), "Morning"))
     db.session.add(Absence(4, datetime.date(2019, 5, 2), "Morning"))
 
+    # to test the availabilities of the nurses (solve_boolean)
     for pID in range(1, 6):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 4, 30), care_id=random.randint(1, 6),
                                    halfday="Afternoon"))
 
+    # to test the optimizer (solve_complete)
     for pID in range(1, 6):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
                                    halfday="Morning"))
