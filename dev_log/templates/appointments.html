@@ -13,8 +13,14 @@
                 <div class="row">
                     <div class="col">
                         <input id="patient_appointments_research" class="form-control"
-                               placeholder="Search (patient first-name then last-name)" required="required"
+                               placeholder="Search (patient first-name then last-name)"
+                               value=""
                                name="patient_appointments_research">
+                    </div>
+                    <div class="col">
+                        <input type="date" id="date_appointments_research" class="form-control"
+                               value=""
+                               name="date_appointments_research">
                     </div>
                     <div class="col">
                         <button class="btn btn-primary" type="submit">Search appointments</button>
@@ -82,11 +88,15 @@
                     {{appointment.halfday}}
                 </td>
                 <td width="8%" style="font-size:14px; vertical-align:middle;">
+                    {% if appointment.schedule[0] %}
                     {{appointment.schedule[0].hour.strftime('%H:%M')}}
+                    {% endif %}
                 </td>
                 <td width="25%" style="font-size:14px; vertical-align:middle;">
+                    {% if appointment.schedule[0] %}
                     {{appointment.schedule[0].nurse.first_name}}
                     {{appointment.schedule[0].nurse.last_name}}
+                    {% endif %}
                 </td>
                 <td width="10%" style="font-size:14px; vertical-align:middle;">
                     <a href="{{ url_for('appointments.delete_appointment',appointment_id=appointment.id)}}"
