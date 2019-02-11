@@ -1,5 +1,15 @@
 from dev_log.optim.space import Space, GmapApiError
 from amplpy import AMPL, Environment
+from sys import platform as _platform
+if _platform == "linux" or _platform == "linux2":
+   # linux
+   ampl_path = "dev_log/optim/ampl/linux"
+elif _platform == "darwin":
+   # MAC OS X
+   ampl_path = "dev_log/optim/ampl/macos"
+elif _platform == "win32" or _platform == "win64":
+    # Windows
+    ampl_path = "dev_log/optim/ampl/windows"
 
 """
 Need
@@ -57,7 +67,7 @@ def vrp(s, centers):
         vrp.write(";\n")
 
     # set up ampl
-    ampl = AMPL(Environment('dev_log/optim/ampl'))
+    ampl = AMPL(Environment(ampl_path))
 
     # Interpret the two files
     ampl.read('dev_log/optim/models/vrp.mod')
