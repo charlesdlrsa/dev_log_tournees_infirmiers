@@ -25,6 +25,9 @@
         </div>
     </div>
 
+    <div style="font-size:18px; font-weight: bold; color:#0F94FF; text-align:center; margin-bottom:2%;">
+        Hour and nurse name will be given 24 hours before the appointment date.
+    </div>
     {% if appointments[0] %}
     <div class="table-responsive" style="border-radius:10px;">
         <table class="table table-bordered" width="100%" cellspacing="0">
@@ -44,6 +47,10 @@
                 </th>
                 <th scope="col" style="vertical-align:center;">Halfday
                 </th>
+                <th scope="col" style="vertical-align:center;">Hour
+                </th>
+                <th scope="col" style="vertical-align:center;">Nurse
+                </th>
                 <th scope="col" style="vertical-align:center;">Delete
                 </th>
             </tr>
@@ -53,16 +60,16 @@
             <tbody style="text-align:center;">
             {% for appointment in appointments %}
             <tr>
-                <td width="20%" style="font-size:16px; vertical-align:middle;">
+                <td width="10%" style="font-size:16px; vertical-align:middle;">
                     {{appointment.patient.last_name}}
                 </td>
-                <td width="12%" style="font-size:16px; vertical-align:middle;">
+                <td width="10%" style="font-size:16px; vertical-align:middle;">
                     {{appointment.patient.first_name}}
                 </td>
                 <td width="15%" style="font-size:14px; vertical-align:middle;">
                     {{appointment.patient.email}}
                 </td>
-                <td width="35%" style="font-size:14px; vertical-align:middle;">
+                <td width="20%" style="font-size:14px; vertical-align:middle;">
                     {{appointment.patient.address}}
                 </td>
                 <td width="10%" style="font-size:14px; vertical-align:middle;">
@@ -73,6 +80,13 @@
                 </td>
                 <td width="10%" style="font-size:14px; vertical-align:middle;">
                     {{appointment.halfday}}
+                </td>
+                <td width="8%" style="font-size:14px; vertical-align:middle;">
+                    {{appointment.schedule[0].hour.strftime('%H:%M')}}
+                </td>
+                <td width="25%" style="font-size:14px; vertical-align:middle;">
+                    {{appointment.schedule[0].nurse.first_name}}
+                    {{appointment.schedule[0].nurse.last_name}}
                 </td>
                 <td width="10%" style="font-size:14px; vertical-align:middle;">
                     <a href="{{ url_for('appointments.delete_appointment',appointment_id=appointment.id)}}"

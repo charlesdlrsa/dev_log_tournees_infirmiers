@@ -1,4 +1,3 @@
-from space import Space
 from amplpy import AMPL, Environment
 
 """
@@ -23,8 +22,8 @@ def runClustering(s):
         - key = center
         - value = list of the points in the cluster (always starting with the center)
     """
-    with open("models/clustering.dat", "r") as clustering:
-        with open("models/kmedian.dat", "w") as kmedian:
+    with open("dev_log/optim/models/clustering.dat", "r") as clustering:
+        with open("dev_log/optim/models/kmedian.dat", "w") as kmedian:
             kmedian.write("# number of clusters\n")
             kmedian.write("param k := {};\n".format(s.clusterNumber))
 
@@ -38,11 +37,11 @@ def runClustering(s):
                 kmedian.write(line)
 
     # set up ampl
-    ampl = AMPL(Environment('ampl'))
+    ampl = AMPL(Environment('dev_log/optim/ampl'))
 
     # Interpret the two files
-    ampl.read('models/kmedian.mod')
-    ampl.readData('models/kmedian.dat')
+    ampl.read('dev_log/optim/models/kmedian.mod')
+    ampl.readData('dev_log/optim/models/kmedian.dat')
 
     # Solve
     print("cluster space")

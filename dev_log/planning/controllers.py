@@ -12,7 +12,7 @@ planning = Blueprint('planning', __name__, url_prefix='/planning')
 
 
 @planning.route("/", methods=['GET', 'POST'])
-# @login_required
+@login_required
 def home():
     """ Planning's home page allowing to search a nurse planning or your planning if your are logged in as a nurse """
 
@@ -67,8 +67,7 @@ def get_nurse_planning(nurse_id, date, halfday):
     # It returns, in date format, the date of the selected day.
 
     office = Office.query.filter(Office.id == nurse.office_id).all()
-    schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
-                                      Schedule.appointment.has(date=date_selected),
+    schedules = Schedule.query.filter(Schedule.appointment.has(date=date_selected),
                                       Schedule.appointment.has(halfday=halfday)).all()
 
     # If no schedules are planned, it means that it's the first time that the nurse can see its planning.
@@ -77,30 +76,32 @@ def get_nurse_planning(nurse_id, date, halfday):
     # launched, so the schedules are set for the half-day and we don't need to call the optimizer.
     if len(schedules) == 0:
         nurses_and_appointments = build_data_for_optimizer(date, halfday)
-        schedules_information, travel_modes = solve_complete(nurses_and_appointments)
+        schedules_information = solve_complete(nurses_and_appointments)
         for info in schedules_information:
             travel_mode = 'DRIVING'
-            for mode in travel_modes:
-                if mode["app_id"] == info["app_id"]:
-                    travel_mode = mode["travel_mode"]
-                    break
+        #     for mode in travel_modes:
+        #         if mode["app_id"] == info["app_id"]:
+        #             travel_mode = mode["travel_mode"]
+        #             break
             db.session.add(
-                Schedule(appointment_id=int(info["app_id"]), hour=datetime.time(info["hour"][:2], info["hour"][3:5]),
+                Schedule(appointment_id=int(info["app_id"]),
+                         hour=datetime.time(int(info["hour"][:2]), int(info["hour"][3:5])),
                          nurse_id=int(info["nurse_id"]), travel_mode=travel_mode))
+            db.session.commit()
 
-    if halfday == "Morning":
-        schedules = office + schedules
-        nb_schedules = len(schedules)
-    else:
-        schedules = schedules + office
-        nb_schedules = len(schedules)
+    schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
+                                      Schedule.appointment.has(date=date_selected),
+                                      Schedule.appointment.has(halfday=halfday)).all()
+
+    schedules = office + schedules + office
+    nb_schedules = len(schedules)
 
     return render_template("planning_nurse.html", nurse=nurse, date=date_selected, halfday=halfday,
                            schedules=schedules, nb_schedules=nb_schedules)
 
 
 @planning.route("/init_db", methods=['GET', 'POST'])
-# @admin_required
+@admin_required
 def reinit_db():
     """ Initializes the database on click """
 

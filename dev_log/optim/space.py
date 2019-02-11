@@ -760,7 +760,7 @@ class Space:
                     except:
                         raise GmapApiError
                     current_pointID = walking_path[1]
-                    current_point = self.getPointByID(next_pointID)
+                    current_point = self.getPointByID(current_pointID)
                     for k in range(1,len(walking_path)-2):
                         next_pointID = walking_path[k+1]
                         next_point = self.getPointByID(next_pointID)

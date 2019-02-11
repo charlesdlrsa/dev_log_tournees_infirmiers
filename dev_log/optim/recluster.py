@@ -35,7 +35,7 @@ def recluster(self, toRecluster):
             d_threshold = min(self.walkingThreshold, (self.dmax+self.dmin)/2.0)
             threshold = int(d_threshold*750)
 
-            with open("models/clusteringWithVertexValues.dat", "w") as clustering:
+            with open("dev_log/optim/models/clusteringWithVertexValues.dat", "w") as clustering:
                 clustering.write("# threshold for walking distance\n")
                 clustering.write("param t:= {};\n".format(threshold))
                 
@@ -74,11 +74,11 @@ def recluster(self, toRecluster):
                 clustering.write(";\n")
 
             # set up ampl
-            ampl = AMPL(Environment('ampl'))
+            ampl = AMPL(Environment('dev_log/optim/ampl'))
 
             # Interpret the two files
-            ampl.read('models/clusteringWithVertexValues.mod')
-            ampl.readData('models/clusteringWithVertexValues.dat')
+            ampl.read('dev_log/optim/models/clusteringWithVertexValues.mod')
+            ampl.readData('dev_log/optim/models/clusteringWithVertexValues.dat')
 
             # Solve
             print("reclustering")

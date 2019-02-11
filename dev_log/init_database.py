@@ -50,10 +50,10 @@ def init_db():
                            address="20 Rue du Dr Roux 91370 Verrières-le-Buisson", phone="0674695898",
                            digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
     db.session.add(Patient(last_name="Compain", first_name="Axel", email="axcompain@hotmail.fr",
-                           address="5 avenue Victor Hugo, 92170 Vanves", phone="0674695898", digicode="4B34",
-                           additional_postal_information="2eme gauche", office_id=1))
+                           address="3 Allée des Devodes, 91160 Saulx-les-Chartreux", phone="0674695898",
+                           digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
     db.session.add(Patient(last_name="Lajouanie", first_name="Simon", email="simon.lajouanie@hotmail.fr",
-                           address="39 rue du Général Leclerc, 92130 Issy Les Moulineaux", phone="0674695898",
+                           address="12 Chemin du Paradis, 91430 Igny", phone="0674695898",
                            digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
     db.session.add(Patient(last_name="Bellec", first_name="Thomas", email="thomas.bellec@hotmail.fr",
                            address="4 rue de Paris, 92190 Meudon", phone="0674695898", digicode="4B34",
@@ -96,7 +96,7 @@ def init_db():
                                    halfday="Morning"))
         # To be deleted
         # db.session.add(Schedule(appointment_id=pID, hour=datetime.time(8 + pID-1, 30),
-        #                         nurse_id=1, travel_mode='driving'))
+        #                         nurse_id =1, travel_mode='driving'))
     for pID in range(5, 9):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
                                    halfday="Morning"))
