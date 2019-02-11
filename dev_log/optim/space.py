@@ -600,9 +600,9 @@ class Space :
         from reclustering import runReclustering
         runReclustering(self, toRecluster)
     
-    def getHamiltonianCycle(self, points, starting_point):
+    def getHamiltonianCycle(self, points, starting_point, mode="walking"):
         from hamiltonian import hamiltonian
-        return hamiltonian(self, points, starting_point)
+        return hamiltonian(self, points, starting_point, mode)
 
     def splitAmongNurse(self, centers):
         from splitAmongNurses import vrp
@@ -681,9 +681,6 @@ class Space :
                 n_id = self.nurse_ids[i]
             except:
                 return False
-            if n_id == 1:
-                print("***\nn_id")
-                print(path)
             current_time = self.start[0]*3600 + self.start[1] * 60
             previous_index = officeIndex
             for c in range(1, len(path) -1):
@@ -760,7 +757,7 @@ class Space :
                     except:
                         raise GmapApiError
                     current_pointID = walking_path[1]
-                    current_point = self.getPointByID(next_pointID)
+                    current_point = self.getPointByID(current_pointID)
                     for k in range(1,len(walking_path)-2):
                         next_pointID = walking_path[k+1]
                         next_point = self.getPointByID(next_pointID)
@@ -844,8 +841,17 @@ if __name__ == "__main__":
 
     nurses = [1,2,3,4]
 
-    test_dict = {'nurse_id': ['2', '1'], 'office_lat': '48.7263802', 'office_lon': '2.2643467', 'start': '08:00', 'end': '12:00', 'appointments': [{'app_id': '1', 'app_lat': '48.73590189999999', 'app_lon': '2.2591394', 'app_length': '35'}, {'app_id': '2', 'app_lat': '48.7317076', 'app_lon': '2.2807308', 'app_length': '20'}, {'app_id': '3', 'app_lat': '48.7400286', 'app_lon': '2.3156139', 'app_length': '20'}, {'app_id': '4', 'app_lat': '48.6961912', 'app_lon': '2.2900446', 'app_length': '35'}, {'app_id': '5', 'app_lat': '48.7086557', 'app_lon': '2.241912', 'app_length': '25'}, {'app_id': '6', 'app_lat': '48.7450455', 'app_lon': '2.2664304', 'app_length': '20'}, {'app_id': '7', 'app_lat': '48.8224412', 'app_lon': '2.2857558', 'app_length': '25'}, {'app_id': '8', 'app_lat': '48.8249728', 'app_lon': '2.2756178', 'app_length': '35'}]}
+    test_dict = {'nurse_id': ['2', '1'], 'office_lat': '48.7263802', 'office_lon': '2.2643467', 'start': '08:00', 'end': '12:00', 'appointments': [{'app_id': '6', 'app_lat': '48.73590189999999', 'app_lon': '2.2591394', 'app_length': '30'}, {'app_id': '7', 'app_lat': '48.7317076', 'app_lon': '2.2807308', 'app_length': '35'}, {'app_id': '8', 'app_lat': '48.7400286', 'app_lon': '2.3156139', 'app_length': '20'}, {'app_id': '9', 'app_lat': '48.6961912', 'app_lon': '2.2900446', 'app_length': '30'}, {'app_id': '10', 'app_lat': '48.7086557', 'app_lon': '2.241912', 'app_length': '35'}, {'app_id': '11', 'app_lat': '48.7450455', 'app_lon': '2.2664304', 'app_length': '35'}, {'app_id': '12', 'app_lat': '48.6964354', 'app_lon': '2.2691329', 'app_length': '25'}, {'app_id': '13', 'app_lat': '48.7382421', 'app_lon': '2.2176977', 'app_length': '35'}, {'app_id': '14', 'app_lat': '48.7973917', 'app_lon': '2.3484036', 'app_length': '35'}]}
     s = Space()
     #s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses)
     s.buildSpaceFromDic(test_dict)
-    print(s.solve())
+    
+    res = s.solve()
+    nurses = dict()
+    for app in res:
+        try :
+            nurses[app['nurse_id']].append(app['app_id'])
+        except:
+            nurses[app['nurse_id']] = [app['app_id']]
+    print(nurses)
+    

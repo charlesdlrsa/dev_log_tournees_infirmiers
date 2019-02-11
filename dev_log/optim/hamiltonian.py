@@ -8,10 +8,10 @@ Need
     - space.regenerateCyclingPath
 """
 
-def hamiltonian(s, points, starting_point):
+def hamiltonian(s, points, starting_point, mode="walking"):
     """
     Compute an hamiltonian cycle on the set of points.
-    It uses a google maps key. Note that mode is "walking".
+    It uses a google maps key. Note that mode is "walking" or "driving".
     
     @param points: should be a subset of s.points
     """
@@ -22,7 +22,7 @@ def hamiltonian(s, points, starting_point):
     
     else:
         try:
-            travel_times = s.getGoogleTravelTimes(points, "walking")
+            travel_times = s.getGoogleTravelTimes(points, mode)
         except:
             raise GmapApiError
     

@@ -60,12 +60,50 @@ def vrp(s, centers):
     ampl = AMPL(Environment('ampl'))
 
     # Interpret the two files
-    ampl.read('models/vrp.mod')
+    ampl.read('models/splitclusters.mod')
     ampl.readData('models/vrp.dat')
 
     # Solve
     ampl.solve()
+
+    # Get objective entity by AMPL name
+    cntrs = ampl.getVariable('center')
     
+    listCenters = []
+
+    # Access all instances using an iterator
+    for index, instance in cntrs:
+        if instance.value():
+            listCenters.append(centers[int(index)-1].getID())
+
+    clusters = dict()
+    for c in listCenters:
+        clusters[c] = [c]
+
+    # access the variable
+    closestCenter = ampl.getVariable('closestCenter')
+    for index, instance in closestCenter:
+        if centers[int(index[0])-1].getID() not in listCenters and instance.value():
+            clusters[centers[int(index[1]-1)].getID()].append(centers[int(index[0]-1)].getID())
+
+    for c in clusters.values():
+        if not 0 in c:
+            c.append(0)
+    
+    #print(clusters)
+    res = []
+    
+    for c in clusters.keys():
+        #print(clusters[c])
+        #print(s.getListPointsByID(clusters[c]))
+        h = s.getHamiltonianCycle(s.getListPointsByID(clusters[c]), 0, mode ="driving")
+        clusters[c] = s.getListPointsByID(h[0]), h[1]
+        res.append(clusters[c])
+
+    return res
+
+    """
     #regenerate the path
     x = ampl.getVariable("x")
     return s.buildVRPSolution(centers, x, time, k)
+    """
