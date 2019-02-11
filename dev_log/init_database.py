@@ -55,6 +55,12 @@ def init_db():
     db.session.add(Patient(last_name="Lajouanie", first_name="Simon", email="simon.lajouanie@hotmail.fr",
                            address="12 Chemin du Paradis, 91430 Igny", phone="0674695898",
                            digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
+    db.session.add(Patient(last_name="Martinet", first_name="Hugo", email="hugo.martinet@hotmail.fr",
+                           address="79 Avenue du Président Allende, 94800 Villejuif", phone="0674695898",
+                           digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
+    db.session.add(Patient(last_name="Taylor", first_name="Daniel", email="daniel.taylor@hotmail.fr",
+                           address="36 rue Varengue, 92340 Bourg-la-Reine", phone="0674695898",
+                           digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
     db.session.add(Patient(last_name="Bellec", first_name="Thomas", email="thomas.bellec@hotmail.fr",
                            address="4 rue de Paris, 92190 Meudon", phone="0674695898", digicode="4B34",
                            additional_postal_information="2eme gauche", office_id=2))
@@ -64,12 +70,6 @@ def init_db():
     db.session.add(Patient(last_name="Borel", first_name="Edouard", email="edouard.borel@hotmail.fr",
                            address="29 rue d'Etienne d'Orves, 92120 Montrouge", phone="0674695898",
                            digicode="4B34", additional_postal_information="2eme gauche", office_id=2))
-    db.session.add(Patient(last_name="Martinet", first_name="Hugo", email="hugo.martinet@hotmail.fr",
-                           address="79 Avenue du Président Allende, 94800 Villejuif", phone="0674695898",
-                           digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
-    db.session.add(Patient(last_name="Taylor", first_name="Daniel", email="daniel.taylor@hotmail.fr",
-                           address="36 rue Varengue, 92340 Bourg-la-Reine", phone="0674695898",
-                           digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
 
     db.session.add(Care(description="Bandage", duration=35))
     db.session.add(Care(description="Sting", duration=30))
@@ -91,13 +91,13 @@ def init_db():
     #                                halfday="Afternoon"))
     #     i += 1
 
-    for pID in range(1, 5):
+    for pID in range(1, 6):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
                                    halfday="Morning"))
         # To be deleted
         # db.session.add(Schedule(appointment_id=pID, hour=datetime.time(8 + pID-1, 30),
         #                         nurse_id =1, travel_mode='driving'))
-    for pID in range(5, 9):
+    for pID in range(6, 10):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
                                    halfday="Morning"))
         # To be deleted
