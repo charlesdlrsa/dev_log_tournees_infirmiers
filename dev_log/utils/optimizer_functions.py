@@ -22,8 +22,6 @@ def build_data_for_optimizer(date, halfday, care_id=None, patient_id=None):
 
     appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).all()
     data["appointments"] = []
-    print(date)
-    print(type(date))
     for app in appointments:
         app_data = {}
         app_data["app_id"] = str(app.id)
@@ -35,7 +33,7 @@ def build_data_for_optimizer(date, halfday, care_id=None, patient_id=None):
         patient = Patient.query.filter(Patient.id == patient_id).first()
         care = Care.query.filter(Care.id == care_id).first()
         new_app_data = {}
-        new_app_data["app_id"] = "0"
+        new_app_data["app_id"] = "1000000"
         new_app_data["app_lat"] = str(patient.latitude)
         new_app_data["app_lon"] = str(patient.longitude)
         new_app_data["app_length"] = str(care.duration)
