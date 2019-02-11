@@ -93,18 +93,9 @@ def init_db():
                                    halfday="Afternoon"))
 
     # to test the optimizer (solve_complete)
-    for pID in range(1, 6):
+    for pID in range(1, 10):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
                                    halfday="Morning"))
-        # To be deleted
-        # db.session.add(Schedule(appointment_id=pID, hour=datetime.time(8 + pID-1, 30),
-        #                         nurse_id =1, travel_mode='driving'))
-    for pID in range(6, 10):
-        db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
-                                   halfday="Morning"))
-        # To be deleted
-        # db.session.add(Schedule(appointment_id=pID, hour=datetime.time(8 + pID-4-1, 30),
-        #                         nurse_id=2, travel_mode='driving'))
     db.session.commit()
 
     lg.warning('Database initialized!')

@@ -40,8 +40,7 @@ def home():
             else:
                 return redirect(url_for('appointments.availabilities', patient_id=patient_id, date=date,
                                         care_id=care_id))
-        elif request.form.get('date_appointments_research') or request.form.get(
-                'patient_appointments_research') is not None:
+        elif request.form['date_appointments_research'] != "" or request.form['patient_appointments_research'] != "":
             date_research = request.form['date_appointments_research']
             if date_research == "":
                 date_research = "all"
@@ -114,8 +113,7 @@ def search_patient_appointments(date, patient):
     """ Function allowing to search the patient's appointments """
 
     if request.method == "POST":
-        if request.form.get('date_appointments_research') or request.form.get(
-                'patient_appointments_research') is not None:
+        if request.form['date_appointments_research'] != "" or request.form['patient_appointments_research'] != "":
             date_research = request.form['date_appointments_research']
             if date_research == "":
                 date_research = "all"
