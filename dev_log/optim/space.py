@@ -677,6 +677,7 @@ class Space :
         isOfficeDone = False
 
         for [path,_] in appointment_distribution:
+            print("***")
             print([p.getID() for p in path])
             try:
                 n_id = self.nurse_ids[i]
@@ -790,7 +791,7 @@ class Space :
         if mode=="addAppointment":
             return isOfficeDone
 
-        print(self.clusters)
+        #print(self.clusters)
         return res
 
     def formatTime(self, time, ft=1):
