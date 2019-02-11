@@ -79,17 +79,17 @@ def init_db():
     db.session.add(Care(description="Assistance", duration=25))
 
     db.session.add(Absence(1, datetime.date(2019, 1, 10), "Afternoon"))
+    db.session.add(Absence(1, datetime.date(2019, 3, 10), "Morning"))
     db.session.add(Absence(2, datetime.date(2019, 2, 25), "Afternoon"))
+    db.session.add(Absence(2, datetime.date(2019, 4, 30), "Afternoon"))
     db.session.add(Absence(3, datetime.date(2019, 4, 30), "Afternoon"))
     db.session.add(Absence(4, datetime.date(2019, 4, 30), "Afternoon"))
     db.session.add(Absence(3, datetime.date(2019, 5, 2), "Morning"))
     db.session.add(Absence(4, datetime.date(2019, 5, 2), "Morning"))
 
-    # i = 0
-    # while i < 10:
-    #     db.session.add(Appointment(patient_id=8, date=datetime.date(2019, 4, 30), care_id=random.randint(1, 6),
-    #                                halfday="Afternoon"))
-    #     i += 1
+    for pID in range(1, 6):
+        db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 4, 30), care_id=random.randint(1, 6),
+                                   halfday="Afternoon"))
 
     for pID in range(1, 6):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
