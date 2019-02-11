@@ -90,8 +90,8 @@ def get_nurse_planning(nurse_id, date, halfday):
             db.session.commit()
 
     schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
-                                          Schedule.appointment.has(date=date_selected),
-                                          Schedule.appointment.has(halfday=halfday)).all()
+                                      Schedule.appointment.has(date=date_selected),
+                                      Schedule.appointment.has(halfday=halfday)).all()
 
     schedules = office + schedules + office
     nb_schedules = len(schedules)
