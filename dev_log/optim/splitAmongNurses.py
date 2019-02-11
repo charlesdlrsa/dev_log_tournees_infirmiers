@@ -94,10 +94,10 @@ def vrp(s, centers):
     res = []
     
     for c in clusters.keys():
-        #print(clusters[c])
-        #print(s.getListPointsByID(clusters[c]))
         h = s.getHamiltonianCycle(s.getListPointsByID(clusters[c]), 0, mode ="driving")
-        clusters[c] = s.getListPointsByID(h[0]), h[1]
+        clusters[c] = [s.getPointByID(p) for p in h[0]], h[1]
         res.append(clusters[c])
+
+    return res
 
     return res
