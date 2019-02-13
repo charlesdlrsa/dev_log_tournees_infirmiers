@@ -107,4 +107,14 @@ _Schéma de classes_
 ![Schéma BDD](erd_from_sqlite.png)
 _Schéma de la base de données_
 
-diagramme de séquence (mettre 1 pour office et 1 pour nurse)
+## Interactions
+
+### Diagramme de séquence d'authentification
+
+![Diagramme de séquence 1](dev_log/static/diag_seq_1.png)
+_diagramme de séquence_
+
+### Diagramme de séquence de prise de rendez-vous
+
+![Diagramme de séquence 2](dev_log/static/diag_seq_2.png)
+_diagramme de séquence_
