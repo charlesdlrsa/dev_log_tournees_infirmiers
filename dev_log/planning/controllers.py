@@ -70,6 +70,7 @@ def get_nurse_planning(nurse_id, date, halfday):
     schedules = Schedule.query.filter(Schedule.appointment.has(date=date_selected),
                                       Schedule.appointment.has(halfday=halfday)).all()
 
+    print(solve_complete(build_data_for_optimizer(date, halfday)))
     # If no schedules are planned, it means that it's the first time that the nurse can see its planning.
     # Consequently, we have to run the optimizer to attribute all the appointments to the available nurses
     # and optimize their journeys. If schedules are already planned, this means that the optimizer had already been
