@@ -31,7 +31,7 @@ Nous avons décidé de séparer notre applications en plusieurs blueprints. Chaq
 
 SQL Alchemy est un outil de mapping objet-relationnel très utilisé par la communauté des développeurs Python.
 
-![SQL Alchemy logo](/dev_log/static/logo_sqlalchemy.jpeg)
+![SQL Alchemy logo](/dev_log/static/logo_sqlalchemy.jpg)
 #### L'avantage des ORM
 Le technique de mapping relationnel (ou object relationnal mapping - ORM) est une technique de programmation informatique qui crée l'illusion d'une base de données orientée objet à partir d'une base de données relationnelle en définissant des correspondances entre cette base de données et les objets du langage utilisé. Les ORM permettent une manipulation bien plus simple des données. L'écriture des requêtes et l'ensemble des opérations sur les bases de données (sélection, jointure, projection) sont extrêmement simplifiées. Enfin, les ORM permmettent de mieux organiser son code dans l'esprit MVC (model view controller).
 #### Notre organisation
