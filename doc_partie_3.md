@@ -11,7 +11,7 @@ Nous avons décidé d'uiliser l'architecture suivante pour notre projet :
 ## Choix du framework Flask
 
 Flask est un microcontroller pour développement Web qui présente de nombreux avantages pour effectuer un projet de développement de logiciel.
-![Flask logo](/dev_log/static/logo_flask.png "flask logo")
+![Flask logo](/dev_log/static/logo_flask.png=250x "flask logo")
 #### Minimaliste et simpliste
 Flask est très petit. C'est un framework qui n'installe que très peu d'éléments (environ 2000 lignes de codes) et qui s'apprend très rapidement. A l'inverse de Django, la courbe d'apprentissage pour entamer une application est très courte. Il n'y a pas de restrictions et on a une liberté totale d'implémenter ce que l'on veut comme on le veut.
 #### Flexible et étendable
@@ -23,6 +23,8 @@ Il est possible d'exécuter le serveur web intégré à Flask et de voir son app
 #### Notre organisation 
 Notre back est organisé sur le principe du MVC : model-view-controller.
 Nous avons décidé de séparer notre applications en plusieurs blueprints. Chaque blueprint correspond à une route principale, auxquelles est associée de nombreuses sous routes. L'ensemble de nos fonctions se situent dans le controller associé au blueprint. Nos modèles sont définis à l'aide d'un ORM présenté ci-dessous. L'ensemble des "views" associés à nos routes se trouvent dans un dossier template où la plupart des templates s'appuient sur Bootstrap.
+
+----------------------------------------------------------------------------------------------------------------------------------------
 
 ## Choix de SQL Alchemy
 
