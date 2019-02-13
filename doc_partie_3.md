@@ -12,7 +12,7 @@ Nous avons décidé d'uiliser l'architecture suivante pour notre projet :
 
 Flask est un microcontroller pour développement Web qui présente de nombreux avantages pour effectuer un projet de développement de logiciel.
 
-![Flask logo](/dev_log/static/logo_flask.png "flask logo" | width=100)
+![Flask logo](/dev_log/static/logo_flask.png =250x250)
 #### Minimaliste et simpliste
 Flask est très petit. C'est un framework qui n'installe que très peu d'éléments (environ 2000 lignes de codes) et qui s'apprend très rapidement. A l'inverse de Django, la courbe d'apprentissage pour entamer une application est très courte. Il n'y a pas de restrictions et on a une liberté totale d'implémenter ce que l'on veut comme on le veut.
 #### Flexible et étendable
@@ -31,7 +31,7 @@ Nous avons décidé de séparer notre applications en plusieurs blueprints. Chaq
 
 SQL Alchemy est un outil de mapping objet-relationnel très utilisé par la communauté des développeurs Python.
 
-![SQL Alchemy logo](/dev_log/static/logo_sqlalchemy.jpeg | width=100)
+![SQL Alchemy logo](/dev_log/static/logo_sqlalchemy.jpeg =250x250)
 #### L'avantage des ORM
 Le technique de mapping relationnel (ou object relationnal mapping - ORM) est une technique de programmation informatique qui crée l'illusion d'une base de données orientée objet à partir d'une base de données relationnelle en définissant des correspondances entre cette base de données et les objets du langage utilisé. Les ORM permettent une manipulation bien plus simple des données. L'écriture des requêtes et l'ensemble des opérations sur les bases de données (sélection, jointure, projection) sont extrêmement simplifiées. Enfin, les ORM permmettent de mieux organiser son code dans l'esprit MVC (model view controller).
 #### Notre organisation
