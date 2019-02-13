@@ -25,7 +25,6 @@ Il est possible d'exécuter le serveur web intégré à Flask et de voir son app
 Notre back est organisé sur le principe du MVC : model-view-controller.
 Nous avons décidé de séparer notre applications en plusieurs blueprints. Chaque blueprint correspond à une route principale, auxquelles est associée de nombreuses sous routes. L'ensemble de nos fonctions se situent dans le controller associé au blueprint. Nos modèles sont définis à l'aide d'un ORM présenté ci-dessous. L'ensemble des "views" associés à nos routes se trouvent dans un dossier template où la plupart des templates s'appuient sur Bootstrap.
 
-----------------------------------------------------------------------------------------------------------------------------------------
 
 ## Choix de SQL Alchemy
 
