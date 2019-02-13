@@ -606,7 +606,7 @@ class Space:
         runReclustering(self, toRecluster)
 
     def getHamiltonianCycle(self, points, starting_point, mode="walking"):
-        from hamiltonian import hamiltonian
+        from dev_log.optim.hamiltonian import hamiltonian
         return hamiltonian(self, points, starting_point, mode)
 
     def splitAmongNurse(self, centers):
