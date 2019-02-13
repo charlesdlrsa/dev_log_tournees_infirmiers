@@ -112,9 +112,7 @@ _Schéma de la base de données_
 ### Diagramme de séquence d'authentification
 
 ![Diagramme de séquence 1](dev_log/static/diag_seq_1.png)
-_diagramme de séquence_
 
 ### Diagramme de séquence de prise de rendez-vous
 
 ![Diagramme de séquence 2](dev_log/static/diag_seq_2.png)
-_diagramme de séquence_
