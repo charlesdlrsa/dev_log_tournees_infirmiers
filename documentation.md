@@ -59,7 +59,7 @@ Le Framework Bootstrap propose directement les définitions de base de tous les 
 
 # 3. Architecture détaillée de chaque entité
 
-### Utilisation
+## Utilisation
 
 API permet lancement de l'app, connexion au front end etc.. ??
 
@@ -67,9 +67,9 @@ justification de l’algo
 
 Configuration
 
-### Modèle
+## Modèle
 
-#### Schéma de classe, BDD 
+### Schéma de classe, Base de données
 
 __Office__
 
@@ -100,6 +100,9 @@ ainsi qu'une description et la durée associée à la prestation de ce soin. Nou
 
 
 ![Schéma de classe](classes_DevLog.png)
+_Schéma de classes_
 
 ![Schéma BDD](erd_from_sqlite.png)
+_Schéma de la base de données_
+
 diagramme de séquence (mettre 1 pour office et 1 pour nurse)
