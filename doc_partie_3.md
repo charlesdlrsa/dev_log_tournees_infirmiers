@@ -12,7 +12,7 @@ Nous avons décidé d'uiliser l'architecture suivante pour notre projet :
 
 Flask est un microcontroller pour développement Web qui présente de nombreux avantages pour effectuer un projet de développement de logiciel.
 
-![Flask logo](/dev_log/static/logo_flask.png =250x "flask logo")
+![Flask logo|30%](/dev_log/static/logo_flask.png "flask logo")
 
 #### Minimaliste et simpliste
 Flask est très petit. C'est un framework qui n'installe que très peu d'éléments (environ 2000 lignes de codes) et qui s'apprend très rapidement. A l'inverse de Django, la courbe d'apprentissage pour entamer une application est très courte. Il n'y a pas de restrictions et on a une liberté totale d'implémenter ce que l'on veut comme on le veut.
