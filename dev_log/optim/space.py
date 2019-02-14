@@ -728,10 +728,13 @@ class Space :
         at this point: 
         => cluster is a dictionnary with:
             - key = center (its index)
+            - value = list of pointID's belonging to the cluster
+        => hamiltonianPathes is a dictionnary with:
+            - key = center (its index)
             - value = hamiltonian path in the cluster (always starting with the center)
         => clusterTime is a dictionnary with:
             - key = center (its index)
-            - value = time to go through the path stored in cluster
+            - value = time to go through the path stored in hamiltonianPathes
         """
 
         """
