@@ -50,7 +50,7 @@ def init_db():
                            address="20 Rue du Dr Roux, 91370 Verrières-le-Buisson", phone="0674695898",
                            digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
     db.session.add(Patient(last_name="Compain", first_name="Axel", email="axcompain@hotmail.fr",
-                           address="3 Allée des Devodes, 91160 Saulx-les-Chartreux", phone="0674695898",
+                           address="1 Rue de la Forge, 91160 Longjumeau", phone="0674695898",
                            digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
     db.session.add(Patient(last_name="Lajouanie", first_name="Simon", email="simon.lajouanie@hotmail.fr",
                            address="12 Chemin du Paradis, 91430 Igny", phone="0674695898",

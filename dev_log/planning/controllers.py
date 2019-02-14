@@ -6,7 +6,7 @@ from dev_log.utils import calendar
 import datetime
 from dev_log import db
 from dev_log.utils.optimizer_functions import build_data_for_optimizer
-from dev_log.optim.space import solve_complete
+from dev_log.optim.space import solve_complete, solve_path
 import random
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
@@ -71,7 +71,9 @@ def get_nurse_planning(nurse_id, date, halfday):
     schedules = Schedule.query.filter(Schedule.appointment.has(date=date_selected),
                                       Schedule.appointment.has(halfday=halfday)).all()
 
-    print(solve_complete(build_data_for_optimizer(date, halfday)))
+    print(solve_path(build_data_for_optimizer(date, halfday)))
+    print('res')
+    travel_information = simplified_path(build_data_for_optimizer(date, halfday))
     # If no schedules are planned, it means that it's the first time that the nurse can see its planning.
     # Consequently, we have to run the optimizer to attribute all the appointments to the available nurses
     # and optimize their journeys. If schedules are already planned, this means that the optimizer had already been
@@ -79,13 +81,15 @@ def get_nurse_planning(nurse_id, date, halfday):
     if len(schedules) == 0:
         nurses_and_appointments = build_data_for_optimizer(date, halfday)
         schedules_information = solve_complete(nurses_and_appointments)
+        travel_information = simplified_path(nurses_and_appointments)
         modes = ['DRIVING', 'WALKING']
-        for info in schedules_information:
-            travel_mode = random.choice(modes)
-        #     for mode in travel_modes:
-        #         if mode["app_id"] == info["app_id"]:
-        #             travel_mode = mode["travel_mode"]
-        #             break
+        print('taille {}'.format(len(schedules_information)))
+        print('taille 2 {}'.format(len(travel_information)))
+
+        for (i,info) in enumerate(schedules_information):
+            # travel_mode = random.choice(modes)
+            travel_mode = travel_information[i]["mode"].upper()
+            print(travel_mode)
             db.session.add(
                 Schedule(appointment_id=int(info["app_id"]),
                          hour=datetime.time(int(info["hour"][:2]), int(info["hour"][3:5])),
@@ -101,6 +105,24 @@ def get_nurse_planning(nurse_id, date, halfday):
 
     return render_template("planning_nurse.html", nurse=nurse, date=date_selected, halfday=halfday,
                            schedules=schedules, nb_schedules=nb_schedules)
+
+
+def simplified_path(data):
+    path = solve_path(data)
+    res = []
+    already_visited = []
+    for i in path:
+        if i["mode"] == 'driving':
+            res.append(i)
+            already_visited.append((i['t_lat'], i['t_lon']))
+        else:
+            if (i['t_lat'], i['t_lon']) in already_visited:
+                pass
+            else:
+                res.append(i)
+                already_visited.append((i['t_lat'], i['t_lon']))
+    print(res)
+    return res
 
 
 @planning.route("/init_db", methods=['GET', 'POST'])
