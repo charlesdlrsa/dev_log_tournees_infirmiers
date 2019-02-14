@@ -188,7 +188,7 @@ var schedules_js = [];
 {% if schedules[i].appointment %}
 schedules_js.push( {'latitude': {{schedules[i].appointment.patient.latitude}}, 'longitude': {{schedules[i].appointment.patient.longitude}}, 'travel_mode': '{{schedules[i].travel_mode}}'} );
 {% else %}
-schedules_js.push( {'latitude': {{schedules[i].latitude}}, 'longitude': {{schedules[i].longitude}}, 'travel_mode': 'DRIVING'} );
+schedules_js.push( {'latitude': {{schedules[i].latitude}}, 'longitude': {{schedules[i].longitude}}, 'travel_mode': 'DRIVING', 'address': '{{schedules[i].address}}' } );
 {% endif %}
 {% endfor %}
 
@@ -196,7 +196,7 @@ function drawAllDirections(schedules=schedules_js){
     document.getElementById('directionsPanel').style.visibility="hidden";
     var departure = {'lat': schedules[0]['latitude'], 'lng': schedules[0]['longitude']};
     var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: departure});
-    makeMarker( departure, "2 rue Christophe Colomb, 91300 Massy", map, 0 );
+    makeMarker( departure, schedules[0]['address'], map, 0 );
     var directionsService = new google.maps.DirectionsService();
     var requests = [0];
     for (var i=1; i<schedules.length; i++){
@@ -270,8 +270,8 @@ function drawOneDirection(lat_depart, lng_depart, lat_arrival, lng_arrival, trav
             };
             summaryPanel.innerHTML += '<strong>Departure:</strong> ' + leg.start_address + '<br>';
             summaryPanel.innerHTML += '<strong>Arrival:</strong> ' + leg.end_address + '<br>';
-            summaryPanel.innerHTML += '<strong>Distance:</strong> ' + leg.distance.text + ' --- ';
-            summaryPanel.innerHTML += '<strong>Duration:</strong> ' + leg.duration.text + ' --- ';
+            summaryPanel.innerHTML += '<strong>Distance:</strong> ' + leg.distance.text + ' -- ';
+            summaryPanel.innerHTML += '<strong>Duration:</strong> ' + leg.duration.text + ' -- ';
             summaryPanel.innerHTML += '<strong>Mode:</strong> ' + leg.steps[0].travel_mode.toLowerCase();
         };
     });
