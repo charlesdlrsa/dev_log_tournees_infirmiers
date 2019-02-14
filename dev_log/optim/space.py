@@ -683,6 +683,8 @@ class Space :
 
         print("3")
 
+        exit()
+
         # compute time to see patients in each cluster
         self.clusterTime = dict()
         for c, p in self.clusters.items():
