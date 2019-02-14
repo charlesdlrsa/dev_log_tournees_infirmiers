@@ -1,37 +1,36 @@
 from space import Space, GmapApiError
 from amplpy import AMPL, Environment
 
-"""
-Need
-    - space.points
-    - space.getGoogleTravelTimes
-    - space.regenerateCyclingPath
-"""
+def rotateToStartingElement(l, e):
+    """
+    Rotate a list such that the list starts with the first element e.
+    """
+    if e not in l:
+        raise ValueError(str(e) + "is not in list")
+    while l[0] != e:
+        x = l.pop(0)
+        l.append(x)
 
-def hamiltonian(s, points, starting_point, mode="walking"):
+def hamiltonian(s, pointIDs, starting_pointID, mode="walking"):
     """
     Compute an hamiltonian cycle on the set of points.
     It uses a google maps key. Note that mode is "walking" or "driving".
     
-    @param points: should be a subset of s.points
+    @param points: should be a a list of ID's refering to subset of s.points
     """
-    n = len(points)
+    n = len(pointIDs)
 
     if n == 1:
-        path, travel_time = points, 0
+        path, travel_time = pointIDs, 0
     
     else:
-        try:
-            travel_times = s.getGoogleTravelTimes(points, mode)
-        except:
-            raise GmapApiError
-    
         if n == 2:
-            if points[0].getID() == starting_point:
-                p1, p2 =  points[0], points[1]
+            if pointIDs[0] == starting_pointID:
+                p_ID1, p_ID2 =  pointIDs[0], pointIDs[1]
             else:
-                p2, p1 =  points[0], points[1]
-            path, travel_time = [p1, p2, p1], travel_times[0][1] + travel_times[1][0]
+                p_ID2, p_ID1 =  pointIDs[0], pointIDs[1]
+            path = [p_ID1, p_ID2, p_ID1]
+            travel_time = s.getDistSource2Target(p_ID1, p_ID2, mode) +  s.getDistSource2Target(p_ID2, p_ID1, mode)
 
         else:
             """
@@ -51,12 +50,13 @@ def hamiltonian(s, points, starting_point, mode="walking"):
                 hamiltonian.write("param: A: time :=\n")
                 for i in range(n):
                     for j in range(i+1, n):
-                        hamiltonian.write("\t{} {} {}\n".format(i+1, j+1, travel_times[i][j]))
-                        hamiltonian.write("\t{} {} {}\n".format(j+1, i+1, travel_times[j][i]))
+                        p_ID1, p_ID2 =  pointIDs[i], pointIDs[j]
+                        hamiltonian.write("\t{} {} {}\n".format(i+1, j+1, s.getDistSource2Target(p_ID1, p_ID2, mode)))
+                        hamiltonian.write("\t{} {} {}\n".format(j+1, i+1, s.getDistSource2Target(p_ID2, p_ID1, mode)))
                 hamiltonian.write(";\n")
 
             # set up ampl
-            ampl = AMPL(Environment('ampl'))
+            ampl = AMPL(Environment('ampl/linux'))
 
             # Interpret the two files
             ampl.read('models/travellingSalesman.mod')
@@ -69,5 +69,29 @@ def hamiltonian(s, points, starting_point, mode="walking"):
             #regenerate the path
             x = ampl.getVariable("x")
 
-            path, travel_time = s.regenerateCyclingPath(points, x, travel_times, starting_point)
-    return [p.getID() for p in path], travel_time
+            # Given a list of pointIDs and the ampl transition matrix, we need to rebuild the path.
+            # pointIDs is list of point  ID's such that its order is the same as the index in x (amplMatPath)
+            # x is the transition matrix (returned by ampl) describing the path (zero, one matrix) such that:
+            #   x[i,j] = 1 iff the path goes from pointIDs[i] to pointIDs[j]
+
+            i = 0
+            j = -1
+            path = []
+
+            while j != 0:
+                for k in range(n):
+                    if i != k and x[i+1,k+1].value():
+                        j = k
+                p_ID1, p_ID2 =  pointIDs[i], pointIDs[j]
+                i = j
+                path.append(pointIDs[i])
+            rotateToStartingElement(path, starting_pointID)
+            path.append(starting_pointID)
+
+            # compute travel_time
+            travel_time = 0
+            for k in range(n):
+                p_ID1, p_ID2 =  path[k], path[k+1]
+                travel_time += s.getDistSource2Target(p_ID1, p_ID2, mode)
+
+    return path, travel_time

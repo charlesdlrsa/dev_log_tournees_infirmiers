@@ -70,7 +70,7 @@ class Space :
         
         self.nb_points = nb_points
         self.points = points
-        self.walkingThreshold =walkingThreshold
+        self.walkingThreshold = walkingThreshold
         self.points_by_long = []
         self.points_by_lat = []
         self.points_lex_sorted = []
@@ -78,6 +78,16 @@ class Space :
         self.lowerConvexHull = []
         self.dmin = None
         self.dmax = None
+
+        self.start = None
+        self.end = None
+        self.duration = None
+        self.nurse_ids = None
+        self.care_duration = None
+
+        self.clusters = None
+        self.hamiltonianPathes = None
+        self.clusterTime = None
     
     # -------------------------------------------------------------------------
     
@@ -218,42 +228,6 @@ class Space :
         del self.points_by_id
 
         return l
-
-    def rotateToStartingPoint(self, path, starting_point):
-        """
-        Rotate a list of points such that the list starts with a given starting point.
-        """
-        while path[0].getID() != starting_point:
-            point = path.pop(0)
-            path.append(point)
-        path.append(path[0])
-
-    def regenerateCyclingPath(self, listPoints, amplMatPath, travel_times, starting_point):
-        """
-        Given a list of points and the ampl transition matrix, rebuild the path.
-        @param listPoints: list of points (id, lat, lon) such that its order is the same as
-        the index in amplMatPath
-        @param amplMatPath: transition matrix (returned by ampl) describing the path 
-        (zero, one matrix) such that:
-            amplMatPath[i,j] = 1 iff the path goes from listPoint[i] to listPoint[j]
-        @param travel_times: time matrix such that travel_times[i][j] is the time to 
-        travel from from listPoint[i] to listPoint[j].
-        """
-        n = len(listPoints)
-        i = 0
-        j = -1
-        path = []
-        travel_time = 0
-        while j != 0:
-            for k in range(n):
-                if i != k and amplMatPath[i+1,k+1].value():
-                    j = k
-            travel_time += travel_times[i][j]
-            i = j
-            path.append(listPoints[i])
-        self.rotateToStartingPoint(path, starting_point)
-        return path, travel_time
-
     
     def buildVRPSolution(self, listCenters, amplMatPath, travel_times, path_number):
         """
@@ -417,6 +391,63 @@ class Space :
             for j in range(n_targets):
                 mat_travel_times[i][j] = distance['rows'][i]['elements'][j]['duration']['value']
         return mat_travel_times
+
+    def getDistKM(self):
+        """
+        Return the matrix of distances as the crow flies
+        """
+        return self.distKm
+
+    def getDistKMSource2Target(self, sourceID, targetID):
+        """
+        Return the distance as the crow flies between two points given by their ID
+        """
+        return self.distKm[(sourceID, targetID)]
+    
+    def getDistWalking(self):
+        """
+        Return the matrix of walking distance
+        """
+        return self.distWalking
+    
+    def getDistWalkingSource2Target(self, sourceID, targetID):
+        """
+        Return the walking distance between two points given by their ID
+        """
+        return self.distWalking[(sourceID, targetID)]
+
+    def getDistDriving(self):
+        """
+        Return the matrix of driving distance
+        """
+        return self.distDriving
+
+    def getDistDrivingSource2Target(self, sourceID, targetID):
+        """
+        Return the driving distance between two points given by their ID
+        """
+        return self.distDriving[(sourceID, targetID)]
+    
+    def getDist(self, mode):
+        """
+        Return either the matrix of walking distance or the matrix of driving
+        distance, depending on the mode given.
+        """
+        if mode == "walking":
+            return self.getDistWalking()
+        elif mode == "driving":
+            return self.getDistDriving()
+    
+    def getDistSource2Target(self, sourceID, targetID, mode):
+        """
+        Return either the walking distance or the driving distance between two
+        points given by their ID, depending on the mode given.
+        """
+        if mode == "walking":
+            return self.getDistWalkingSource2Target(sourceID, targetID)
+        elif mode == "driving":
+            return self.getDistDrivingSource2Target(sourceID, targetID)
+
         
     # -------------------------------------------------------------------------
      
@@ -648,16 +679,13 @@ class Space :
         from reclustering import runReclustering
         runReclustering(self, toRecluster)
     
-    def getHamiltonianCycle(self, points, starting_point, mode="walking"):
+    def getHamiltonianCycle(self, pointIDs, starting_pointID, mode="walking"):
         from hamiltonian import hamiltonian
-        return hamiltonian(self, points, starting_point, mode)
+        return hamiltonian(self, pointIDs, starting_pointID, mode)
 
     def splitAmongNurse(self, centers):
         from splitAmongNurses import vrp
         return vrp(self, centers)
-    
-    def setDrivingTimes(self,time):
-        self.driving_mat = time
 
     def solve(self, mode="schedule"):
         """
@@ -683,16 +711,18 @@ class Space :
 
         print("3")
 
-        exit()
-
         # compute time to see patients in each cluster
         self.clusterTime = dict()
-        for c, p in self.clusters.items():
-            walking_points = self.getListPointsByID(p)
+        self.hamiltonianPathes = dict()
+        for c, walking_points in self.clusters.items():
+            # c and walking_points are pointID's
             walking_path, walking_time = self.getHamiltonianCycle(walking_points, c)
             walking_time += sum(self.care_duration[app_id] for app_id in walking_path)
-            self.clusters[c] = walking_path
+            self.hamiltonianPathes[c] = walking_path
             self.clusterTime[c] = walking_time
+
+        print(4)
+        exit()
 
         """
         at this point: 
