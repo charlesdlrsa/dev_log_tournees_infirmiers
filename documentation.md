@@ -47,6 +47,7 @@ Nous avons décidé d'utiliser l'architecture suivante pour notre projet :
 - Flask pour le back et le serveur
 - SQL Alchemy pour les bases de données
 - Bootstrap pour le Front
+- AMPL pour la résolution des problèmes linéaires
 
 ## Choix du framework Flask
 
@@ -84,6 +85,24 @@ Les thèmes proposés par Bootstrap permettent, depuis la v2, de concevoir des a
 ##### Composants disponibles
 Le Framework Bootstrap propose directement les définitions de base de tous les composants HTML, ainsi que de nombreux éléments graphiques standardisés et prêts à l’emploi.
 
+## Choix d'AMPL
+
+A Mathematical Programming Language (AMPL) est un langage de modélisation algébrique qui permet de décrire et de résoudre de larges problèmes d'optimisation.
+
+![AMPL logo](/dev_log/static/AMPL_logo.jpg)
+
+##### Gratuit et Simple d'utilisation
+
+AMPL est très simple d'utilisation et gratuit pour une utilisation scolaire. Il suffit d'incorporer les différents fichiers et les solveurs souhaiter pour pouvoir l'utiliser dans un projet. AMPL possède par ailleurs une bibliothèque python (amplpy) qui permet de l'utiliser simplement depuis un programme python.
+
+##### AMPL IDE
+
+AMPL possède une IDE qui (AmplIde) qui permet de run les différents programmes linéaires en dehors de l'application. Cela simplifie grandement le debuggage. Par ailleurs, cela permet de définir le programme linéaire directement dans l'IDE
+et ainsi d'éditer seulement le jeu de données dans l'application.
+
+##### Compatibilité
+
+AMPL est compatible avec Linux, MacOS et Windows (sous réserve d'ajouter les bonnes librairies), ce qui rend son uilisation plus versatile.
 
 # 3. Architecture détaillée de chaque entité
 
