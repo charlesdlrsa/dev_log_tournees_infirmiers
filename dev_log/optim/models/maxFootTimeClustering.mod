@@ -45,7 +45,7 @@ subject to maxFootTime{v in V, c in V}:
 subject to holdValue{c in V : c <> 1}:
 	clusterValue[c] = 
 		center[c] * (drivingTime[office,c] + drivingTime[c,office]) 
-		+ sum{v in V : v <> c}(duration[v] + walkingTime[v,c]) * closestCenter[v,c];
+		+ sum{v in V : v <> c}(duration[v] + walkingTime[v,c] + walkingTime[c,v]) * closestCenter[v,c];
 	
 # the value of a cluster has to be smaller than the threshold
 subject to clusterValueIsBounded{v in V}:

@@ -632,14 +632,12 @@ class Space :
     # -------------------------------------------------------------------------
     # -- PROCESS
     # -------------------------------------------------------------------------
-    def setClusterNumber(self, clusterNumber):
-        self.clusterNumber = clusterNumber
-    
-    def computeClusterNumber(self):
-        from clusterNumber import numberOfClusters
-        numberOfClusters(self)
-
     def setClusters(self, clusters):
+        """
+        self.cluster is a dictionnary.
+            - key: pointID if the cluster center
+            - value: list of pointID's belonging to the cluster
+        """
         self.clusters = clusters
     
     def clusterSpace(self):

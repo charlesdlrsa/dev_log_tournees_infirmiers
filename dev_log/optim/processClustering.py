@@ -1,23 +1,16 @@
 from space import Space
 from amplpy import AMPL, Environment
 
-"""
-Need: 
-    - space.clusterNumber
-"""
 
 def runClustering(s):
     """
-    Cluster the space, using the k-median paradigm:
-        provide the set of $k$ vertices ${c_1, ... c_k}$ minimizing
-            sum_{v in V} min_i d_{c_i,v}
-    
-    k is stored in space.clusterNumber
+    Cluster the space, using a weighted k-median paradigm.
+    The goal is to minimize k.
 
     The office is set to be a center by default. 
     NB: The office id has to be set to 0.
 
-    @store  a dict representing the clusters in space.clusters.
+    @return: a dict representing the clusters
 
     The dictionnary representing the cluster has the format:
         - key = center
@@ -27,7 +20,7 @@ def runClustering(s):
     threshold = min(s.walkingThreshold, (s.dmax+s.dmin)/2.0)
     with open("models/maxFootTimeClustering.dat", "w") as clustering:
         clustering.write("# threshold for cluster size\n")
-        clustering.write("param maxClusterSize:= {};\n".format(7200))
+        clustering.write("param maxClusterSize:= {};\n".format(12000))
         
         clustering.write("\n")
 
@@ -81,7 +74,6 @@ def runClustering(s):
 
     # Solve
     print("cluster space")
-    exit()
     ampl.solve()
 
     # Get objective entity by AMPL name
@@ -92,6 +84,7 @@ def runClustering(s):
     # Access all instances using an iterator
     for index, instance in centers:
         if instance.value():
+            # int(index) is the point_ID of a center
             listCenters.append(int(index))
 
     clusters = dict()
@@ -104,4 +97,5 @@ def runClustering(s):
         if int(index[0]) not in listCenters and instance.value():
             clusters[int(index[1])].append(int(index[0]))
 
+    print(clusters)
     s.setClusters(clusters)
