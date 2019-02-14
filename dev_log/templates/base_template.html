@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -23,24 +22,23 @@
     <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.3/css/all.css'
           integrity='sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/' crossorigin='anonymous'>
 
-
 </head>
 
 <body id="page-top">
 
-<nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+<nav class="navbar navbar-expand navbar-dark static-top" style="background-color: #31394d;">
     <div class="container-fluid">
         <div class="navbar-header">
             <img src="{{ url_for('static', filename='nurse_logo.png') }}"
                  style="width:60px;margin-right:5px; vertical-align:middle;">
             <a class="navbar-brand mr-1" href="{{ url_for('planning.home') }}"
-               style="color:#B1F5FF; font-size:30px; vertical-align:middle; font-family:Impact;">Nursissimo </a>
+               style="color:#b0e0e6; font-size:30px; vertical-align:middle; font-family:Impact;">Nursissimo </a>
         </div>
         {% if session['office_id'] %}
         <ul class="nav navbar-nav navbar-right">
-            <li style="color:#B1F5FF; margin-right:15px; font-style:italic;">{{session['office_name'].capitalize()}}<i
+            <li style="color:#b0e0e6; margin-right:15px; font-style:italic;">{{session['office_name'].capitalize()}}<i
                     style="color:#FFFFFF; margin-left:8px;" class="fa fa-user"></i></li>
-            <li><a style="color:#B1F5FF; margin-right:5px; font-style:italic;" href="{{ url_for('auth.logout') }}">Log Out </a> <i
+            <li><a style="color:#b0e0e6; margin-right:5px; font-style:italic;" href="{{ url_for('auth.logout') }}">Log Out </a> <i
                     style="color:#FFFFFF; margin-right:5px;" class="fa fa-sign-out-alt"></i></li>
         </ul>
         {% elif session['nurse_id'] %}
@@ -58,7 +56,7 @@
 <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="sidebar navbar-nav" , id="myDIV">
+    <ul class="sidebar navbar-nav" , id="myDIV" style="background-color: #41495d;">
         <li class="nav-item active" id="planning">
             <a class="nav-link" href="{{url_for('planning.home')}}" id="planning_link">
                 <i class="far fa-calendar-alt"></i>
@@ -91,6 +89,10 @@
             <a href="{{ url_for('planning.reinit_db')}}" class="btn btn-secondary btn-sm active"
                role="button"> Reinitialise database </a>
         </li>
+<!--        <li class="nav-item" id="schedules">
+            <a href="{{ url_for('planning.delete_schedules')}}" class="btn btn-secondary btn-sm active"
+               role="button"> Delete schedules </a>
+        </li>-->
 
     </ul>
 

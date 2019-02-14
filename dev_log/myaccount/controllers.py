@@ -12,19 +12,23 @@ account = Blueprint('account', __name__, url_prefix='/account')
 @account.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
+    """ Account's home page allowing to see your account information and edit them.
+    If your are logged in as a nurse, you can also see and edit your vacations """
+
     if session.get('office_id') is None:
-        print(session['nurse_id'])
         return redirect(url_for('account.nurse_info', nurse_id=session['nurse_id']))
     else:
         id = session['office_id']
-        office = Office.query.filter(Office.id == id).first()
+        office = Office.query.get(id)
         return render_template('office_account.html', office=office)
 
 
 @account.route('/nurse/<int:nurse_id>', methods=['GET', 'POST'])
 @login_required
 def nurse_info(nurse_id):
-    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+    """ Function requesting the database to get the nurse information """
+
+    nurse = Nurse.query.get(nurse_id)
     absences = Absence.query.filter(Absence.nurse_id == nurse_id).all()
     cares = Care.query.all()
     return render_template('nurse_account.html', nurse=nurse, absences=absences, cares=cares)
@@ -33,6 +37,8 @@ def nurse_info(nurse_id):
 @account.route('/edit/nurse/<int:nurse_id>', methods=['GET', 'POST'])
 @login_required
 def edit_nurse_account(nurse_id):
+    """ Function allowing to edit the nurse information """
+
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
@@ -76,7 +82,7 @@ def edit_nurse_account(nurse_id):
 
         flash(error)
 
-    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+    nurse = Nurse.query.get(nurse_id)
     cares = Care.query.all()
     return render_template("edit_nurse.html", cares=cares, nurse=nurse)
 
@@ -84,8 +90,9 @@ def edit_nurse_account(nurse_id):
 @account.route('/edit/office/<int:office_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_office_account(office_id):
+    """ Function allowing to edit the office account information """
+
     if request.method == "POST":
-        print(request.form)
         name = request.form['name']
         email = request.form['email']
         phone = request.form['phone_number']
@@ -112,21 +119,25 @@ def edit_office_account(office_id):
                             phone=phone,
                             password=password,
                             address=address))
+            office = Office.query.filter(Office.id == office_id).first()
+            office.geolocation()
             db.session.commit()
             flash("The office's information have been updated")
             return redirect(url_for('account.home'))
 
         flash(error)
 
-    office = Office.query.filter(Office.id == office_id).first()
+    office = Office.query.get(office_id)
     return render_template("edit_office.html", office=office)
 
 
 @account.route('/absence/<int:nurse_id>', methods=['GET', 'POST'])
 @login_required
 def add_absence(nurse_id):
+    """ Function allowing to add one or several vacations for a nurse """
+
     # TODO : drop old absences
-    nurse = Nurse.query.filter(Nurse.id == nurse_id).first()
+    nurse = Nurse.query.get(nurse_id)
     if request.method == "POST":
         start_date = datetime.datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
         end_date = datetime.datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
@@ -163,6 +174,8 @@ def add_absence(nurse_id):
 @account.route('/delete_nurse/<int:absence_id>')
 @login_required
 def delete_absence(absence_id):
+    """ Delete an absence with its id """
+
     absence = Absence.query.get(absence_id)
     db.session.delete(absence)
     db.session.commit()

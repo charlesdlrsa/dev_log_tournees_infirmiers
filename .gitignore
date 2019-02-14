@@ -3,9 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
-*.so
-
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
@@ -130,8 +127,9 @@ nohup.out
 *.db
 
 # google maps key
-dev_log/key.py
+dev_log/utils/key.py
 dev_log/optim/key.py
+dev_log/key.py
 
 # optim
 *.dat

@@ -1,6 +1,6 @@
 import googlemaps
 from dev_log import db
-from dev_log.key import key
+from dev_log.utils.key import key
 
 
 class Base(db.Model):
@@ -9,6 +9,7 @@ class Base(db.Model):
         db.Integer,
         primary_key=True,
         nullable=False)
+    
 
     def geolocation(self):
         """
@@ -25,6 +26,11 @@ class Base(db.Model):
 
 
 class BasePerson(Base):
+    """
+    Class model for persons : Nurses and Patients.
+    Attributes:
+         Basic information about a person.
+    """
     __abstract__ = True
 
     last_name = db.Column(
@@ -49,6 +55,14 @@ class BasePerson(Base):
 
 
 class Patient(BasePerson):
+    """
+    Store the information of patients.
+
+    Attributes:
+          office_id : id of the office the patient is linked to.
+          digicode, additional_postal_information : additional info to the address.
+          latitude, longitude : Coordinates of the patient home, determined with geolocation function.
+    """
     id = db.Column(
         'patient_id',
         db.Integer,
@@ -144,7 +158,9 @@ class Appointment(Base):
     id = db.Column(
         'appointment_id',
         db.Integer,
-        primary_key=True)
+        primary_key=True,
+        nullable=False,
+        autoincrement=True)
 
     patient_id = db.Column(
         db.Integer,
@@ -173,6 +189,10 @@ class Appointment(Base):
         "Care",
         backref="care")
 
+    schedule = db.relationship(
+        "Schedule",
+        backref="schedule")
+
     def __init__(self, patient_id, date, care_id, halfday):
         self.patient_id = patient_id
         self.date = date
@@ -181,6 +201,14 @@ class Appointment(Base):
 
 
 class Schedule(Base):
+    """
+    Store the result given by the optmizer.
+
+    Attributes:
+        appointment_id : id of the appointment in table Appointment.
+        nurse_id : nurse in charge of the appointment.
+        hour : optimized hour of the appointment.
+    """
     id = db.Column(
         db.Integer,
         primary_key=True,
@@ -189,7 +217,7 @@ class Schedule(Base):
     appointment_id = db.Column(
         db.Integer,
         db.ForeignKey('appointment.appointment_id'),
-        unique=False)
+        unique=True)
 
     nurse_id = db.Column(
         db.Integer,
@@ -199,6 +227,9 @@ class Schedule(Base):
     hour = db.Column(
         db.Time)
 
+    travel_mode = db.Column(
+        db.String)
+
     appointment = db.relationship(
         "Appointment",
         backref="appointment")
@@ -207,9 +238,11 @@ class Schedule(Base):
         "Nurse",
         backref="nurse")
 
-    def __init__(self, hour, nurse_id):
+    def __init__(self, appointment_id, hour, nurse_id, travel_mode):
+        self.appointment_id = appointment_id
         self.hour = hour
         self.nurse_id = nurse_id
+        self.travel_mode = travel_mode
 
 
 class Care(Base):

@@ -28,25 +28,25 @@
     </div>
 
     {% if patients[0] %}
-    <div class="table-responsive">
+    <div class="table-responsive" style="border-radius:10px;">
         <table class="table table-bordered" width="100%" cellspacing="0">
             <thead>
             <tr style="text-align:center;" class="table-secondary">
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Last Name
+                <th scope="col" style="vertical-align:middle;">Last Name
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">First Name
+                <th scope="col" style="vertical-align:middle;">First Name
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Email
+                <th scope="col" style="vertical-align:middle;">Email
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Phone number
+                <th scope="col" style="vertical-align:middle;">Phone number
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Address
+                <th scope="col" style="vertical-align:middle;">Address
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Office
+                <th scope="col" style="vertical-align:middle;">Office
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Edit
+                <th scope="col" style="vertical-align:middle;">Edit
                 </th>
-                <th scope="col" style="border:1px solid black; vertical-align:middle;">Delete
+                <th scope="col" style="vertical-align:middle;">Delete
                 </th>
             </tr>
             </thead>
@@ -55,29 +55,29 @@
             <tbody style="text-align:center;">
             {% for patient in patients %}
             <tr>
-                <td width="20%" style="font-size:16px; border:1px solid black; vertical-align:middle;">
+                <td width="20%" style="font-size:16px; vertical-align:middle;">
                     {{patient.last_name}}
                 </td>
-                <td width="10%" style="font-size:16px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:16px; vertical-align:middle;">
                     {{patient.first_name}}
                 </td>
-                <td width="15%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="15%" style="font-size:14px; vertical-align:middle;">
                     {{ patient.email }}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     {{ patient.phone }}
                 </td>
-                <td width="20%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="20%" style="font-size:14px; vertical-align:middle;">
                     {{ patient.address }}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     {{ patient.office.name }}
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     <a href="{{ url_for('patients.edit_patient',patient_id=patient.id)}}"
                        class="btn btn-outline-danger">Edit</a>
                 </td>
-                <td width="10%" style="font-size:14px; border:1px solid black; vertical-align:middle;">
+                <td width="10%" style="font-size:14px; vertical-align:middle;">
                     <a href="{{ url_for('patients.delete_patient',patient_id=patient.id)}}"
                        class="btn btn-danger">Delete</a>
 

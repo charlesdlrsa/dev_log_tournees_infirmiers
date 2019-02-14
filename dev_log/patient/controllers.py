@@ -1,9 +1,8 @@
-from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 import re
+from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 from sqlalchemy.sql import or_
 from dev_log import db
 from dev_log.models import Patient
-from dev_log.auth.controllers import login_required
 from dev_log.auth.controllers import admin_required
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
@@ -12,6 +11,9 @@ patients = Blueprint('patients', __name__, url_prefix='/patients')
 @patients.route('/', methods=['GET', 'POST'])
 @admin_required
 def home():
+    """ Patients' home page allowing to see all the office's patients and their information,
+    to edit them or add a new one """
+
     if request.method == "POST":
         research = request.form['research']
         error = None
@@ -32,6 +34,8 @@ def home():
 @patients.route('/results/<research>', methods=['GET', 'POST'])
 @admin_required
 def search_patients(research):
+    """ Function allowing to search for a precise patient's information """
+
     if request.method == "POST":
         new_research = request.form['research']
         error = None
@@ -64,6 +68,8 @@ def search_patients(research):
 @patients.route('/add_patient', methods=['GET', 'POST'])
 @admin_required
 def add_patient():
+    """ Add a new patient in the database """
+
     if request.method == "POST":
         last_name = request.form['last_name']
         first_name = request.form['first_name']
@@ -107,6 +113,8 @@ def add_patient():
 @patients.route('/edit/<int:patient_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_patient(patient_id):
+    """ Edit patient information in database """
+
     if request.method == "POST":
         print(request.form)
         last_name = request.form['last_name']
@@ -138,18 +146,22 @@ def edit_patient(patient_id):
                             digicode=digicode,
                             additional_postal_information=additional_postal_information,
                             office_id=session['office_id']))
+            patient = Patient.query.filter(Patient.id == patient_id).first()
+            patient.geolocation()
             db.session.commit()
             flash("The patient's information have been updated")
             return redirect(url_for('patients.home'))
         flash(error)
 
-    patient = Patient.query.filter(Patient.id == patient_id).first()
+    patient = Patient.query.get(patient_id)
     return render_template("edit_patient.html", patient=patient)
 
 
 @patients.route('/delete_patient/<int:patient_id>')
 @admin_required
 def delete_patient(patient_id):
+    """ Delete patient from database """
+
     patient = Patient.query.get(patient_id)
     db.session.delete(patient)
     db.session.commit()
