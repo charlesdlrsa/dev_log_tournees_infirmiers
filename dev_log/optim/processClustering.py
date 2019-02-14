@@ -22,30 +22,66 @@ def runClustering(s):
     The dictionnary representing the cluster has the format:
         - key = center
         - value = list of the points in the cluster (always starting with the center)
+
     """
-    with open("models/clustering.dat", "r") as clustering:
-        with open("models/kmedian.dat", "w") as kmedian:
-            kmedian.write("# number of clusters\n")
-            kmedian.write("param k := {};\n".format(s.clusterNumber))
+    threshold = min(s.walkingThreshold, (s.dmax+s.dmin)/2.0)
+    with open("models/maxFootTimeClustering.dat", "w") as clustering:
+        clustering.write("# threshold for cluster size\n")
+        clustering.write("param maxClusterSize:= {};\n".format(7200))
+        
+        clustering.write("\n")
 
-            kmedian.write("\n")
+        clustering.write("# threshold for walking time\n")
+        clustering.write("param maxWalkingTime:= {};\n".format(3600))
+        
+        clustering.write("\n")
+        
+        clustering.write("# nombre de sommets {}\n".format(s.nb_points))
+        clustering.write("param: V: duration :=\n")
+        for p in s.points:
+            p_ID = p.getID()
+            p_duration = s.getCareDurationByID(p_ID)
+            clustering.write("\t{} {}\n".format(p_ID, p_duration))
+        clustering.write(";\n")
 
-            clustering.readline()
-            clustering.readline()
-            clustering.readline()
+        clustering.write("\n")
 
-            for line in clustering.readlines():
-                kmedian.write(line)
-
+        clustering.write("# id_sommet1, id_sommet2, drivingTime\n")
+        clustering.write("param: A: drivingTime :=\n")
+        for p1 in s.points:
+            for p2 in s.points:
+                if p1 == p2:
+                    p_ID = p1.getID()
+                    clustering.write("\t{} {} 0\n".format(p_ID, p_ID))
+                else:
+                    p_ID1 = p1.getID()
+                    p_ID2 = p2.getID()
+                    clustering.write("\t{} {} {}\n".format(p_ID1, p_ID2, s.distDriving[(p_ID1,p_ID2)]))
+        clustering.write(";\n")
+        
+        clustering.write("# id_sommet1, id_sommet2, walkingTime\n")
+        clustering.write("param: walkingTime :=\n")
+        for p1 in s.points:
+            for p2 in s.points:
+                if p1 == p2:
+                    p_ID = p1.getID()
+                    clustering.write("\t{} {} 0\n".format(p_ID, p_ID))
+                else:
+                    p_ID1 = p1.getID()
+                    p_ID2 = p2.getID()
+                    clustering.write("\t{} {} {}\n".format(p_ID1, p_ID2, s.distWalking[(p_ID1,p_ID2)]))
+        clustering.write(";\n")
+    
     # set up ampl
-    ampl = AMPL(Environment('ampl'))
+    ampl = AMPL(Environment('ampl/linux'))
 
     # Interpret the two files
-    ampl.read('models/kmedian.mod')
-    ampl.readData('models/kmedian.dat')
+    ampl.read('models/maxFootTimeClustering.mod')
+    ampl.readData('models/maxFootTimeClustering.dat')
 
     # Solve
     print("cluster space")
+    exit()
     ampl.solve()
 
     # Get objective entity by AMPL name

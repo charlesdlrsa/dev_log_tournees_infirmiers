@@ -8,18 +8,11 @@
 """
 
 TODO: 
-    recluster -> issue with office
-    assignNurse -> do LP
-    mettre en forme les sorties
+    remove calls to GmapAPI
     clean le code
 
 ISSUES:
     reclustering -> some solutions are infeasible
-
-
-Output: list of two dicts
-[{"nurse_id":"id", "app_id":"id", "hour":"hh:mm"}]
-[{"app_id:"id, "travel_mode":["driving"/"walking"]}]
 
 
 
@@ -185,6 +178,12 @@ class Space :
         Return the care duration list
         """
         return self.care_duration
+    
+    def getCareDurationByID(self, p_ID):
+        """
+        Return the care duration to be done at a given point
+        """
+        return self.care_duration[p_ID]
 
     def getPointByID(self, id):
         """
@@ -221,6 +220,9 @@ class Space :
         return l
 
     def rotateToStartingPoint(self, path, starting_point):
+        """
+        Rotate a list of points such that the list starts with a given starting point.
+        """
         while path[0].getID() != starting_point:
             point = path.pop(0)
             path.append(point)
@@ -335,18 +337,64 @@ class Space :
         
         return delta_lat * delta_long
     
+    # -------------------------------------------------------------------------
+    
+    # -------------------------------------------------------------------------
+    # -- BUILD DISTANCE MATRICES
+    # -------------------------------------------------------------------------
+
     def computeKmDistance(self):
         """
         Compute the matrix of distance between the points using distance as the crow flies.
-        This is a triangular matrix.
+        This is stored as a dictionnary using pointID's as keys
         """
-        dist = [[0 for k in range(self.nb_points)] for k in range(self.nb_points)]
-        for i in range(self.nb_points):
-            for j in range(i+1, self.nb_points):
-                dist[i][j] = self.points[i].distanceKmTo(self.points[j])
-        self.kmDist = dist
+        dist = dict()
+        for p1 in self.points:
+            for p2 in self.points:
+                if p1 != p2 :
+                    dist[(p1.getID(),p2.getID())] = p1.distanceKmTo(p2)
+                else:
+                    dist[(p1.getID(),p2.getID())] = 0
+        return dist
+    
+    def computeGmapDist(self, mode):
+        """
+        Compute the matrix of distance between two points using googlemaps.
+        This is stored as a dictionnary using pointID's as keys
+        """
+        dist = dict()
 
-    def getGoogleTravelTimes(self, addresses, mode):
+        nb_sublist = math.ceil(self.nb_points / 10.)
+
+        for i in range(nb_sublist):
+            for j in range(nb_sublist):
+                sources = self.points[10*i:10*(i+1)]
+                targets = self.points[10*j:10*(j+1)]
+
+                d = self.getGoogleTravelTimes(sources, targets, mode)
+
+                for s in range(len(sources)):
+                    for t in range(len(targets)):
+                        dist[(sources[s].getID(), targets[t].getID())] = int(d[s][t])
+
+        return dist
+
+    def buildDistanceMatrices(self):
+        """
+        Build the three distance matrices (as the crow flies, walking and driving)
+        """
+        self.distKm = self.computeKmDistance()
+
+        print(self.nb_points)
+        import time
+        a = time.time()
+        self.distWalking = self.computeGmapDist(mode="walking")
+        self.distDriving = self.computeGmapDist(mode="driving")
+        b = time.time()
+
+        print("app Gmap API:", b-a)
+
+    def getGoogleTravelTimes(self, sources, targets, mode):
         """
         Compute the matrix of time to travel (in seconds) between the points googlemaps 
         in either driving or walking mode.
@@ -359,12 +407,14 @@ class Space :
         :type mode: string
         """
         gmaps = googlemaps.Client(key=googlekey)
-        length = len(addresses)
-        liste_coordonnees = [(addresses[i].getLatitude(),addresses[i].getLongitude()) for i in range(length)]
-        distance = gmaps.distance_matrix(liste_coordonnees, liste_coordonnees, mode)
-        mat_travel_times = np.zeros((length, length))
-        for i in range(length):
-            for j in range(length):
+        n_sources = len(sources)
+        n_targets = len(targets)
+        coordonnees_sources = [(p.getLatitude(), p.getLongitude()) for p in sources]
+        coordonnees_targets = [(p.getLatitude(), p.getLongitude()) for p in targets]
+        distance = gmaps.distance_matrix(coordonnees_sources, coordonnees_targets, mode)
+        mat_travel_times = np.zeros((n_sources, n_targets))
+        for i in range(n_sources):
+            for j in range(n_targets):
                 mat_travel_times[i][j] = distance['rows'][i]['elements'][j]['duration']['value']
         return mat_travel_times
         
@@ -617,17 +667,23 @@ class Space :
         """
         if self.dmin is None or self.dmax is None:
             Space.computeExtremalDistances(self)
+        
+        print("1")
 
-        # compute distance as the crow flies
-        self.computeKmDistance()
+        # compute distance matrices
+        self.buildDistanceMatrices()
+
+
+        print("2")
 
         # get the minimal number of clusters
-        self.computeClusterNumber()
-
-        del self.kmDist
+        #self.computeClusterNumber()
 
         # cluster the space
         self.clusterSpace()
+
+
+        print("3")
 
         # compute time to see patients in each cluster
         self.clusterTime = dict()
@@ -841,7 +897,7 @@ if __name__ == "__main__":
 
     nurses = [1,2,3,4]
 
-    test_dict = {'nurse_id': ['2', '1'], 'office_lat': '48.7263802', 'office_lon': '2.2643467', 'start': '08:00', 'end': '12:00', 'appointments': [{'app_id': '6', 'app_lat': '48.73590189999999', 'app_lon': '2.2591394', 'app_length': '30'}, {'app_id': '7', 'app_lat': '48.7317076', 'app_lon': '2.2807308', 'app_length': '35'}, {'app_id': '8', 'app_lat': '48.7400286', 'app_lon': '2.3156139', 'app_length': '20'}, {'app_id': '9', 'app_lat': '48.6961912', 'app_lon': '2.2900446', 'app_length': '30'}, {'app_id': '10', 'app_lat': '48.7086557', 'app_lon': '2.241912', 'app_length': '35'}, {'app_id': '11', 'app_lat': '48.7450455', 'app_lon': '2.2664304', 'app_length': '35'}, {'app_id': '12', 'app_lat': '48.6964354', 'app_lon': '2.2691329', 'app_length': '25'}, {'app_id': '13', 'app_lat': '48.7382421', 'app_lon': '2.2176977', 'app_length': '35'}, {'app_id': '14', 'app_lat': '48.7973917', 'app_lon': '2.3484036', 'app_length': '35'}]}
+    test_dict = {'nurse_id': ['2', '1'], 'office_lat': '48.7263802', 'office_lon': '2.2643467', 'start': '08:00', 'end': '12:00', 'appointments': [{'app_id': '6', 'app_lat': '48.73590189999999', 'app_lon': '2.2591394', 'app_length': '30'},{'app_id': '16', 'app_lat': '48.6559099', 'app_lon': '2.23327', 'app_length': '15'}, {'app_id': '7', 'app_lat': '48.7317076', 'app_lon': '2.2807308', 'app_length': '35'}, {'app_id': '8', 'app_lat': '48.7400286', 'app_lon': '2.3156139', 'app_length': '20'}, {'app_id': '9', 'app_lat': '48.6961912', 'app_lon': '2.2900446', 'app_length': '30'}, {'app_id': '10', 'app_lat': '48.7086557', 'app_lon': '2.241912', 'app_length': '35'}, {'app_id': '11', 'app_lat': '48.7450455', 'app_lon': '2.2664304', 'app_length': '35'}, {'app_id': '12', 'app_lat': '48.6964354', 'app_lon': '2.2691329', 'app_length': '25'}, {'app_id': '13', 'app_lat': '48.7382421', 'app_lon': '2.2176977', 'app_length': '35'}, {'app_id': '14', 'app_lat': '48.7973917', 'app_lon': '2.3484036', 'app_length': '35'}]}
     s = Space()
     #s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses)
     s.buildSpaceFromDic(test_dict)
