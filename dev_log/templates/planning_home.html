@@ -1,11 +1,7 @@
 {% extends 'base_template.html' %}
 {% block content %}
 
-<div id="loading" style="margin-left:200px; width: 15px; height: 15px; visibility:hidden;">
-    <img src="../static/loading_image.gif"/>
-</div>
-
-<div id="content" class="container-fluid">
+<div class="container-fluid">
 
     <div class="card" style="margin-bottom:30px;">
         <div class="card-header">
@@ -17,7 +13,7 @@
         </div>
         <div class="card-body">
 
-            <form method="post">
+            <form method="post" onsubmit="loading();">
                 <div class="row">
                     {% if session['office_id'] %}
                     <div class="col">
@@ -44,7 +40,7 @@
 
                     </div>
                     <div class="col">
-                        <button class="btn btn-primary" type="submit" onclick="loading();">View planning</button>
+                        <button class="btn btn-primary" type="submit">View planning</button>
                     </div>
                 </div>
             </form>
@@ -54,10 +50,13 @@
 
 </div>
 
+<div id="loading" style="margin-left:200px; width: 15px; height: 15px; visibility:hidden;">
+    <img src="../static/loading_image.gif"/>
+</div>
+
 <script>
     function loading(){
         document.getElementById('loading').style.visibility="visible";
-        document.getElementById('content').style.visibility="hidden";
     };
 </script>
 

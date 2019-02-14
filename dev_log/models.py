@@ -11,7 +11,7 @@ class Base(db.Model):
         nullable=False)
     
 
-    def _geolocation(self):
+    def geolocation(self):
         """
         Set the attributes latitude and longitude of an address using Google Maps API.
 
@@ -100,7 +100,7 @@ class Patient(BasePerson):
         self.additional_postal_information = additional_postal_information
         self.phone = phone
         self.office_id = office_id
-        self._geolocation()
+        self.geolocation()
 
 
 class Nurse(BasePerson):
@@ -317,7 +317,7 @@ class Office(Base):
         self.email = email
         self.phone = phone
         self.password = password
-        self._geolocation()
+        self.geolocation()
 
 
 class Absence(Base):

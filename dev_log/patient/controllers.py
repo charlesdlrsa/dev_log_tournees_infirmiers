@@ -146,6 +146,8 @@ def edit_patient(patient_id):
                             digicode=digicode,
                             additional_postal_information=additional_postal_information,
                             office_id=session['office_id']))
+            patient = Patient.query.filter(Patient.id == patient_id).first()
+            patient.geolocation()
             db.session.commit()
             flash("The patient's information have been updated")
             return redirect(url_for('patients.home'))

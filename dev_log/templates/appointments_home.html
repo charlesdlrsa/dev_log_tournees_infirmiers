@@ -1,11 +1,7 @@
 {% extends 'base_template.html' %}
 {% block content %}
 
-<div id="loading" style="margin-left:200px; width: 15px; height: 15px; visibility:hidden;">
-    <img src="../static/loading_image.gif"/>
-</div>
-
-<div id="content" class="container-fluid">
+<div class="container-fluid">
 
     <!-- Page Content -->
     <div class="card" style="margin-bottom:100px;">
@@ -14,7 +10,7 @@
         </div>
         <div class="card-body">
 
-            <form action="." method="post">
+            <form action="." method="post" onsubmit="loading();">
                 <div class="row">
                     <div class="col">
                         <select id="input_patient" class="form-control" required="required" name="input_patient">
@@ -42,13 +38,14 @@
 
                     </div>
                     <div class="col">
-                        <button class="btn btn-primary" type="submit" onclick="loading();">Search availabilities</button>
+                        <button class="btn btn-primary" type="submit">Search availabilities</button>
                     </div>
                 </div>
             </form>
 
         </div>
     </div>
+
 
     <div class="card" style="margin-bottom:30px;">
         <div class="card-header">
@@ -80,11 +77,17 @@
 
 </div>
 
+
+<div id="loading" style="margin-left:200px; width: 15px; height: 15px; visibility:hidden;">
+    <img src="../static/loading_image.gif"/>
+</div>
+
+
 <script>
     function loading(){
         document.getElementById('loading').style.visibility="visible";
-        document.getElementById('content').style.visibility="hidden";
     };
+
 </script>
 
 {% endblock%}
