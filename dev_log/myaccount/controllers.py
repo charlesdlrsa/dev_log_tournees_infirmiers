@@ -119,6 +119,8 @@ def edit_office_account(office_id):
                             phone=phone,
                             password=password,
                             address=address))
+            office = Office.query.filter(Office.id == office_id).first()
+            office.geolocation()
             db.session.commit()
             flash("The office's information have been updated")
             return redirect(url_for('account.home'))
