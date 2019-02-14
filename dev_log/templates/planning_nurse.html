@@ -62,20 +62,20 @@
                     <a onclick="seeMyPointOfDeparture({{schedules[0].latitude}}, {{schedules[0].longitude}})"
                        href="#departure" class="btn btn-primary"> Your Office </a>
                     {% elif i==nb_schedules-1%}
-                    <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
+                    <a onclick="drawOneDirection({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
                           {{schedules[i].latitude}}, {{schedules[i].longitude}})"
                        href="#{{i-1}}->{{i}}"
                        class="btn btn-primary">Your Office</a>
                     {% else %}
                     {% if schedules[i-1].latitude %}
-                    <a onclick="drawMap({{schedules[i-1].latitude}}, {{schedules[i-1].longitude}},
-                              {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
+                    <a onclick="drawOneDirection({{schedules[i-1].latitude}}, {{schedules[i-1].longitude}},
+                              {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}}, '{{schedules[i].travel_mode}}')"
                        href="#{{i-1}}->{{i}}"
                        class="btn btn-primary">RDV
                         {{i}}</a>
                     {% else %}
-                    <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
-                              {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
+                    <a onclick="drawOneDirection({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
+                              {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}}, '{{schedules[i].travel_mode}}' )"
                        href="#{{i-1}}->{{i}}"
                        class="btn btn-primary">RDV
                         {{i}}</a>
@@ -160,7 +160,7 @@
 </div>
 
 <div style="width:37%; float:right; margin-left:0%; margin-right:2%; margin-bottom:1%; text-align:center;"><a
-        onclick="initMap()" href="#alltrajects" class="btn btn-danger"> See all your journeys on a map ! </a>
+        onclick="drawAllDirections()" href="#alltrajects" class="btn btn-danger"> See all your journeys on a map ! </a>
 </div>
 
 <div id="map"
@@ -168,7 +168,7 @@
 </div>
 
 <div id="directionsPanel"
-     style="width:37%; float:right; margin-left:0%; margin-right:2%; margin-bottom:2%; padding:5px 10px 5px 10px; background-color:#B3D1FF; border: blue 1px; border-radius: 15px;"></div>
+     style="width:37%; float:right; margin-left:0%; margin-right:2%; margin-bottom:2%; padding:5px 10px 5px 10px; background-color:#B3D1FF; border: blue 1px; border-radius: 15px; visibility:hidden;"></div>
 
 
 {% endif %}
@@ -186,64 +186,94 @@ function seeMyPointOfDeparture(lat_depart, lng_depart){
 var schedules_js = [];
 {% for i in range(0, nb_schedules) %}
 {% if schedules[i].appointment %}
-schedules_js.push( {'latitude':{{schedules[i].appointment.patient.latitude}}, 'longitude':{{schedules[i].appointment.patient.longitude}} } )
+schedules_js.push( {'latitude': {{schedules[i].appointment.patient.latitude}}, 'longitude': {{schedules[i].appointment.patient.longitude}}, 'travel_mode': '{{schedules[i].travel_mode}}'} );
 {% else %}
-schedules_js.push( {'latitude':{{schedules[i].latitude}}, 'longitude':{{schedules[i].longitude}} } )
+schedules_js.push( {'latitude': {{schedules[i].latitude}}, 'longitude': {{schedules[i].longitude}}, 'travel_mode': 'DRIVING'} );
 {% endif %}
 {% endfor %}
 
-function initMap(schedules=schedules_js, travel_mode='DRIVING'){
+function drawAllDirections(schedules=schedules_js){
+    document.getElementById('directionsPanel').style.visibility="hidden";
     var departure = {'lat': schedules[0]['latitude'], 'lng': schedules[0]['longitude']};
-    var arrival = {'lat': schedules[schedules.length-1]['latitude'], 'lng': schedules[schedules.length-1]['longitude']};
     var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: departure});
+    makeMarker( departure, "2 rue Christophe Colomb, 91300 Massy", map, 0 );
     var directionsService = new google.maps.DirectionsService();
-    var directionsDisplay = new google.maps.DirectionsRenderer();
-    directionsDisplay.setMap(map);
-    var request = {
-        origin: departure,
-        destination: arrival,
-        waypoints: [],
-        travelMode: travel_mode,
+    var requests = [0];
+    for (var i=1; i<schedules.length; i++){
+        var request = {
+            origin: {'lat':schedules[i-1]['latitude'], 'lng':schedules[i-1]['longitude'] },
+            destination: {'lat':schedules[i]['latitude'], 'lng':schedules[i]['longitude'] },
+            travelMode: schedules[i]['travel_mode'],
+        };
+        drawDirection(request, i, map, directionsService);
     };
-    for (var i=1; i<schedules.length-1; i++){
-        request.waypoints.push({
-          location: {'lat':schedules[i]['latitude'], 'lng':schedules[i]['longitude'] },
-          stopover: true,
-          });
-    };
+};
+
+function drawDirection(Request, nb, map, directionsService){
+    const request = Request;
+    const i = nb;
     directionsService.route(request, function(result, status) {
         if (status == 'OK') {
-            directionsDisplay.setDirections(result);
+            if (request['travelMode'] === 'DRIVING'){
+                new google.maps.DirectionsRenderer({
+                    map: map,
+                    directions: result,
+                    suppressMarkers: true
+                });
+            } else{
+                new google.maps.DirectionsRenderer({
+                    map: map,
+                    directions: result,
+                    suppressMarkers: true,
+                    polylineOptions: { strokeColor: "#00FF39", strokeWeight: 6, strokeOpacity: 0.7,}
+                });
+            };
+            var leg = result.routes[0].legs[0];
+            makeMarker( leg.end_location, leg.end_address, map, i);
         }
     });
 };
 
-function drawMap(lat_depart, lng_depart, lat_arrival, lng_arrival, travel_mode='DRIVING') {
+function makeMarker(position, title, map, i) {
+        new google.maps.Marker({
+            position: position,
+            map: map,
+            title: title,
+            label: {text:i.toString(), fontSize:"16px",fontWeight:"bold"},
+        });
+};
+
+function drawOneDirection(lat_depart, lng_depart, lat_arrival, lng_arrival, travel_mode='DRIVING') {
+    document.getElementById('directionsPanel').style.visibility="visible";
     var departure = {'lat': lat_depart, 'lng': lng_depart};
     var arrival = {'lat': lat_arrival, 'lng': lng_arrival};
     var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: departure});
     var directionsService = new google.maps.DirectionsService();
-    var directionsDisplay = new google.maps.DirectionsRenderer();
+    if (travel_mode == 'WALKING'){
+        var directionsDisplay = new google.maps.DirectionsRenderer({ polylineOptions: { strokeColor: "#00FF39", strokeWeight: 6} });
+    } else{
+        var directionsDisplay = new google.maps.DirectionsRenderer();
+    };
     directionsDisplay.setMap(map);
     var request = {
-    origin: departure,
-    destination: arrival,
-    travelMode: travel_mode,
+        origin: departure,
+        destination: arrival,
+        travelMode: travel_mode,
     };
     directionsService.route(request, function(result, status) {
         if (status == 'OK') {
             directionsDisplay.setDirections(result);
-            var route = result.routes[0];
+            var leg = result.routes[0].legs[0];
             var summaryPanel = document.getElementById('directionsPanel');
             while(summaryPanel.firstChild){
                 summaryPanel.removeChild(summaryPanel.firstChild);
             };
-            summaryPanel.innerHTML += '<strong>Departure:</strong> ' + route.legs[0].start_address + '<br>';
-            summaryPanel.innerHTML += '<strong>Arrival:</strong> ' + route.legs[0].end_address + '<br>';
-            summaryPanel.innerHTML += '<strong>Distance:</strong> ' + route.legs[0].distance.text + ' ---- ';
-            summaryPanel.innerHTML += '<strong>Duration:</strong> ' + route.legs[0].duration.text + ' ---- ';
-            summaryPanel.innerHTML += '<strong>Mode:</strong> ' + route.legs[0].steps[0].travel_mode.toLowerCase();
-        }
+            summaryPanel.innerHTML += '<strong>Departure:</strong> ' + leg.start_address + '<br>';
+            summaryPanel.innerHTML += '<strong>Arrival:</strong> ' + leg.end_address + '<br>';
+            summaryPanel.innerHTML += '<strong>Distance:</strong> ' + leg.distance.text + ' --- ';
+            summaryPanel.innerHTML += '<strong>Duration:</strong> ' + leg.duration.text + ' --- ';
+            summaryPanel.innerHTML += '<strong>Mode:</strong> ' + leg.steps[0].travel_mode.toLowerCase();
+        };
     });
 };
 

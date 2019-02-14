@@ -7,6 +7,7 @@ import datetime
 from dev_log import db
 from dev_log.utils.optimizer_functions import build_data_for_optimizer
 from dev_log.optim.space import solve_complete
+import random
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
@@ -77,8 +78,9 @@ def get_nurse_planning(nurse_id, date, halfday):
     if len(schedules) == 0:
         nurses_and_appointments = build_data_for_optimizer(date, halfday)
         schedules_information = solve_complete(nurses_and_appointments)
+        modes = ['DRIVING', 'WALKING']
         for info in schedules_information:
-            travel_mode = 'DRIVING'
+            travel_mode = random.choice(modes)
         #     for mode in travel_modes:
         #         if mode["app_id"] == info["app_id"]:
         #             travel_mode = mode["travel_mode"]
