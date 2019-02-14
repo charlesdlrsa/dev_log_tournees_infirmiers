@@ -69,14 +69,14 @@ Nous avons décidé de séparer notre application en plusieurs blueprints. Chaqu
 
 SQL Alchemy est un outil de mapping objet-relationnel très utilisé par la communauté des développeurs Python.
 
-![SQL Alchemy logo](/dev_log/static/lsqlalchemy_logo.jpg)
+![SQL Alchemy logo](/dev_log/static/sqlalchemy_logo.jpg)
 ##### L'avantage des ORM
 Le technique de mapping relationnel (ou object relationnal mapping - ORM) est une technique de programmation informatique qui crée l'illusion d'une base de données orientée objet à partir d'une base de données relationnelle en définissant des correspondances entre cette base de données et les objets du langage utilisé. Les ORM permettent une manipulation bien plus simple des données. L'écriture des requêtes et l'ensemble des opérations sur les bases de données (sélection, jointure, projection) sont extrêmement simplifiées. Enfin, les ORM permmettent de mieux organiser son code dans l'esprit MVC (model view controller).
 ##### Notre organisation
 Nous avons décidé de séparer notre modèle en plusieurs classes : cabinet, infirmiers, patients, rendez-vous, soins, rendez-vous planifiés. Les classes sont reliées entre elles par des "foreign keys" et des "relationships" afin de pouvoir effectuer des jointures de façon très simple.
 
 ## Choix de Bootstrap 
-![Bootstrap logo](/dev_log/static/bootstraps_logo.jpg)
+![Bootstrap logo](/dev_log/static/bootstraps_logo.png)
 ##### Facilité de prise en main
 Cette collection d’outil destinée à la création de sites internet et d’application web a été choisie pour sa facilité de prise en main. Chaque membre de l’équipe ayant initialement un profil bien plus orienté vers le Back End et le développement en python, l’aspect efficace, intuitif et simple de Bootstrap a semblé être la meilleure des solutions.
 ##### L'aspect "responsive"
