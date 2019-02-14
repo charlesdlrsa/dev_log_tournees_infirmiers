@@ -10,7 +10,33 @@
 
 # 1. Description du projet
 
- éventuellement les améliorations
+## Enjeux sous-jacents
+
+Les cabinets d'infirmiers ont un fonctionnement très spécifique à leur activité qui consiste en une répartition des soins à effectuer chez les patients au sein de toute l'équipe. Si celle-ci est mal faite, cela peut conduire à une perte considérable de temps / d'argent, et donc d'efficacité. Plus encore, cela peut contraindre le cabinet à refuser des rendez-vous à certaines dates si les interventions des infirmiers ne sont pas optimisées.
+En particulier, les trajets effectués par les infirmiers sont évidemment la première source potentielle de perte de temps : Il paraît inconcevable qu'un infirmier ait à effectuer un soin au nord de la région parisienne chez un patient A, et le suivant tout au sud alors que certains de ses collègues iront en même temps réaliser des soins à proximité du patient A. 
+
+## Notre solution
+
+La solution que nous proposons se veut simple et efficace, sous la forme d'une application web:
+- Celle-ci permet au compte administrateur du cabinet de: 
+  - Créer des comptes infirmiers
+  - Créer des comptes patients
+  - Gagner du temps graĉe à une interface spécialement pensée pour la prise de rendez-vous par téléphone.
+- Pour les infirmiers, l'interface permet de: 
+  - Modifier ses informations personnelles et professionnelles (prise en charge de soins, demande de congés)
+  - Visualiser son parcours de la prochaine journée (24 heures avant le début de celle-ci)
+- Le tout est géré par un optimiseur qui prend en compte tous les rendez-vous d'une demi-journée (Voir section 3.1 pour la description complète)
+
+## Les améliorations
+
+Voici les pistes d'améliorations prioritaires pour une v2 du projet:
+- Notre optimiseur devrait être capable de prendre en compte des rendez-vous à des horaires fixes. Si un patient doit recevoir un soin toutes les semaines, le même jour à la même heure, nous ne pouvons pas nous permettre de lui assurer seulement que son soin aura lieu à un moment dans la demi-journée (pour des raisons médicales évidentes).
+- A l'heure actuelle, les compétences professionnelles des infirmiers sont renseignées dans la base de données, mais pas prise en compte dans l'optimisation. Cette contrainte devrait donc également être rajoutée durant le processus d'optimisation dans notre v2. 
+
+Nous listons désormais ici les améliorations secondaires (qui permettent essentiellement un meilleur workflow d'utilisation de notre application):
+- implémentation d'alertes SMS/mails tant pour les infirmiers que pour les patients, afin de les informer des prochains rendez-vous qui arrivent.
+- Possibilité de valider un rendez-vous a posteriori si celui-ci a bien eu lieu, ou de l'invalider dans le cas contraire (contre-temps précisé au même moment par l'infirmier dans l'application)
+- Sur un smartphone, notre interface de vue du planning de la journée pour un infirmier pourrait directement lancer l'application "Google Maps" avec le guidage vers la prochaine destination.
 
 
 # 2. Vue d’ensemble de l’architecture
