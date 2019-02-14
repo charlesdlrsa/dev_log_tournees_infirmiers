@@ -10,7 +10,26 @@
 
 # 1. Description du projet
 
- éventuellement les améliorations
+## Enjeux sous-jacents
+
+Les cabinets d'infirmiers ont un fonctionnement très spécifique à leur activité qui consiste en une répartition des soins à effectuer chez les patients au sein de toute l'équipe. Si celle-ci est mal faite, cela peut conduire à une perte considérable de temps / d'argent, et donc d'efficacité. Plus encore, cela peut contraindre le cabinet à refuser des rendez-vous à certaines dates si les interventions des infirmiers ne sont pas optimisées.
+En particulier, les trajets effectués par les infirmiers sont évidemment la première source potentielle de perte de temps : Il paraît inconcevable qu'un infirmier ait à effectuer un soin au nord de la région parisienne chez un patient A, et le suivant tout au sud alors que certains de ses collègues iront en même temps réaliser des soins à proximité du patient A. 
+
+## Notre solution
+
+La solution que nous proposons se veut simple et efficace, sous la forme d'une application web:
+- Celle-ci permet au compte administrateur du cabinet de: 
+  - Créer des comptes infirmiers
+  - Créer des comptes patients
+  - Gagner du temps graĉe à une interface spécialement pensée pour la prise de rendez-vous par téléphone.
+- Pour les infirmiers, l'interface permet de: 
+  - Modifier ses informations personnelles et professionnelles (prise en charge de soins, demande de congés)
+  - Visualiser son parcours de la prochaine journée (24 heures avant le début de celle-ci)
+- Le tout est géré par un optimiseur qui prend en compte tous les rendez-vous d'une demi-journée (Voir section 3.1 pour la description complète)
+
+## Les améliorations
+
+FILLME
 
 
 # 2. Vue d’ensemble de l’architecture
