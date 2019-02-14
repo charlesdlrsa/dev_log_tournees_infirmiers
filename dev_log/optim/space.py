@@ -76,7 +76,7 @@ class Space:
             self,
             nb_points=0,
             points=[],
-            walkingThreshold=2.0):
+            walkingThreshold=1.0):
 
         self.nb_points = nb_points
         self.points = points
