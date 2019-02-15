@@ -1,6 +1,6 @@
-#Nursissimo
+# Nursissimo
 
-##Collaborative project
+## Collaborative project
 
 Nursissimo is a software for nurses' offices. It allows the nurses' offices to register patients in the database easily,
 to make appointments, and to quickly visualize the different nurses timetable depending on the day. Nursissimo also 
@@ -10,7 +10,7 @@ they also can also report their days off.
 *Accès au site web, en fonction du déploiement*
 
 
-##Installation
+## Installation
 
 **1**. Install the Python `virtualenv` package:
 
@@ -31,7 +31,7 @@ Windows: `.\venv\Scripts\activate.bat`
 
 `pip install -e nursissimo/`
 
-##Running Nursissimo
+## Running Nursissimo
 
 
 **1**. Go to your virtualenv. Add the app to your environment variables:
