@@ -216,10 +216,10 @@ Cette classe contient les soins que peuvent fournir les infirmiers. Chacun poss�
 ainsi qu'une description et la durée associée à la prestation de ce soin. Nous n'avons stocké qu'une petite dizaine de soins mais il est tout à fait possible d'en rajouter autant que nécessaire.
 
 
-![Schéma de classe](classes_DevLog.png)
+![Schéma de classe](dev_log/static/classes_DevLog.png)
 _Schéma de classes_
 
-![Schéma BDD](erd_from_sqlite.png)
+![Schéma BDD](dev_log/static/erd_from_sqlite.png)
 _Schéma de la base de données_
 
 ## Interactions
