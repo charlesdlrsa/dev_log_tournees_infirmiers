@@ -1,4 +1,4 @@
-# Nursissimo   <img src="dev_log/static/nurse_logo.png" width=60 align=center />
+# Nursissimo   <img src="dev_log/static/nurse_logo.png" width=60 />
 
 ## Collaborative project
 
@@ -85,12 +85,23 @@ The passwords are initialized to `password`
 
 
 
-**Our strength**
+## Our strengths
+
+**Our optimizer**
 
 Our software use a specific optimizer to determine the different appointments of a nurse in a day. Its goal is to minimize
-the transport time of a nurse. It allows the largest number of appointments to a nurse in a reduced geographic area around
-the nurse office. Then he gives the best way for every nurse to go the appointments, minimizing the tips time. If it is
-possible, our optimizer favors walking rather than driving.
+the transport time of a nurse. 
+- It allows the largest number of appointments to a nurse in a reduced geographic area around
+the nurse office. 
+- Then he gives the best way for every nurse to go the appointments, minimizing the tips time. 
+- If it is possible, our optimizer favors walking rather than driving.
+
+**The Google Maps visualization**
+
+We propose to the nurses to visualize their daily tips in a Google Maps map. This functionnality will help them to 
+- The nurse can visualize the complete itinerary of the day in his map, with all the appointement markers on the map.
+- The nurse can also visualize a specific tip between two appointments by selecting the destination appointment.
+- We differenciate the "driving" tips (in blue) and the "walking" tips (in green).
 
 
  
