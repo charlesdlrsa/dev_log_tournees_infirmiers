@@ -1,8 +1,6 @@
-# Nursissimo
-## Gestion de tournée des infirmiers
+# Nursissimo <img src="dev_log/static/nurse_logo.png" width=60 align=center />
 
-### Atelier Développement Logiciel
-#### 2018-2019
+### Atelier Développement Logiciel - Gestion de tournée des infirmiers - 2018-2019
 
 *Louis Cassedanne, Maxime Dieudonné, Charles de la Roche, Hippolyte Lévêque,  Alix Mallard, Romain Pascual*
 
