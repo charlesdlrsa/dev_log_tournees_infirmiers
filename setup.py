@@ -1,9 +1,12 @@
 from setuptools import setup, find_packages
 
 requirements = """
+amplpy
 click
 coverage
 elasticsearch
+flask
+flask_sqlalchemy==2.3.2
 googlemaps
 lxml
 numpy
@@ -18,10 +21,6 @@ selenium
 sendgrid
 xlrd
 xlsxwriter
-flask_sqlalchemy==2.3.2
-flask
-googlemaps
-amplpy
 """
 # numpy==1.14.3
 
