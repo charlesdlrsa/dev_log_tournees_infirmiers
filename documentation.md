@@ -4,7 +4,7 @@
 
 *Louis Cassedanne, Maxime Dieudonné, Charles de la Roche, Hippolyte Lévêque,  Alix Mallard, Romain Pascual*
 
-
+<br/>
 
 # 1. Description du projet
 
@@ -36,6 +36,7 @@ Nous listons désormais ici les améliorations secondaires (qui permettent essen
 - Possibilité de valider un rendez-vous a posteriori si celui-ci a bien eu lieu, ou de l'invalider dans le cas contraire (contre-temps précisé au même moment par l'infirmier dans l'application)
 - Sur un smartphone, notre interface de vue du planning de la journée pour un infirmier pourrait directement lancer l'application "Google Maps" avec le guidage vers la prochaine destination.
 
+<br/>
 
 # 2. Vue d’ensemble de l’architecture
 
@@ -101,6 +102,8 @@ et ainsi d'éditer seulement le jeu de données dans l'application.
 ##### Compatibilité
 
 AMPL est compatible avec Linux, MacOS et Windows (sous réserve d'ajouter les bonnes librairies), ce qui rend son uilisation plus versatile.
+
+<br/>
 
 # 3. Architecture détaillée de chaque entité
 
@@ -221,10 +224,9 @@ _Schéma de la base de données_
 
 ## Interactions
 
-### Diagramme de séquence d'authentification
-
 ![Diagramme de séquence 1](dev_log/static/diag_seq_1.png)
-
-### Diagramme de séquence de prise de rendez-vous
+_Diagramme de séquence d'authentification_
 
 ![Diagramme de séquence 2](dev_log/static/diag_seq_2.png)
+_Diagramme de séquence de prise de rendez-vous_
+
