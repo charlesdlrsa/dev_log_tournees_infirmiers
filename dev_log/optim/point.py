@@ -6,7 +6,7 @@ import math
 
 # @class Point
 
-class Point :
+class Point:
     """
     Point in the euclidien space.
             

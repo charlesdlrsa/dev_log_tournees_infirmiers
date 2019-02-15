@@ -4,6 +4,9 @@ from dev_log.auth.controllers import login_required, admin_required
 from dev_log.models import Nurse, Schedule, Office
 from dev_log.utils import calendar
 import datetime
+from dev_log import db
+from dev_log.utils.optimizer_functions import build_data_for_optimizer
+from dev_log.optim.space import solve_complete
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
@@ -64,8 +67,7 @@ def get_nurse_planning(nurse_id, date, halfday):
     # It returns, in date format, the date of the selected day.
 
     office = Office.query.filter(Office.id == nurse.office_id).all()
-    schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
-                                      Schedule.appointment.has(date=date_selected),
+    schedules = Schedule.query.filter(Schedule.appointment.has(date=date_selected),
                                       Schedule.appointment.has(halfday=halfday)).all()
 
     # If no schedules are planned, it means that it's the first time that the nurse can see its planning.
@@ -73,22 +75,32 @@ def get_nurse_planning(nurse_id, date, halfday):
     # and optimize their journeys. If schedules are already planned, this means that the optimizer had already been
     # launched, so the schedules are set for the half-day and we don't need to call the optimizer.
     if len(schedules) == 0:
-        # TODO : à changer par la vraie fonction de Romu
-        schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
-                                          Schedule.appointment.has(date=date_selected),
-                                          Schedule.appointment.has(halfday=halfday)).all()
-    if halfday == "Morning":
-        schedules = office + schedules
-        nb_schedules = len(schedules)
-    else:
-        schedules = schedules + office
-        nb_schedules = len(schedules)
+        nurses_and_appointments = build_data_for_optimizer(date, halfday)
+        schedules_information = solve_complete(nurses_and_appointments)
+        for info in schedules_information:
+            travel_mode = 'DRIVING'
+        #     for mode in travel_modes:
+        #         if mode["app_id"] == info["app_id"]:
+        #             travel_mode = mode["travel_mode"]
+        #             break
+            db.session.add(
+                Schedule(appointment_id=int(info["app_id"]),
+                         hour=datetime.time(int(info["hour"][:2]), int(info["hour"][3:5])),
+                         nurse_id=int(info["nurse_id"]), travel_mode=travel_mode))
+            db.session.commit()
+
+    schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
+                                      Schedule.appointment.has(date=date_selected),
+                                      Schedule.appointment.has(halfday=halfday)).all()
+
+    schedules = office + schedules + office
+    nb_schedules = len(schedules)
 
     return render_template("planning_nurse.html", nurse=nurse, date=date_selected, halfday=halfday,
                            schedules=schedules, nb_schedules=nb_schedules)
 
 
-@planning.route("/init", methods=['GET', 'POST'])
+@planning.route("/init_db", methods=['GET', 'POST'])
 @admin_required
 def reinit_db():
     """ Initializes the database on click """
@@ -96,5 +108,20 @@ def reinit_db():
     # TODO : to be deleted
     init_db()
     message = "The database has been reinitialised"
+    flash(message)
+    return redirect(url_for("planning.home"))
+
+
+@planning.route("/delete_schedules", methods=['GET', 'POST'])
+@admin_required
+def delete_schedules():
+    """ Initializes the database on click """
+
+    # TODO : to be deleted
+    schedules = Schedule.query.filter(Schedule.nurse.office_id == session["office_id"]).all()
+    db.session.delete(schedules)
+    db.session.commit()
+    flash("The appointment was successfully deleted.")
+    message = "The schedules have been deleted"
     flash(message)
     return redirect(url_for("planning.home"))

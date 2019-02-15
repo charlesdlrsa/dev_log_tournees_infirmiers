@@ -1,4 +1,4 @@
-from space import Space, GmapApiError
+from dev_log.optim.space import Space, GmapApiError
 from amplpy import AMPL, Environment
 
 def rotateToStartingElement(l, e):
@@ -12,6 +12,7 @@ def rotateToStartingElement(l, e):
         l.append(x)
 
 def hamiltonian(s, pointIDs, starting_pointID, mode="walking"):
+
     """
     Compute an hamiltonian cycle on the set of points.
     It uses a google maps key. Note that mode is "walking" or "driving".
@@ -37,7 +38,7 @@ def hamiltonian(s, pointIDs, starting_pointID, mode="walking"):
             For the solver to work, the points has to be numbered from 1 to n
             """
 
-            with open("models/travellingSalesman.dat", "w") as hamiltonian:
+            with open("dev_log/optim/models/travellingSalesman.dat", "w") as hamiltonian:
                 hamiltonian.write("# nombre de sommets {}\n".format(n))
                 hamiltonian.write("set V :=\n")
                 for k in range(1, n+1):
@@ -56,11 +57,12 @@ def hamiltonian(s, pointIDs, starting_pointID, mode="walking"):
                 hamiltonian.write(";\n")
 
             # set up ampl
-            ampl = AMPL(Environment('ampl/linux'))
+            ampl = AMPL(Environment('dev_log/optim/ampl/linux'))
+
 
             # Interpret the two files
-            ampl.read('models/travellingSalesman.mod')
-            ampl.readData('models/travellingSalesman.dat')
+            ampl.read('dev_log/optim/models/travellingSalesman.mod')
+            ampl.readData('dev_log/optim/models/travellingSalesman.dat')
 
             # Solve
             print("get Hamiltonian cycle")

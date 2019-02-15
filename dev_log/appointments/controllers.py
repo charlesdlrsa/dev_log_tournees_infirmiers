@@ -3,11 +3,10 @@ from sqlalchemy.sql import or_
 import datetime
 from dev_log.utils import calendar
 from dev_log import db
-from dev_log.models import Appointment, Patient, Nurse, Care, Office
+from dev_log.models import Appointment, Patient, Nurse, Care, Office, Schedule
 from dev_log.auth.controllers import admin_required
-
-# from dev_log.opti.space import solve_boolean
-
+from dev_log.optim.space import solve_boolean
+from dev_log.utils.optimizer_functions import build_data_for_optimizer
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 
@@ -41,12 +40,19 @@ def home():
             else:
                 return redirect(url_for('appointments.availabilities', patient_id=patient_id, date=date,
                                         care_id=care_id))
-        elif request.form.get('patient_appointments_research') is not None:
-            research = request.form['patient_appointments_research']
+        elif request.form.get('date_appointments_research') or request.form.get(
+                'patient_appointments_research') is not None:
+            date_research = request.form['date_appointments_research']
+            if date_research == "":
+                date_research = "all"
+            patient_research = request.form['patient_appointments_research']
+            if patient_research == "":
+                patient_research = "all"
             # we call the function "search_patient_appointments"
-            return redirect(url_for('appointments.search_patient_appointments', research=research))
+            return redirect(
+                url_for('appointments.search_patient_appointments', patient=patient_research, date=date_research))
         else:
-            error = 'You must choose a patient.'
+            error = 'You must choose a patient or a date.'
             flash(error)
 
     patients = Patient.query.filter(Patient.office_id == session['office_id']).order_by(Patient.last_name)
@@ -88,7 +94,7 @@ def availabilities(patient_id, date, care_id):
             # an appointment by calling the functions : check_appointments_patient and check_appointments_nurses
             appointment = check_appointments_patient(patient_id, date, halfday=halfday)
             if appointment is None:
-                if check_appointments_nurses(care_id, date, halfday=halfday) is True:
+                if check_appointments_nurses(care_id, patient_id, date, halfday=halfday) is True:
                     availabilities[week_day][halfday] = "A nurse is available"
                 else:
                     availabilities[week_day][halfday] = "No nurse is available"
@@ -103,58 +109,66 @@ def availabilities(patient_id, date, care_id):
                            care=care)
 
 
-@appointments.route('/research-<research>', methods=['GET', 'POST'])
-def search_patient_appointments(research):
+@appointments.route('/research/date-<date>/patient-<patient>', methods=['GET', 'POST'])
+def search_patient_appointments(date, patient):
     """ Function allowing to search the patient's appointments """
 
     if request.method == "POST":
-        research = request.form['patient_appointments_research']
-        return redirect(url_for('appointments.search_patient_appointments', research=research))
+        if request.form.get('date_appointments_research') or request.form.get(
+                'patient_appointments_research') is not None:
+            date_research = request.form['date_appointments_research']
+            if date_research == "":
+                date_research = "all"
+            patient_research = request.form['patient_appointments_research']
+            if patient_research == "":
+                patient_research = "all"
+            # we call the function "search_patient_appointments"
+            return redirect(
+                url_for('appointments.search_patient_appointments', patient=patient_research, date=date_research))
+        else:
+            error = 'You must choose a patient or a date.'
+            flash(error)
 
-    if len(research.split()) >= 2:
-        first_name, last_name = research.split()[0], " ".join(research.split()[1:])
-        appointments = Appointment.query \
-            .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
-                                                  Patient.first_name.like('%' + first_name + '%')))
+    if patient == "all":
+        date_selected = calendar.get_dates_from_form(date)[0]
+        appointments = Appointment.query.filter(Appointment.date == date_selected)
+    elif date == "all":
+        if len(patient.split()) >= 2:
+            first_name, last_name = patient.split()[0], " ".join(patient.split()[1:])
+            appointments = Appointment.query \
+                .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
+                                                      Patient.first_name.like('%' + first_name + '%'))).order_by(
+                Appointment.date)
+        else:
+            appointments = Appointment.query \
+                .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + patient + '%'),
+                                                      Patient.first_name.like('%' + patient + '%'))).order_by(
+                Appointment.date)
     else:
-        appointments = Appointment.query \
-            .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + research + '%'),
-                                                  Patient.first_name.like('%' + research + '%')))
+        date_selected = calendar.get_dates_from_form(date)[0]
+        if len(patient.split()) >= 2:
+            first_name, last_name = patient.split()[0], " ".join(patient.split()[1:])
+            appointments = Appointment.query \
+                .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + last_name + '%'),
+                                                      Patient.first_name.like('%' + first_name + '%')),
+                                                  Appointment.date == date_selected)
+        else:
+            appointments = Appointment.query \
+                .join(Appointment.patient).filter(or_(Patient.last_name.like('%' + patient + '%'),
+                                                      Patient.first_name.like('%' + patient + '%')),
+                                                  Appointment.date == date_selected)
 
     return render_template('appointments.html', appointments=appointments)
 
 
-def check_appointments_nurses(care_id, date, halfday):
+def check_appointments_nurses(care_id, patient_id, date, halfday):
     """ Function checking if the nurses are able to do all the appointments of the selected half-day, plus the new
     appointment that the administrator wants to schedule by calling the optimizer function """
 
-    # TODO : Ne pas oublier d'envoyer la position du cabinet
-    nurses_office = Nurse.query.filter(Nurse.office_id == session['office_id']).all()
-    nurses_absent = Nurse.query.filter(Nurse.nurse_absence.any(date=date)).all()
-    nurses = list(set(nurses_office) - set(nurses_absent))
-    office = Office.query.filter(Office.id == session['office_id']).first()
-    data = {}
-    data["nurse_ids"] = [str(nurse.id) for nurse in nurses]
-    data["office_lat"] = str(office.latitude)
-    data["office_lon"] = str(office.longitude)
-    if halfday == "Morning":
-        data["start"] = "08:00"
-        data["end"] = "12:00"
-    if halfday == "Afternoon":
-        data["start"] = "14:00"
-        data["end"] = "18:00"
-
-    appointments = Appointment.query.filter(Appointment.date == date, Appointment.halfday == halfday).all()
-    data["appointments"] = []
-    for app in appointments:
-        app_data = {}
-        app_data["app_id"] = str(app.id)
-        app_data["app_lat"] = str(app.patient.latitude)
-        app_data["app_lon"] = str(app.patient.longitude)
-        app_data["app_length"] = str(app.care.duration)
-        data["appointments"].append(app_data)
-    # response = solve_boolean(data)
-    response = True
+    appointments_and_available_nurses_for_this_date = build_data_for_optimizer(date, halfday, care_id,
+                                                                               patient_id=patient_id)
+    print(appointments_and_available_nurses_for_this_date)
+    response = solve_boolean(appointments_and_available_nurses_for_this_date)
 
     return response
 
@@ -183,7 +197,7 @@ def add_appointment(patient_id, date, care_id, halfday):
     appointment = Appointment(patient_id=patient_id, date=date_selected, care_id=care_id, halfday=halfday)
     db.session.add(appointment)
     db.session.commit()
-    flash('The appointment was successfully added on {} in the morning'.format(date_selected.strftime("%d/%m/%y")))
+    flash('The appointment was successfully added on {} in the {}'.format(date_selected.strftime("%d/%m/%y"), halfday))
     return redirect(url_for('appointments.home'))
 
 
@@ -193,7 +207,12 @@ def delete_appointment(appointment_id):
     """ Delete an appointment with its id from the database """
 
     appointment = Appointment.query.get(appointment_id)
+    schedule = Schedule.query.filter(Schedule.appointment_id == appointment_id).first()
     db.session.delete(appointment)
+    try:
+        db.session.delete(schedule)
+    except:
+        pass
     db.session.commit()
     flash("The appointment was successfully deleted.")
     return redirect(url_for('appointments.home'))

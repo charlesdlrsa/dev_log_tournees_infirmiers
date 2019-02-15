@@ -1,4 +1,4 @@
-from space import Space, GmapApiError
+from dev_log.optim.space import Space, GmapApiError
 from amplpy import AMPL, Environment
 import math
 
@@ -52,7 +52,7 @@ def runReclustering(s, toRecluster):
         d_threshold = min(s.walkingThreshold, (s.dmax+s.dmin)/2.0)
         threshold = int(d_threshold*750)
 
-        with open("models/clusteringWithVertexValues.dat", "w") as clustering:
+        with open("dev_log/optim/models/clusteringWithVertexValues.dat", "w") as clustering:
             clustering.write("# threshold for walking distance\n")
             clustering.write("param t:= {};\n".format(threshold))
             
@@ -91,11 +91,11 @@ def runReclustering(s, toRecluster):
             clustering.write(";\n")
 
         # set up ampl
-        ampl = AMPL(Environment('ampl'))
+        ampl = AMPL(Environment('dev_log/models/ampl'))
 
         # Interpret the two files
-        ampl.read('models/clusteringWithVertexValues.mod')
-        ampl.readData('models/clusteringWithVertexValues.dat')
+        ampl.read('dev_log/models/clusteringWithVertexValues.mod')
+        ampl.readData('dev_log/models/clusteringWithVertexValues.dat')
 
         # Solve
         print("reclustering")

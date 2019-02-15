@@ -1,4 +1,4 @@
-from space import Space, GmapApiError
+from dev_log.optim.space import Space, GmapApiError
 from amplpy import AMPL, Environment
 
 """
@@ -90,6 +90,7 @@ def vrp(s, centers):
         if not 0 in c:
             c.append(0)
     
+
     #print(clusters)
     res = []
     
@@ -97,14 +98,9 @@ def vrp(s, centers):
         #print(clusters[c])
         #print(s.getListPointsByID(clusters[c]))
         h = s.getHamiltonianCycle(s.getListPointsByID(clusters[c]), 0, mode ="driving")
+
         clusters[c] = [s.getPointByID(p) for p in h[0]], h[1]
         res.append(clusters[c])
         print("###")
         print(h[0])
     return res
-
-    """
-    #regenerate the path
-    x = ampl.getVariable("x")
-    return s.buildVRPSolution(centers, x, time, k)
-    """

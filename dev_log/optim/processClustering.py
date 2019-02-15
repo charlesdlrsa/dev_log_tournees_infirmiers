@@ -1,4 +1,3 @@
-from space import Space
 from amplpy import AMPL, Environment
 
 
@@ -15,7 +14,6 @@ def runClustering(s):
     The dictionnary representing the cluster has the format:
         - key = center
         - value = list of the points in the cluster (always starting with the center)
-
     """
     threshold = min(s.walkingThreshold, (s.dmax+s.dmin)/2.0)
     with open("models/maxFootTimeClustering.dat", "w") as clustering:
@@ -66,11 +64,11 @@ def runClustering(s):
         clustering.write(";\n")
     
     # set up ampl
-    ampl = AMPL(Environment('ampl/linux'))
+    ampl = AMPL(Environment('dev_log/optim/ampl/linux'))
 
     # Interpret the two files
-    ampl.read('models/maxFootTimeClustering.mod')
-    ampl.readData('models/maxFootTimeClustering.dat')
+    ampl.read('dev_log/optim/models/maxFootTimeClustering.mod')
+    ampl.readData('dev_log/optim/models/maxFootTimeClustering.dat')
 
     # Solve
     print("cluster space")

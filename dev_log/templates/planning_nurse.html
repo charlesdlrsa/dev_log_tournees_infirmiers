@@ -11,7 +11,7 @@
     {% endif %}
 </div>
 
-{% if schedules[1] %}
+{% if nb_schedules > 2 %}
 <div style="font-size:18px; font-weight: bold; color:#0F94FF; text-align:center; margin-bottom:2%;">
     Please click on one of the blue buttons to see how to go to the appointment from the previous appointment.
 </div>
@@ -23,7 +23,7 @@
 </div>
 {%endif%}
 
-{% if schedules[1] %}
+{% if nb_schedules > 2 %}
 <div style="float:left; width:57%; vertical-align:middle; margin-left:2%; margin-right:2%;">
     <div class="table-responsive" style="border-radius:10px;">
         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -59,32 +59,27 @@
                 <td width=5%
                     style="font-size:12px; vertical-align:middle;">
                     {% if i==0 %}
-                        {% if schedules[0].appointment %}
-                        <a onclick="seeMyPointOfDeparture({{schedules[0].appointment.patient.latitude}}, {{schedules[0].appointment.patient.longitude}})"
-                           href="#departure" class="btn btn-primary"> RDV 0 </a>
-                        {% else %}
-                        <a onclick="seeMyPointOfDeparture({{schedules[0].latitude}}, {{schedules[0].longitude}})"
-                           href="#departure" class="btn btn-primary"> Your Office </a>
-                    {% endif %}
-                    {% elif i==nb_schedules-1 and halfday=="Afternoon"%}
+                    <a onclick="seeMyPointOfDeparture({{schedules[0].latitude}}, {{schedules[0].longitude}})"
+                       href="#departure" class="btn btn-primary"> Your Office </a>
+                    {% elif i==nb_schedules-1%}
                     <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
                           {{schedules[i].latitude}}, {{schedules[i].longitude}})"
                        href="#{{i-1}}->{{i}}"
                        class="btn btn-primary">Your Office</a>
                     {% else %}
-                        {% if schedules[i-1].latitude %}
-                        <a onclick="drawMap({{schedules[i-1].latitude}}, {{schedules[i-1].longitude}},
+                    {% if schedules[i-1].latitude %}
+                    <a onclick="drawMap({{schedules[i-1].latitude}}, {{schedules[i-1].longitude}},
                               {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
-                           href="#{{i-1}}->{{i}}"
-                           class="btn btn-primary">RDV
-                            {{i}}</a>
-                        {% else %}
-                        <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
+                       href="#{{i-1}}->{{i}}"
+                       class="btn btn-primary">RDV
+                        {{i}}</a>
+                    {% else %}
+                    <a onclick="drawMap({{schedules[i-1].appointment.patient.latitude}}, {{schedules[i-1].appointment.patient.longitude}},
                               {{schedules[i].appointment.patient.latitude}}, {{schedules[i].appointment.patient.longitude}})"
-                           href="#{{i-1}}->{{i}}"
-                           class="btn btn-primary">RDV
-                            {{i}}</a>
-                        {% endif %}
+                       href="#{{i-1}}->{{i}}"
+                       class="btn btn-primary">RDV
+                        {{i}}</a>
+                    {% endif %}
                     {% endif %}
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
@@ -101,11 +96,15 @@
                 </td>
                 <td width=5% style="font-size:12px; vertical-align:middle;">
                     {% if schedules[i].hour %}
-                    {{schedules[i].hour}}
-                    {% elif halfday=="Morning"%}
-                    07:45:00
-                    {% else %}
-                    18:00:00
+                    {{schedules[i].hour.strftime('%H:%M')}}
+                    {% elif halfday=="Morning" and i == 0%}
+                    07:45
+                    {% elif halfday=="Afternoon" and i == 0%}
+                    12:00
+                    {% elif halfday=="Morning" and i == nb_schedules-1 %}
+                    12:00
+                    {% elif halfday=="Afternoon" and i == nb_schedules-1 %}
+                    18:00
                     {% endif %}
                 </td>
                 <td width=10% style="font-size:12px; vertical-align:middle;">
@@ -116,8 +115,14 @@
                 <td width=5% style="font-size:12px; vertical-align:middle;">
                     {% if schedules[i].appointment %}
                     {{schedules[i].appointment.care.duration}} min
-                    {% else %}
+                    {% elif halfday=="Morning" and i == 0%}
                     15 min
+                    {% elif halfday=="Afternoon" and i == 0%}
+                    2h
+                    {% elif halfday=="Morning" and i == nb_schedules-1 %}
+                    2h
+                    {% else %}
+                    --
                     {% endif %}
                 </td>
                 <td width=45% style="font-size:12px; vertical-align:middle;">
@@ -154,10 +159,17 @@
 
 </div>
 
-<div id="map"
-     style="height:70%; width:37%; float:right; margin-left:0%; margin-right:2%; vertical-align:middle; padding:150px;">
-    <a onclick="initMap()" href="#alltrajects" class="btn btn-danger"> See all your journeys on a map ! </a>
+<div style="width:37%; float:right; margin-left:0%; margin-right:2%; margin-bottom:1%; text-align:center;"><a
+        onclick="initMap()" href="#alltrajects" class="btn btn-danger"> See all your journeys on a map ! </a>
 </div>
+
+<div id="map"
+     style="height:60%; width:37%; float:right; margin-left:0%; margin-right:2%; margin-bottom:1%;">
+</div>
+
+<div id="directionsPanel"
+     style="width:37%; float:right; margin-left:0%; margin-right:2%; margin-bottom:2%; padding:5px 10px 5px 10px; background-color:#B3D1FF; border: blue 1px; border-radius: 15px;"></div>
+
 
 {% endif %}
 
@@ -166,7 +178,7 @@
 function seeMyPointOfDeparture(lat_depart, lng_depart){
     var office = {'lat': lat_depart , 'lng': lng_depart};
     var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: office});
-    var marker = new google.maps.Marker({position: office, map: map, label: {text: 'Your departure', fontSize:"18px",fontWeight:"bold", color:'black'}});
+    var marker = new google.maps.Marker({position: office, map: map, label: {text: 'Your office', fontSize:"18px",fontWeight:"bold", color:'black'}});
     var directionsDisplay = new google.maps.DirectionsRenderer();
     directionsDisplay.setMap(map);
 };
@@ -221,11 +233,19 @@ function drawMap(lat_depart, lng_depart, lat_arrival, lng_arrival, travel_mode='
     directionsService.route(request, function(result, status) {
         if (status == 'OK') {
             directionsDisplay.setDirections(result);
+            var route = result.routes[0];
+            var summaryPanel = document.getElementById('directionsPanel');
+            while(summaryPanel.firstChild){
+                summaryPanel.removeChild(summaryPanel.firstChild);
+            };
+            summaryPanel.innerHTML += '<strong>Departure:</strong> ' + route.legs[0].start_address + '<br>';
+            summaryPanel.innerHTML += '<strong>Arrival:</strong> ' + route.legs[0].end_address + '<br>';
+            summaryPanel.innerHTML += '<strong>Distance:</strong> ' + route.legs[0].distance.text + ' ---- ';
+            summaryPanel.innerHTML += '<strong>Duration:</strong> ' + route.legs[0].duration.text + ' ---- ';
+            summaryPanel.innerHTML += '<strong>Mode:</strong> ' + route.legs[0].steps[0].travel_mode.toLowerCase();
         }
     });
 };
-
-
 
 
 

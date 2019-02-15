@@ -14,8 +14,6 @@ TODO:
 ISSUES:
     reclustering -> some solutions are infeasible
 
-
-
 Use of the Distance Matrix service for existing Premium Plan customers
 
 In order to switch over to the new pay as you go pricing plan, you must create a new project, as your existing Premium project cannot be transferred. You must get new API keys, and use them to to replace your existing keys. Please contact your account manager and/or reseller to coordinate your transition to the new plan before your current Premium license expires. In the meantime, your Premium Plan quotas remain in effect.
@@ -30,26 +28,23 @@ In order to switch over to the new pay as you go pricing plan, you must create a
 googlemaps.exceptions.ApiError: MAX_ELEMENTS_EXCEEDED
 
 """
-
 import os
-
 import sys
 import math
-import time
-import re
-from point import Point
+from dev_log.optim.point import Point
 from operator import attrgetter
-from amplpy import AMPL, Environment
 import numpy as np
 import googlemaps
-from key import key
+from dev_log.utils.key import key
+
 googlekey = key
+
 
 class GmapApiError(Exception):
     pass
 
-class Space :
-    
+
+class Space:
     ## Attributes :
     # nb_points: number of points
     # points: list of the points
@@ -57,17 +52,17 @@ class Space :
     # dmax: maximal distance between two points in the space
 
     clustering_factor = 0.5
-    
+
     # -------------------------------------------------------------------------
     # -- INITIALIZATION
     # -------------------------------------------------------------------------
 
     def __init__(
             self,
-            nb_points = 0,
-            points = [],
-            walkingThreshold = 2.0):
-        
+            nb_points=0,
+            points=[],
+            walkingThreshold=2.0):
+
         self.nb_points = nb_points
         self.points = points
         self.walkingThreshold = walkingThreshold
@@ -90,7 +85,7 @@ class Space :
         self.clusterTime = None
     
     # -------------------------------------------------------------------------
-    
+
     # -------------------------------------------------------------------------
     # -- PARSE 
     # -------------------------------------------------------------------------
@@ -123,7 +118,7 @@ class Space :
         """
         self.start = [int(x) for x in dataDict["start"].split(":")]
         self.end = [int(x) for x in dataDict["end"].split(":")]
-        self.duration = (self.end[0] - self.start[0])*3600 + (self.end[1] - self.start[1]) * 60
+        self.duration = (self.end[0] - self.start[0]) * 3600 + (self.end[1] - self.start[1]) * 60
         self.nurse_ids = [int(x) for x in dataDict["nurse_id"]]
         self.points = [Point(id=0, lat=float(dataDict["office_lat"]), lon=float(dataDict["office_lon"]))]
         self.nb_points = 1
@@ -134,15 +129,13 @@ class Space :
             self.nb_points += 1
             self.care_duration[int(app["app_id"])] = 60 * int(app["app_length"])
 
-
-
     # -------------------------------------------------------------------------
-    
+
     # -------------------------------------------------------------------------
     # -- CREATION 
     # -------------------------------------------------------------------------
 
-    def buildSpaceFromDB(self, office, patients, nurse_ids=[], cares=[], start = [8,0], end = [12,0]):
+    def buildSpaceFromDB(self, office, patients, nurse_ids=[], cares=[], start=[8, 0], end=[12, 0]):
         """
         Build a 2D space from a given dictionnary of patients and the realted office.
         @param office: position of the office(latitude, longitude)
@@ -156,10 +149,10 @@ class Space :
         self.points = []
         self.start = start
         self.end = end
-        self.duration = (self.end[0] - self.start[0])*3600 + (self.end[1] - self.start[1]) * 60
+        self.duration = (self.end[0] - self.start[0]) * 3600 + (self.end[1] - self.start[1]) * 60
 
         # add office
-        self.nb_points +=1
+        self.nb_points += 1
         self.points.append(Point(0, office[0], office[1]))
         self.care_duration = dict()
         self.care_duration[0] = 0
@@ -172,14 +165,14 @@ class Space :
         # process patients
         for patient_id, patient_position in patients.items():
             try:
-                self.care_duration[patient_id] = cares[self.nb_points-1]
+                self.care_duration[patient_id] = cares[self.nb_points - 1]
             except IndexError:
                 self.care_duration[patient_id] = 1800
             self.nb_points += 1
-            self.points.append(Point(patient_id,patient_position[0], patient_position[1]))
+            self.points.append(Point(patient_id, patient_position[0], patient_position[1]))
 
     # -------------------------------------------------------------------------
-    
+
     # -------------------------------------------------------------------------
     # -- Finders 
     # -------------------------------------------------------------------------
@@ -203,7 +196,7 @@ class Space :
             if p.getID() == id:
                 return p
         return None
-    
+
     def getListPointsByID(self, listIds):
         """
         Return the list of points in the space having the given ids, can be empty.
@@ -224,11 +217,11 @@ class Space :
                 i_list += 1
             else:
                 i_points += 1
-        
+
         del self.points_by_id
 
         return l
-    
+
     def buildVRPSolution(self, listCenters, amplMatPath, travel_times, path_number):
         """
         Given a list of points and the ampl transition matrix, rebuild the differents
@@ -247,34 +240,34 @@ class Space :
         n = len(listCenters)
         VRP = []
         for p in range(n):
-            if p != 0 and amplMatPath[1,p+1].value():
+            if p != 0 and amplMatPath[1, p + 1].value():
                 i = p
                 j = -1
                 path = [listCenters[0], listCenters[p]]
                 travel_time = travel_times[0][p]
                 while j != 0:
                     for k in range(n):
-                        if i != k and amplMatPath[i+1,k+1].value():
+                        if i != k and amplMatPath[i + 1, k + 1].value():
                             j = k
                     travel_time += self.clusterTime[listCenters[i].getID()] + travel_times[i][j]
                     i = j
                     path.append(listCenters[i])
-                VRP.append([path,travel_time])
+                VRP.append([path, travel_time])
         return VRP
-        
+
     # -------------------------------------------------------------------------
-    
+
     # -------------------------------------------------------------------------
     # -- PRE COMPUTATION
     # -------------------------------------------------------------------------
-    
+
     def sortByLong(self):
         """
         Sort the points in the space according to their longitude.
         """
         self.points_by_long = self.points.copy()
         self.points_by_long.sort(key=attrgetter("longitude"))
-    
+
     def sortByLat(self):
         """
         Sort the points in the space according to their latitude.
@@ -288,7 +281,7 @@ class Space :
         """
         self.points_by_id = self.points.copy()
         self.points_by_id.sort(key=attrgetter("id"))
-           
+
     def lexSort(self):
         """
         Sort the points in the space according to their (longitude, latitude),
@@ -296,7 +289,7 @@ class Space :
         """
         self.points_lex_sorted = self.points.copy()
         self.points_lex_sorted.sort(key=(attrgetter("longitude", "latitude")))
-    
+
     def surface(self):
         """
         Determine the rectangular surface in which the points are.
@@ -305,10 +298,10 @@ class Space :
             self.sortByLong()
         if not self.points_by_lat:
             self.sortByLat()
-        
+
         delta_long = self.points_by_long[-1].getLongitude() - self.points_by_long[0].getLongitude()
         delta_lat = self.points_by_lat[-1].getLatitude() - self.points_by_lat[0].getLatitude()
-        
+
         return delta_lat * delta_long
     
     # -------------------------------------------------------------------------
@@ -316,6 +309,7 @@ class Space :
     # -------------------------------------------------------------------------
     # -- BUILD DISTANCE MATRICES
     # -------------------------------------------------------------------------
+
 
     def computeKmDistance(self):
         """
@@ -366,6 +360,7 @@ class Space :
         self.distDriving = self.computeGmapDist(mode="driving")
         b = time.time()
 
+
         print("app Gmap API:", b-a)
 
     def getGoogleTravelTimes(self, sources, targets, mode):
@@ -385,7 +380,10 @@ class Space :
         n_targets = len(targets)
         coordonnees_sources = [(p.getLatitude(), p.getLongitude()) for p in sources]
         coordonnees_targets = [(p.getLatitude(), p.getLongitude()) for p in targets]
-        distance = gmaps.distance_matrix(coordonnees_sources, coordonnees_targets, mode)
+        try:
+            distance = gmaps.distance_matrix(coordonnees_sources, coordonnees_targets, mode)
+        except:
+            raise GmapApiError
         mat_travel_times = np.zeros((n_sources, n_targets))
         for i in range(n_sources):
             for j in range(n_targets):
@@ -448,18 +446,17 @@ class Space :
         elif mode == "driving":
             return self.getDistDrivingSource2Target(sourceID, targetID)
 
-        
     # -------------------------------------------------------------------------
-     
+
     # -------------------------------------------------------------------------
     # -- DMIN USING DIVIDE AND CONQUER
     # -------------------------------------------------------------------------
-    
+
     """
     Dmin is computed approximating latitude and longitude as coordinates in a 2D space
     """
 
-    def bruteForce(self,points_by_long):
+    def bruteForce(self, points_by_long):
         """
         Brute force guess for small instances
         """
@@ -471,8 +468,8 @@ class Space :
         length = len(points_by_long)
         if length == 2:
             return p1, p2, dmin
-        for i in range(0,length-1):
-            for j in range(i+1, length):
+        for i in range(0, length - 1):
+            for j in range(i + 1, length):
                 if i != 0 and j != 1:
                     p, q = points_by_long[i], points_by_long[j]
                     if not p.sameLocation(q):
@@ -480,73 +477,74 @@ class Space :
                         if d < dmin:
                             p1, p2, dmin = p, q, d
         return p1, p2, dmin
-    
-    def closestPairCenter(self, center, dist, pmin,qmin):
+
+    def closestPairCenter(self, center, dist, pmin, qmin):
         """
         Compute the minimum distance in the center
         """
         p1, p2, dmin = pmin, qmin, dist
-        length = len(center) 
+        length = len(center)
         for i in range(length - 1):
-            for j in range(i+1, min(i + 7, length)):
+            for j in range(i + 1, min(i + 7, length)):
                 p, q = center[i], center[j]
                 if not p.sameLocation(q):
                     d = p.squaredDistanceTo(q)
                     if d < dmin:
-                        p1, p2, dmin = p, q , d
+                        p1, p2, dmin = p, q, d
         return p1, p2, dmin
-    
-    def closestPair(self,points_by_long, points_by_lat, stop = 3):
+
+    def closestPair(self, points_by_long, points_by_lat, stop=3):
         """
         Implementation of the divide and conquer
         """
         # Brute force for small instances
         length = len(points_by_long)
         if length <= stop:
-            return Space.bruteForce(self,points_by_long)
-        
+            return Space.bruteForce(self, points_by_long)
+
         # divide
         med = length // 2
         leftLong = points_by_long[:med]
         rightLong = points_by_long[med:]
-        longitude_midpoint = points_by_long[med].getLongitude()  
+        longitude_midpoint = points_by_long[med].getLongitude()
         leftLat = list()
         rightLat = list()
         for x in points_by_lat:
             if x.getLongitude() <= longitude_midpoint:
-               leftLat.append(x)
+                leftLat.append(x)
             else:
-               rightLat.append(x)
-    
+                rightLat.append(x)
+
         # recursive calls
-        p1, q1, dmin1 = Space.closestPair(self,leftLong, leftLat, stop = stop)
-        p2, q2, dmin2 = Space.closestPair(self,rightLong, rightLat, stop = stop)
-    
+        p1, q1, dmin1 = Space.closestPair(self, leftLong, leftLat, stop=stop)
+        p2, q2, dmin2 = Space.closestPair(self, rightLong, rightLat, stop=stop)
+
         if dmin1 <= dmin2:
             p, q, d = p1, q1, dmin1
         else:
             p, q, d = p2, q2, dmin2
-    
+
         # get the min distance for points in the middle
-        center = [points for points in points_by_lat if longitude_midpoint - d <= p.getLongitude() <= longitude_midpoint - d]
-        p3, q3, dmin3 = Space.closestPairCenter(self, center, d, p,q)
-        
+        center = [points for points in points_by_lat if
+                  longitude_midpoint - d <= p.getLongitude() <= longitude_midpoint - d]
+        p3, q3, dmin3 = Space.closestPairCenter(self, center, d, p, q)
+
         if d <= dmin3:
             return p, q, d
         else:
             return p3, q3, dmin3
-    
+
     def computeDmin(self, stop=10):
         """
         Compute dmin using a divide and conquer approach
         """
         self.sortByLat()
         self.sortByLong()
-        p1, p2, dmin = Space.closestPair(self,self.points_by_lat,self.points_by_long,stop=stop)
-        return p1,p2,dmin
+        p1, p2, dmin = Space.closestPair(self, self.points_by_lat, self.points_by_long, stop=stop)
+        return p1, p2, dmin
 
     # -------------------------------------------------------------------------
-    
+
     # -------------------------------------------------------------------------
     # -- Computing Dmax using a convex hull algorithm
     # -------------------------------------------------------------------------
@@ -557,8 +555,8 @@ class Space :
     
     Dmax is computed approximating latitude and longitude as coordinates in a 2D space
     """
-    
-    def orient (self, p, q, r):
+
+    def orient(self, p, q, r):
         """
         Determine if the points are clockwise oriented (returned value = 1),
         counter-clockwise oriented (returned vlaue = 1) or colinear (returned 
@@ -567,19 +565,19 @@ class Space :
         px, py = p.getLongitude(), p.getLatitude()
         qx, qy = q.getLongitude(), q.getLatitude()
         rx, ry = r.getLongitude(), r.getLatitude()
-        
+
         cp1 = (qy - py) * (rx - px)
         cp2 = (qx - px) * (ry - py)
-        
+
         return (cp1 > cp2) - (cp1 < cp2)
-    
+
     def convexHull(self):
         upper = list()
         lower = list()
-        
+
         if not self.points_lex_sorted:
             self.lexSort()
-        
+
         for p in self.points_lex_sorted:
             while len(upper) > 1 and Space.orient(self, upper[-2], upper[-1], p) != 1:
                 upper.pop()
@@ -587,59 +585,63 @@ class Space :
                 lower.pop()
             upper.append(p)
             lower.append(p)
-        
+
         self.upperConvexHull = upper
         self.lowerConvexHull = lower
-    
+
     def computeDmax(self):
         """
         Computte dmax using rotation calipers on the convex hull.
-        """        
+        """
         p1, p2, dmax = None, None, 0
-        
+
         if not (self.upperConvexHull and self.lowerConvexHull):
             Space.convexHull(self)
-        
-        
+
         length_upper = len(self.upperConvexHull) - 1
         rotating_calipers = []
         upper_index = 0
         lower_index = len(self.lowerConvexHull) - 1
         while upper_index < length_upper or lower_index > 0:
-            rotating_calipers.append((self.upperConvexHull[upper_index],self.lowerConvexHull[lower_index]))
-            
+            rotating_calipers.append((self.upperConvexHull[upper_index], self.lowerConvexHull[lower_index]))
+
             # upper finished
             if upper_index == length_upper:
                 lower_index -= 1
-                
+
             # lower finished
             elif lower_index == 0:
                 upper_index += 1
-            
+
             # none finished
             else:
-                u_px, u_py = self.upperConvexHull[upper_index].getLongitude(), self.upperConvexHull[upper_index].getLatitude()
-                u_npx, u_npy = self.upperConvexHull[upper_index+1].getLongitude(), self.upperConvexHull[upper_index+1].getLatitude()
-                l_px, l_py = self.lowerConvexHull[lower_index].getLongitude(), self.lowerConvexHull[lower_index].getLatitude()
-                l_npx, l_npy = self.lowerConvexHull[lower_index-1].getLongitude(), self.lowerConvexHull[lower_index-1].getLatitude()
-                
+                u_px, u_py = self.upperConvexHull[upper_index].getLongitude(), self.upperConvexHull[
+                    upper_index].getLatitude()
+                u_npx, u_npy = self.upperConvexHull[upper_index + 1].getLongitude(), self.upperConvexHull[
+                    upper_index + 1].getLatitude()
+                l_px, l_py = self.lowerConvexHull[lower_index].getLongitude(), self.lowerConvexHull[
+                    lower_index].getLatitude()
+                l_npx, l_npy = self.lowerConvexHull[lower_index - 1].getLongitude(), self.lowerConvexHull[
+                    lower_index - 1].getLatitude()
+
                 if (u_npy - u_py) * (l_px - l_npx) > (l_py - l_npy) * (u_npx - u_px):
                     upper_index += 1
                 else:
                     lower_index -= 1
-            
-        for p,q in rotating_calipers:
+
+        for p, q in rotating_calipers:
             if not p.sameLocation(q):
                 d = p.squaredDistanceTo(q)
                 if d > dmax:
                     p1, p2, dmax = p, q, d
         return p1, p2, dmax
+
     # -------------------------------------------------------------------------
-    
+
     # -------------------------------------------------------------------------
     # -- Extremal distances
     # -------------------------------------------------------------------------
-    
+
     def computeExtremalDistances(self):
         """
         Compute the extremal distances using the two algorithms explained above.
@@ -650,7 +652,7 @@ class Space :
             pmin1, pmin2, _ = Space.computeDmin(self)
             pmax1, pmax2, _ = Space.computeDmax(self)
             self.dmin, self.dmax = pmin1.distanceKmTo(pmin2), pmax1.distanceKmTo(pmax2)
-            
+
             # freeing memory
             self.points_by_long = []
             self.points_by_lat = []
@@ -659,10 +661,11 @@ class Space :
             self.lowerConvexHull = []
 
     # -------------------------------------------------------------------------
-    
+
     # -------------------------------------------------------------------------
     # -- PROCESS
     # -------------------------------------------------------------------------
+
     def setClusters(self, clusters):
         """
         self.cluster is a dictionnary.
@@ -670,21 +673,22 @@ class Space :
             - value: list of pointID's belonging to the cluster
         """
         self.clusters = clusters
-    
+
     def clusterSpace(self):
-        from processClustering import runClustering
+        from dev_log.optim.processClustering import runClustering
         runClustering(self)
 
     def reclusterSpace(self, toRecluster):
-        from reclustering import runReclustering
+        from dev_log.optim.reclustering import runReclustering
         runReclustering(self, toRecluster)
     
     def getHamiltonianCycle(self, pointIDs, starting_pointID, mode="walking"):
         from hamiltonian import hamiltonian
         return hamiltonian(self, pointIDs, starting_pointID, mode)
 
+
     def splitAmongNurse(self, centers):
-        from splitAmongNurses import vrp
+        from dev_log.optim.splitAmongNurses import vrp
         return vrp(self, centers)
 
     def solve(self, mode="schedule"):
@@ -768,6 +772,7 @@ class Space :
         for [path,_] in appointment_distribution:
             print("***")
             print([p.getID() for p in path])
+
             try:
                 n_id = self.nurse_ids[i]
             except:
@@ -883,11 +888,12 @@ class Space :
         #print(self.clusters)
         return res
 
-    def formatTime(self, time, ft=1):
+    def formatTime(self, time):
         t = int(time)
-        s = "%s%d.%s%d"%("0" if t // 3600 < 10 else "", t // 3600, "0" if (t % 3600)//60 < 10 else "", (t % 3600)//60)
+        s = "%s%d.%s%d" % (
+        "0" if t // 3600 < 10 else "", t // 3600, "0" if (t % 3600) // 60 < 10 else "", (t % 3600) // 60)
         return s
-        
+
 
 def solve_complete(data):
     s = Space()
@@ -907,6 +913,7 @@ def solve_path(data):
 
 if __name__ == "__main__":
     from random import random, seed
+
     seed(9001)
     lonMin = 2.313721
     lonMax = 2.394590
@@ -926,7 +933,7 @@ if __name__ == "__main__":
     for k in range(10):
         lon = lonRef + random() * lonRange
         lat = latRef + random() * latRange
-        patientDict[k+1] = (lat,lon)
+        patientDict[k + 1] = (lat, lon)
 
     nurses = [1,2,3,4]
 
@@ -944,3 +951,5 @@ if __name__ == "__main__":
             nurses[app['nurse_id']] = [app['app_id']]
     #print(nurses)
     
+
+
