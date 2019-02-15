@@ -58,6 +58,9 @@ def init_db():
     db.session.add(Patient(last_name="Martinet", first_name="Hugo", email="hugo.martinet@hotmail.fr",
                            address="21 Rue de la Chaudière, 91370 Verrières-le-Buisson", phone="0674695898",
                            digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
+    db.session.add(Patient(last_name="Béraud", first_name="Pauline", email="pauline.beraud@hotmail.fr",
+                           address="35 Rue Jacques Duclos, 91120 Palaiseau", phone="0674697597",
+                           digicode="4C36", additional_postal_information="7eme gauche", office_id=1))
     db.session.add(Patient(last_name="Taylor", first_name="Daniel", email="daniel.taylor@hotmail.fr",
                            address="36 rue Varengue, 92340 Bourg-la-Reine", phone="0674695898",
                            digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
@@ -93,7 +96,7 @@ def init_db():
                                    halfday="Afternoon"))
 
     # to test the optimizer (solve_complete)
-    for pID in range(1, 9):
+    for pID in range(1, 12):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
                                    halfday="Morning"))
     db.session.commit()

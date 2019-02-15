@@ -71,7 +71,10 @@ def get_nurse_planning(nurse_id, date, halfday):
     schedules = Schedule.query.filter(Schedule.appointment.has(date=date_selected),
                                       Schedule.appointment.has(halfday=halfday)).all()
 
-    travel_information = simplified_path(build_data_for_optimizer(date, halfday))
+    print(solve_path(build_data_for_optimizer(date, halfday)))
+    print('OK')
+    print(simplified_path(build_data_for_optimizer(date, halfday)))
+
     # If no schedules are planned, it means that it's the first time that the nurse can see its planning.
     # Consequently, we have to run the optimizer to attribute all the appointments to the available nurses
     # and optimize their journeys. If schedules are already planned, this means that the optimizer had already been
@@ -80,7 +83,8 @@ def get_nurse_planning(nurse_id, date, halfday):
         nurses_and_appointments = build_data_for_optimizer(date, halfday)
         schedules_information = solve_complete(nurses_and_appointments)
         travel_information = simplified_path(nurses_and_appointments)
-
+        print(len(schedules_information))
+        print(len(travel_information))
         for (i, info) in enumerate(schedules_information):
             travel_mode = travel_information[i]["mode"].upper()
             print(travel_mode)
