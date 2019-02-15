@@ -33,6 +33,12 @@ Windows: `.\venv\Scripts\activate.bat`
 
 `cd /project_directory`
 
+To use our installation Makefile system, you only need to get the wheel library first:
+
+`pip3 install wheel`
+
+You can now install the whole package:
+
 `make install`
 
 ## Running Nursissimo
@@ -46,8 +52,7 @@ Windows :
 
 **2**. Run the app:
 
-
-
+`python3 run.py`
 
 **Authentification**
 
