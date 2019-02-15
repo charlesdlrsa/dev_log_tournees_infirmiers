@@ -16,8 +16,8 @@ they also can also report their days off.
 
 `pip install virtualenv`
 
-**2**. Download the project directory. Once the files unzipped/downloaded, create a python virtual environment in the said 
-directory:
+**2**. Go in the directory of your choice and there, create a python virtual environment in the said 
+directory and activate it:
 
 `cd /project_directory`
 
