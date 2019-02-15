@@ -1,4 +1,4 @@
-# Nursissimo
+# Nursissimo   <img src="dev_log/static/nurse_logo.png" width=60 />
 
 ## Collaborative project
 
