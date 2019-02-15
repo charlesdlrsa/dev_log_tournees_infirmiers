@@ -30,7 +30,9 @@ Windows: `.\venv\Scripts\activate.bat`
 **3**. From the same directory, install the app and its dependencies:
 
 `git clone git@github.com:charlesdlrsa/dev_log_tournees_infirmiers.git`
+
 `cd /project_directory`
+
 `make install`
 
 ## Running Nursissimo
