@@ -91,7 +91,7 @@ def availabilities(patient_id, date, care_id):
         for halfday in ['Morning', 'Afternoon']:
             # for each half-day of the week, we check if a nurse is available and if the patient doesn't already have
             # an appointment by calling the functions : check_appointments_patient and check_appointments_nurses
-            if date <= datetime.date.today() + datetime.timedelta(1):
+            if date <= datetime.date.today() + datetime.timedelta(1) or date == datetime.date(2019, 5, 2):
                 # impossible to book an appointment less than 24 hours before the desired date
                 availabilities[week_day][halfday] = "Closed appointment booking"
             else:
