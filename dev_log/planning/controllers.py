@@ -71,19 +71,23 @@ def get_nurse_planning(nurse_id, date, halfday):
     schedules = Schedule.query.filter(Schedule.appointment.has(date=date_selected),
                                       Schedule.appointment.has(halfday=halfday)).all()
 
-    travel_information = simplified_path(build_data_for_optimizer(date, halfday))
     # If no schedules are planned, it means that it's the first time that the nurse can see its planning.
     # Consequently, we have to run the optimizer to attribute all the appointments to the available nurses
     # and optimize their journeys. If schedules are already planned, this means that the optimizer had already been
     # launched, so the schedules are set for the half-day and we don't need to call the optimizer.
     if len(schedules) == 0:
         nurses_and_appointments = build_data_for_optimizer(date, halfday)
-        schedules_information = solve_complete(nurses_and_appointments)
-        travel_information = simplified_path(nurses_and_appointments)
+        try:
+            schedules_information = solve_complete(nurses_and_appointments)
+            travel_information = simplified_path(nurses_and_appointments)
+        except GmapApiError:
+            error = "You need to be connected to see the planning. Please check your network connexion " \
+                    "and try again."
+            flash(error)
+            return redirect(url_for('planning.home'))
 
         for (i, info) in enumerate(schedules_information):
             travel_mode = travel_information[i]["mode"].upper()
-            print(travel_mode)
             db.session.add(
                 Schedule(appointment_id=int(info["app_id"]),
                          hour=datetime.time(int(info["hour"][:2]), int(info["hour"][3:5])),
@@ -130,7 +134,7 @@ def delete_schedules():
 def simplified_path(data):
     """ Transform the output of the function solve_path to extract the travel modes.
     The solve_path function returns all the steps that the nurse has to follow during the half-day."""
-    
+
     path = solve_path(data)
     res = []
     already_visited = []

@@ -5,7 +5,7 @@ from dev_log.utils import calendar
 from dev_log import db
 from dev_log.models import Appointment, Patient, Nurse, Care, Office, Schedule
 from dev_log.auth.controllers import admin_required
-from dev_log.optim.space import solve_boolean
+from dev_log.optim.space import solve_boolean, GmapApiError
 from dev_log.utils.optimizer_functions import build_data_for_optimizer
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
@@ -93,10 +93,16 @@ def availabilities(patient_id, date, care_id):
             # an appointment by calling the functions : check_appointments_patient and check_appointments_nurses
             appointment = check_appointments_patient(patient_id, date, halfday=halfday)
             if appointment is None:
-                if check_appointments_nurses(care_id, patient_id, date, halfday=halfday) is True:
-                    availabilities[week_day][halfday] = "A nurse is available"
-                else:
-                    availabilities[week_day][halfday] = "No nurse is available"
+                try:
+                    if check_appointments_nurses(care_id, patient_id, date, halfday=halfday) is True:
+                        availabilities[week_day][halfday] = "A nurse is available"
+                    else:
+                        availabilities[week_day][halfday] = "No nurse is available"
+                except GmapApiError:
+                    error = "You need to be connected to see the availabilities. Please check your network connexion " \
+                            "and try again."
+                    flash(error)
+                    return redirect(url_for('appointments.home'))
             else:
                 availabilities[week_day][halfday] = "Appointment already scheduled: -- {} --".format(appointment)
 
