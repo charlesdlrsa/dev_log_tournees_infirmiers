@@ -138,7 +138,7 @@ A l'instar des patients, le Cabinet est également responsable de la gestion des
 - La suppression d'un infirmier de la base de donnée
 - L'accès aux dates de congés d'un infirmier
 
-Nous avons envisager le même type de visualisation pour les infirmiers et les patients.
+Nous avons envisagé le même type de visualisation pour les infirmiers et les patients.
 
 #### Les rendez-vous
 
@@ -149,22 +149,21 @@ C'est également au cabinet qu'il incombe d'ajouter et de gérer les rendez-vous
   - La vérification des disponibilités infirmiers pendant la semaine du jour indiqué
   - La sélection de la date finale et de la demi-journée retenue.
 
-Nous avons pensé le processus et la visualisation d'ajout de rendez-vous pour être les plus ergonomiques possible, dans un contexte qui pourrait être une conversation téléphonique avec un patient. Ainsi, une fois la première sélection passée (par patient, soin et date), un tableau Jour/Demi-journée apparaît où les demi-journées disponibles sont immédiatement identifiables et il suffit pour valider le rendez-vous de cliquer sur une case disponible.
+Nous avons pensé le processus et la visualisation d'ajout de rendez-vous pour être les plus ergonomiques possible, dans un contexte qui pourrait être une conversation téléphonique avec un patient. Ainsi, une fois la première sélection passée (par patient, soin et date), un tableau Jour/Demi-journée apparaît où les demi-journées disponibles sont immédiatement identifiables et il suffit, pour valider le rendez-vous, de cliquer sur une case disponible.
 
 - La visualisation des rendez-vous:
   - Informations principales sur le rendez-vous
   - Suppression du rendez-vous
 
-Nous avons retenu pour les rendez-vous une visualisation similaire à celle pour les patients et les infirmiers qui permet de voir les informations principales relatives aux rendez-vous : informations patients, type de soin, date ainsi que l'infirmier et l'horaire précis du rendez-vous (seulement 24 heures avant pour ces deux derniers éléments).
+Nous avons retenu pour les rendez-vous une visualisation similaire à celle pour les patients et les infirmiers qui permet de voir les informations principales relatives aux rendez-vous : informations patients, type de soin, date ainsi que l'infirmier et l'horaire précis du rendez-vous (accessibles seulement 24 heures avant pour ces deux derniers éléments).
 
 #### Le planning
 
-Le cabinet à accès à l'ensemble des planning une fois ceux-ci fixés, c'est à dire ceux de la journée et ceux du lendemain. Pour consulter un planning, l'utilisateur sélectionne un infirmier, une date et une demi-journée et il accède alors à l'ensemble des rendez-vous de l'infirmier en question sur la demi-journée et également à une visualisation géographique (sur une carte dynamique) de tous les trajets à effectuer par l'infirmier.
+Le cabinet a accès à l'ensemble des planning une fois ceux-ci fixés, c'est à dire ceux de la journée et ceux du lendemain. Pour consulter un planning, l'utilisateur sélectionne un infirmier, une date et une demi-journée et il accède alors à l'ensemble des rendez-vous de l'infirmier en question sur la demi-journée et également à une visualisation géographique (sur une carte dynamique) de tous les trajets à effectuer par l'infirmier.
 
 #### Gestion du Compte
 
-Le Cabinet a également la possibilité de modifier les informations qui le concerne : numéro, adresse etc...
-
+Le cabinet a également la possibilité de modifier les informations qui le concerne : numéro, adresse etc...
 
 ### Utilisateur Infirmier
 
@@ -172,11 +171,11 @@ Les autres utilisateurs de notre application seront les infirmiers eux-mêmes qu
 
 #### Visualisation du planning
 
-L'utilisateur infirmier visualise directement ses rendez-vous de la demi-journée à travers la même interface que les cabinets (sans pouvoir consulter les plannings de ses collègues). Il y voit les informations relatives au rendez-vous et visualise les trajets à effectuer durant la demi-journée.
+L'utilisateur infirmier visualise directement ses rendez-vous de la demi-journée à travers la même interface que les cabinets (sans pouvoir consulter les plannings de ses collègues). Il y voit les informations relatives au rendez-vous et visualise les trajets à effectuer par la demi-journée.
 
 #### Gestion du compte et congés
 
-L'utilisateur infirmier a également la possibilité de modifier ses informations personnelles et c'est sûr la même page qu'il peut renseigner des congés.  
+L'utilisateur infirmier a également la possibilité de modifier ses informations personnelles et sur la même page il peut renseigner des congés.  
 
 
 
@@ -201,7 +200,7 @@ Comme précisé pour la classe `Office`, les deux classes possèdent un attribut
 
 __Appointment et Schedule__
 
-Les classes `Appointment` et `Schedule` sont très similaires, en effet à terme un objet de la classe `Appointment` possède un alter ego dans la classe `Schedule` (après que l'optimiseur ait tourné).
+Les classes `Appointment` et `Schedule` sont très similaires, en effet à terme un objet de la classe `Appointment` possède un correspondant dans la classe `Schedule` (après que l'optimiseur ait tourné).
 En effet on stocke dans la table `appointment` les informations liées à la demande de rendez-vous réceptionnée par le cabinet (identifiant du patient qui demande, soin demandé, date et demie journée).
 La veille du jour du rendez-vous l'optimiseur attribue le rendez-vous à un infirmier et grâce au trajet qu'il lui donne on peut définir une horaire à ce rendez-vous. Ces informations sont stockées
 dans la table `schedule` pour stocker les résultats de l'optimiseur à part et simplifier les échanges.
@@ -214,7 +213,7 @@ Chaque absence est donc associée à un infimier via son identifiant. Etant donn
 __Care__
 
 Cette classe contient les soins que peuvent fournir les infirmiers. Chacun possède un identifiant, qui permet notamment de repérer le soin associé à un rendez-vous,
-ainsi qu'une description et la durée associée à la prestation de ce soin. Nous n'avons stocké qu'une petite dizaine de soins mais il est tout à fait possible d'en rajouter qutant que nécessaire.
+ainsi qu'une description et la durée associée à la prestation de ce soin. Nous n'avons stocké qu'une petite dizaine de soins mais il est tout à fait possible d'en rajouter autant que nécessaire.
 
 
 ![Schéma de classe](classes_DevLog.png)

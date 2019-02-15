@@ -29,7 +29,11 @@ Windows: `.\venv\Scripts\activate.bat`
 
 **3**. From the same directory, install the app and its dependencies:
 
-`pip install -e nursissimo/`
+`git clone git@github.com:charlesdlrsa/dev_log_tournees_infirmiers.git`
+
+`cd /project_directory`
+
+`make install`
 
 ## Running Nursissimo
 
@@ -79,10 +83,6 @@ Malakoff office
 
 The passwords are initialized to `password`
 
-**Administrator view**
-
-**Nurse view**
-
 
 
 ## Our strengths
@@ -98,10 +98,12 @@ the nurse office.
 
 **The Google Maps visualization**
 
-We propose to the nurses to visualize their daily tips in a Google Maps map. This functionnality will help them to 
+We propose to the nurses to visualize their daily tips in a Google Maps map. This functionnality will help them to prepare their daily work.
 - The nurse can visualize the complete itinerary of the day in his map, with all the appointement markers on the map.
 - The nurse can also visualize a specific tip between two appointments by selecting the destination appointment.
 - We differenciate the "driving" tips (in blue) and the "walking" tips (in green).
 
+**An intuitive use**
 
+Our technical choices for this software have a goal : having a simple to use service. Every essential task in a nurses' office have a dedicated tab in our application. We
  
