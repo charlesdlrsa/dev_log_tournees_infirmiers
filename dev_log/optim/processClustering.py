@@ -1,4 +1,14 @@
 from amplpy import AMPL, Environment
+from sys import platform as _platform
+if _platform == "linux" or _platform == "linux2":
+   # linux
+   ampl_path = "ampl/linux"
+elif _platform == "darwin":
+   # MAC OS X
+   ampl_path = "ampl/macos"
+elif _platform == "win32" or _platform == "win64":
+    # Windows
+    ampl_path = "ampl/windows"
 
 
 def runClustering(s):
@@ -15,7 +25,6 @@ def runClustering(s):
         - key = center
         - value = list of the points in the cluster (always starting with the center)
     """
-    threshold = min(s.walkingThreshold, (s.dmax+s.dmin)/2.0)
     with open("models/maxFootTimeClustering.dat", "w") as clustering:
         clustering.write("# threshold for cluster size\n")
         clustering.write("param maxClusterSize:= {};\n".format(12000))
@@ -64,11 +73,11 @@ def runClustering(s):
         clustering.write(";\n")
     
     # set up ampl
-    ampl = AMPL(Environment('dev_log/optim/ampl/linux'))
+    ampl = AMPL(Environment(ampl_path))
 
     # Interpret the two files
-    ampl.read('dev_log/optim/models/maxFootTimeClustering.mod')
-    ampl.readData('dev_log/optim/models/maxFootTimeClustering.dat')
+    ampl.read('models/maxFootTimeClustering.mod')
+    ampl.readData('models/maxFootTimeClustering.dat')
 
     # Solve
     print("cluster space")

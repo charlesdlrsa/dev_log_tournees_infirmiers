@@ -1,5 +1,15 @@
-from dev_log.optim.space import Space, GmapApiError
+from space import Space, GmapApiError
 from amplpy import AMPL, Environment
+from sys import platform as _platform
+if _platform == "linux" or _platform == "linux2":
+   # linux
+   ampl_path = "ampl/linux"
+elif _platform == "darwin":
+   # MAC OS X
+   ampl_path = "ampl/macos"
+elif _platform == "win32" or _platform == "win64":
+    # Windows
+    ampl_path = "ampl/windows"
 
 def rotateToStartingElement(l, e):
     """
@@ -38,7 +48,7 @@ def hamiltonian(s, pointIDs, starting_pointID, mode="walking"):
             For the solver to work, the points has to be numbered from 1 to n
             """
 
-            with open("dev_log/optim/models/travellingSalesman.dat", "w") as hamiltonian:
+            with open("models/travellingSalesman.dat", "w") as hamiltonian:
                 hamiltonian.write("# nombre de sommets {}\n".format(n))
                 hamiltonian.write("set V :=\n")
                 for k in range(1, n+1):
@@ -57,12 +67,12 @@ def hamiltonian(s, pointIDs, starting_pointID, mode="walking"):
                 hamiltonian.write(";\n")
 
             # set up ampl
-            ampl = AMPL(Environment('dev_log/optim/ampl/linux'))
+            ampl = AMPL(Environment(ampl_path))
 
 
             # Interpret the two files
-            ampl.read('dev_log/optim/models/travellingSalesman.mod')
-            ampl.readData('dev_log/optim/models/travellingSalesman.dat')
+            ampl.read('models/travellingSalesman.mod')
+            ampl.readData('models/travellingSalesman.dat')
 
             # Solve
             print("get Hamiltonian cycle")

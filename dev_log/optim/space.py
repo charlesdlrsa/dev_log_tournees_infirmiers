@@ -31,11 +31,11 @@ googlemaps.exceptions.ApiError: MAX_ELEMENTS_EXCEEDED
 import os
 import sys
 import math
-from dev_log.optim.point import Point
+from point import Point
 from operator import attrgetter
 import numpy as np
 import googlemaps
-from dev_log.utils.key import key
+from key import key
 
 googlekey = key
 
@@ -675,20 +675,24 @@ class Space:
         self.clusters = clusters
 
     def clusterSpace(self):
-        from dev_log.optim.processClustering import runClustering
+        # from dev_log.optim.processClustering import runClustering
+        from processClustering import runClustering
         runClustering(self)
 
     def reclusterSpace(self, toRecluster):
-        from dev_log.optim.reclustering import runReclustering
+        #from dev_log.optim.reclustering import runReclustering
+        from reclustering import runReclustering
         runReclustering(self, toRecluster)
     
     def getHamiltonianCycle(self, pointIDs, starting_pointID, mode="walking"):
+        #from dev_log.optim.hamiltonian import hamiltonian
         from hamiltonian import hamiltonian
         return hamiltonian(self, pointIDs, starting_pointID, mode)
 
 
     def splitAmongNurse(self, centers):
-        from dev_log.optim.splitAmongNurses import vrp
+        #from dev_log.optim.splitAmongNurses import vrp
+        from splitAmongNurses import vrp
         return vrp(self, centers)
 
     def solve(self, mode="schedule"):
