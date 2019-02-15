@@ -72,7 +72,7 @@ def availabilities(patient_id, date, care_id):
         care_id = request.form['input_care']
 
         if date_selected <= datetime.date.today():
-            error = "You cannot add an appointment 24 hours before the wanted date."
+            error = "You cannot add an appointment 24 hours before the desired date."
             # To be able to set the nurses' planning 24 hours before each day, we forbidden the admin to add
             # appointments after this delay. See planning's controllers for more explications.
             flash(error)
@@ -91,20 +91,24 @@ def availabilities(patient_id, date, care_id):
         for halfday in ['Morning', 'Afternoon']:
             # for each half-day of the week, we check if a nurse is available and if the patient doesn't already have
             # an appointment by calling the functions : check_appointments_patient and check_appointments_nurses
-            appointment = check_appointments_patient(patient_id, date, halfday=halfday)
-            if appointment is None:
-                try:
-                    if check_appointments_nurses(care_id, patient_id, date, halfday=halfday) is True:
-                        availabilities[week_day][halfday] = "A nurse is available"
-                    else:
-                        availabilities[week_day][halfday] = "No nurse is available"
-                except GmapApiError:
-                    error = "You need to be connected to see the availabilities. Please check your network connexion " \
-                            "and try again."
-                    flash(error)
-                    return redirect(url_for('appointments.home'))
+            if date <= datetime.date.today() + datetime.timedelta(1):
+                # impossible to book an appointment less than 24 hours before the desired date
+                availabilities[week_day][halfday] = "Closed appointment booking"
             else:
-                availabilities[week_day][halfday] = "Appointment already scheduled: -- {} --".format(appointment)
+                appointment = check_appointments_patient(patient_id, date, halfday=halfday)
+                if appointment is None:
+                    try:
+                        if check_appointments_nurses(care_id, patient_id, date, halfday=halfday) is True:
+                            availabilities[week_day][halfday] = "A nurse is available"
+                        else:
+                            availabilities[week_day][halfday] = "No nurse is available"
+                    except GmapApiError:
+                        error = "You need to be connected to see the availabilities. " \
+                                "Please check your network connexion and try again."
+                        flash(error)
+                        return redirect(url_for('appointments.home'))
+                else:
+                    availabilities[week_day][halfday] = "Appointment already scheduled: -- {} --".format(appointment)
 
     patient = Patient.query.get(patient_id)
     care = Care.query.get(care_id)

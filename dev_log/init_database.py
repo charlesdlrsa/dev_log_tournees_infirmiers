@@ -27,8 +27,11 @@ def init_db():
     db.session.add(Nurse(last_name="Detriche", first_name="Jean-Marie", email="jeanmarie.detriche@hotmail.fr",
                          phone="0694699858", password=password, address="45 avenue Saint Laurent, 91400 Orsay",
                          office_id=1, cares="-1-2-6-"))
-    db.session.add(Nurse(last_name="Dupont", first_name="Pierre", email="pierre.dupont@hotmail.fr",
+    db.session.add(Nurse(last_name="Travers", first_name="Nicolas", email="nicolas.travers@hotmail.fr",
                          phone="0694697658", password=password, address="41 Rue Hévin, 92140 Clamart",
+                         office_id=2, cares="-1-2-6-"))
+    db.session.add(Nurse(last_name="Geraud", first_name="Rémi", email="remi.geraud@hotmail.fr",
+                         phone="0694697468", password=password, address="16 rue Kléber, 92130 Issy-les-Moulineaux",
                          office_id=2, cares="-1-2-6-"))
 
     db.session.add(Patient(last_name="De la roche", first_name="Charles", email="charles.dlrsa@hotmail.fr",
@@ -61,6 +64,15 @@ def init_db():
     db.session.add(Patient(last_name="Taylor", first_name="Daniel", email="daniel.taylor@hotmail.fr",
                            address="36 rue Varengue, 92340 Bourg-la-Reine", phone="0674695898",
                            digicode="4B34", additional_postal_information="2eme gauche", office_id=1))
+    db.session.add(Patient(last_name="Perez", first_name="Gael", email="gael.perez@hotmail.fr",
+                           address="20 rue des Jacinthes, 94260 Fresnes", phone="0674695898",
+                           digicode="4B34", additional_postal_information="1ere gauche", office_id=1))
+    db.session.add(Patient(last_name="Mulciba", first_name="Mathis", email="mathis.mulciba@hotmail.fr",
+                           address="26 rue Appert, 91300 Massy", phone="0674695898",
+                           digicode="4B34", additional_postal_information="4eme gauche", office_id=1))
+    db.session.add(Patient(last_name="Bureau", first_name="Baptiste", email="baptiste.bureau@hotmail.fr",
+                           address="12 rue Albert Camus, 92160 Antony", phone="0674695898",
+                           digicode="4B34", additional_postal_information="10eme gauche", office_id=1))
     db.session.add(Patient(last_name="Bellec", first_name="Thomas", email="thomas.bellec@hotmail.fr",
                            address="4 rue de Paris, 92190 Meudon", phone="0674695898", digicode="4B34",
                            additional_postal_information="2eme gauche", office_id=2))
@@ -79,8 +91,8 @@ def init_db():
     db.session.add(Care(description="Assistance", duration=25))
 
     db.session.add(Absence(1, datetime.date(2019, 1, 10), "Afternoon"))
-    db.session.add(Absence(1, datetime.date(2019, 3, 10), "Morning"))
     db.session.add(Absence(2, datetime.date(2019, 2, 25), "Afternoon"))
+    db.session.add(Absence(1, datetime.date(2019, 3, 10), "Morning"))
     db.session.add(Absence(2, datetime.date(2019, 4, 30), "Afternoon"))
     db.session.add(Absence(3, datetime.date(2019, 4, 30), "Afternoon"))
     db.session.add(Absence(4, datetime.date(2019, 4, 30), "Afternoon"))
@@ -88,12 +100,12 @@ def init_db():
     db.session.add(Absence(4, datetime.date(2019, 5, 2), "Morning"))
 
     # to test the availabilities of the nurses (solve_boolean)
-    for pID in range(1, 6):
+    for pID in range(1, 8):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 4, 30), care_id=random.randint(1, 6),
                                    halfday="Afternoon"))
 
     # to test the optimizer (solve_complete)
-    for pID in range(1, 9):
+    for pID in range(1, 12):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
                                    halfday="Morning"))
     db.session.commit()
