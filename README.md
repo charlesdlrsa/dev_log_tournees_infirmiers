@@ -101,6 +101,8 @@ For example, you can try to add a new appointment for the patient "Charles de la
 You will see that the patient has already an appointment the 26/04/2019, so you cannot add another appointment.<br/>
 You will also see that no nurse is available the 23/04/2019 in the morning and that's perfectly normal. Indeed, if you check the vacation of the nurses, you will show that 3 of the 4 nurses are in day off and the only one available has already 7 appointments in the morning.
 
+#### See a nurse planning
+
 <br/>
 
 ## Our strengths
