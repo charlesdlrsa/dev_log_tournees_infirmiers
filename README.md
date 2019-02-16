@@ -95,9 +95,9 @@ By clicking on the button `See vacations` in the nurses list, you can see, add a
 By going to the `Appointments` tab, you can see all the planned appoinments for a specific date or for a specific patient, or for both. <br/>
 You can also choose to add a new appointment for a specific patient, a specific care and a specific date. Here, you will see several features we have implemented:
 
-**1.** You cannot add an appointment less than 24 hours before the desired date. This constraint is unfortunatly necessary to allow the nurses to know their exact planning 24 hours before each day.
+- You cannot add an appointment less than 24 hours before the desired date. This constraint is unfortunatly necessary to allow the nurses to know their exact planning 24 hours before each day.
 
-**2.** By clicking on the button `Search availabilities`, our application will show to the administrator if there are some availabilities to add a new appointment during the week of the selected date. These availabilities are determined in function of the date, of the patient appointments, and of the available nurses. It's our optimizer goal to predict if the nurses will be able to do all the planned appointments more the new appointment during a specific halfday.
+- By clicking on the button `Search availabilities`, our application will show to the administrator if there are some availabilities to add a new appointment during the week of the selected date. These availabilities are determined in function of the date, of the patient appointments, and of the available nurses. It's our optimizer goal to predict if the nurses will be able to do all the planned appointments more the new appointment during a specific halfday.
 
 For example, you can try to add a new appointment for the patient `Charles de la Roche` on the 24/04/2109.<br/>
 You will see that the patient has already an appointment the 26/04/2019, so you cannot add another appointment.<br/>
@@ -107,9 +107,9 @@ You will also see that no nurse is available the 23/04/2019 in the morning and t
 
 By going to the `Planning` tab, you can see the planning of each nurse. Here, you will see several features we have implemented:
 
-**1.** You cannot see a planning more than 24 hours before the desired date. This is due to our optimizer. To set all the appointments to the nurses and optimize their journeys, we need to have all the appointments of the selected half-day. Yet, we can add appointments until 24 hours before a day. Therefore, we must wait that all the possible appointments had been added to launch the optimizer and show the planning of each nurse.
+- You cannot see a planning more than 24 hours before the desired date. This is due to our optimizer. To set all the appointments to the nurses and optimize their journeys, we need to have all the appointments of the selected half-day. Yet, we can add appointments until 24 hours before a day. Therefore, we must wait that all the possible appointments had been added to launch the optimizer and show the planning of each nurse.
 
-**2.** By clicking on the button `View planning`, our application will launch the optimizer. This last one will attribute the planned appointments to all the available nurses in order to minimize their traveled distance and maximize their walk.
+- By clicking on the button `View planning`, our application will launch the optimizer. This last one will attribute the planned appointments to all the available nurses in order to minimize their traveled distance and maximize their walk.
 
 For the example, we have only autorized the Massy's office administrator to view the planning of morning on the 02/05/2019, and we closed the appointment booking for this half-day. <br/>
 On this date, two nurses are in vacations so only `Laurent Cabaret` and `Jean-Philippe Poli` are available. <br/>
