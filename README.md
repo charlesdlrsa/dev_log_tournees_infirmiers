@@ -45,7 +45,7 @@ Linux / MacOs:
 
 Windows:
 
-`cd ./dev_log_tourneees_infirimiers`
+`cd ./dev_log_tournees_infirimiers`
 
 `pip3 install -r requirements.txt`
 
