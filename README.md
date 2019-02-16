@@ -1,98 +1,96 @@
 # Nursissimo   <img src="dev_log/static/nurse_logo.png" width=60 align=center />
 
-## Collaborative project
+<br/>
 
-Nursissimo is a software for nurses' offices. It allows the nurses' offices to register patients in the database easily,
-to make appointments, and to quickly visualize the different nurses timetable depending on the day. Nursissimo also 
-allows nurses to check their daily planning, the different appointments and the tips between these appointments. Moreover,
+## Collaborative school project
+
+Nursissimo is a software for nurses' offices. It allows the offices to easily register patients and nurses in their database,
+to schedule appointments, and to quickly visualize the different nurses schedules depending on the day. Nursissimo applciation also 
+allows nurses to check their daily planning, the different appointments and the journeys between these appointments. Moreover,
 they also can also report their days off.
 
-*Accès au site web, en fonction du déploiement*
+<br/>
 
-
-## Installation
+## Installing and running Nursissimo application
 
 **1**. Install the Python `virtualenv` package:
 
-`pip install virtualenv`
+`pip3 install virtualenv` or `pip install virtualenv`
 
-**2**. Download the project directory. Once the files unzipped/downloaded, create a python virtual environment in the said 
-directory:
+**2**. Go in the directory of your choice and there, create a python virtual environment in the said 
+directory and activate it:
 
-`cd /project_directory`
+`cd ./your_directory`
 
 `virtualenv venv`
 
-Linux / MacOS: `source venv/bin/activate`
+- Linux / MacOS: `source venv/bin/activate`
 
-Windows: `.\venv\Scripts\activate.bat`
+- Windows: `.\venv\Scripts\activate.bat`
 
-**3**. From the same directory, install the app and its dependencies:
+**3**. Go in the folder `venv` and clone the github project:
+
+`cd ./venv`
 
 `git clone git@github.com:charlesdlrsa/dev_log_tournees_infirmiers.git`
 
-`cd /project_directory`
+_If you don't have `git` on your computer, you can download the zip of this project at the top right of this page and unzipped it in your folder `venv` giving it the name `dev_log_tourneees_infirmiers`._
 
-To use our installation Makefile system, you only need to get the wheel library first:
+**4**. To use our application, you need to install our requirements. You have two methods according to your computer:
 
-`pip3 install wheel`
+- Linux / MacOs:
 
-You can now install the whole package:
+`cd ./dev_log_tourneees_infirmiers`
+
+`pip3 install wheel` or `pip install wheel`
 
 `make install`
 
-## Running Nursissimo
+- Windows:
 
+`cd ./dev_log_tournees_infirmiers`
 
-**1**. Go to your virtualenv. Add the app to your environment variables:
+`pip3 install -r requirements.txt` or `pip install -r requirements.txt`
 
-Linux / MacOS : 
+<br/>
 
-Windows : 
+**5**. Run the app:
 
-**2**. Run the app:
+`python3 run.py` or `python run.py`
 
-`python3 run.py`
+<br/>
 
-**Authentification**
+## Try our features with our database examples
 
-You can log in with an administrator account. Depending on your office, select the *As Admin* mode and fill in the identifiers : 
+#### Authentification
 
-Doctissimo office
+You can log in to the application as an office administrator or as an office nurs. <br/>
+To try our features, we set in the database two offices with their corresponding nurses and patients. <br/>
+We advise you to use Massy office's account which is more provided with examples, but feel free to use both accounts.
 
-`username: doctissimo@hotmail.fr`
+- Massy office
 
-`password : password`
+Admin: `username: massy@hotmail.fr` and `password : password` <br/>
+Nurse: `username : laurent.cabaret@hotmail.fr` and `password : password` <br/>
+Nurse: `username : jpp@hotmail.fr` and `password : password` <br/>
+Nurse: `username : celine.hudelot@hotmail.fr` and `password : password` <br/>
+Nurse: `username : jeanmarie.detriche@hotmail.fr` and `password : password` <br/>
 
-Malakoff office
+- Malakoff office
 
-`username : malakoff@gmail.com`
+Admin: `username : malakoff@gmail.com` and `password : password` <br/>
+Nurse: `username : nicolas.travers@hotmail.fr` and `password : password` <br/>
+Nurse: `username : remi.geraud@hotmail.fr` and `password : password` <br/>
 
-`password : password`
+#### Add nurses and patients
 
-You can also log in with a nurse account corresponding to the initial database. The following profiles have been initialized :
+Even if our 
 
-Doctissimo office
-
-`username : laurent.cabaret@hotmail.fr`
-
-`username : jpp@hotmail.fr`
-
-`username : celine.hudelot@hotmail.fr`
-
-`username : jeanmarie.detriche@hotmail.fr`
-
-Malakoff office
-
-`username : pierre.dupont@hotmail.fr`
-
-The passwords are initialized to `password`
-
-
+<br/>
 
 ## Our strengths
 
-**Our optimizer**
+#### Our optimizer
 
 Our software use a specific optimizer to determine the different appointments of a nurse in a day. Its goal is to minimize
 the transport time of a nurse. 
@@ -101,14 +99,14 @@ the nurse office.
 - Then he gives the best way for every nurse to go the appointments, minimizing the tips time. 
 - If it is possible, our optimizer favors walking rather than driving.
 
-**The Google Maps visualization**
+#### The Google Maps visualization
 
 We propose to the nurses to visualize their daily tips in a Google Maps map. This functionnality will help them to prepare their daily work.
 - The nurse can visualize the complete itinerary of the day in his map, with all the appointement markers on the map.
 - The nurse can also visualize a specific tip between two appointments by selecting the destination appointment.
 - We differenciate the "driving" tips (in blue) and the "walking" tips (in green).
 
-**An intuitive use**
+#### An intuitive use
 
 Our technical choices for this software have a goal : having a simple to use service. Every essential task in a nurses' office have a dedicated tab in our application. We
  
