@@ -30,7 +30,7 @@ directory and activate it:
 
 `git clone git@github.com:charlesdlrsa/dev_log_tournees_infirmiers.git`
 
-_If you don't have `git` on your computer, you can download the zip of this project and unzipped it in your folder `venv`._
+_If you don't have `git` on your computer, you can download the zip of this project at the top right of this page and unzipped it in your folder `venv`._
 
 **4**. To use our application, you need to install our requirements. You have two methods according to your computer:
 
