@@ -108,7 +108,7 @@ def availabilities(patient_id, date, care_id):
                         flash(error)
                         return redirect(url_for('appointments.home'))
                 else:
-                    availabilities[week_day][halfday] = "Appointment already scheduled: -- {} --".format(appointment)
+                    availabilities[week_day][halfday] = "Appointment already scheduled: '{}' ".format(appointment)
 
     patient = Patient.query.get(patient_id)
     care = Care.query.get(care_id)
