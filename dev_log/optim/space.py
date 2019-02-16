@@ -3,46 +3,77 @@
 # @author Romain Pascual
 # @author Maxime Dieudionne
 
-# @class Space
-
-"""
-
-TODO: 
-    remove calls to GmapAPI
-    clean le code
-
-ISSUES:
-    reclustering -> some solutions are infeasible
-
-Use of the Distance Matrix service for existing Premium Plan customers
-
-In order to switch over to the new pay as you go pricing plan, you must create a new project, as your existing Premium project cannot be transferred. You must get new API keys, and use them to to replace your existing keys. Please contact your account manager and/or reseller to coordinate your transition to the new plan before your current Premium license expires. In the meantime, your Premium Plan quotas remain in effect.
-
-    Shared daily free quota of 100,000 elements per 24 hours; additional requests applied against the annual purchase of Maps APIs Credits.
-    Limited to 100 elements per client-side request.
-    Maximum of 25 origins and 25 destinations per server-side request.
-        Server-side requests using mode=transit or using the optional parameter departure_time when mode=driving are limited to 100 elements per request.
-    1,000 server-side elements per second. *Note that the client-side service offers Unlimited elements per second, per project.
-
-
-googlemaps.exceptions.ApiError: MAX_ELEMENTS_EXCEEDED
-
-"""
+# -------------------------------------------------------------------------
+# -- IMPORTS 
+# -------------------------------------------------------------------------
 import os
 import sys
 import math
+import time
 from point import Point
 from operator import attrgetter
 import numpy as np
 import googlemaps
 from key import key
+from amplpy import AMPL, Environment
+
+from sys import platform as _platform
+if _platform == "linux" or _platform == "linux2":
+   # linux
+   ampl_path = "ampl/linux"
+elif _platform == "darwin":
+   # MAC OS X
+   ampl_path = "ampl/macos"
+elif _platform == "win32" or _platform == "win64":
+    # Windows
+    ampl_path = "ampl/windows"
 
 googlekey = key
 
+# -------------------------------------------------------------------------
 
+# -------------------------------------------------------------------------
+# -- AUX
+# -------------------------------------------------------------------------
 class GmapApiError(Exception):
+    """
+    Extract of Gmap API doc:
+
+    Use of the Distance Matrix service for existing Premium Plan customers
+
+    In order to switch over to the new pay as you go pricing plan, you must create a new project, as your existing Premium project cannot be transferred. 
+    You must get new API keys, and use them to to replace your existing keys. Please contact your account manager and/or reseller to coordinate your 
+    transition to the new plan before your current Premium license expires. In the meantime, your Premium Plan quotas remain in effect.
+
+        Shared daily free quota of 100,000 elements per 24 hours; additional requests applied against the annual purchase of Maps APIs Credits.
+        Limited to 100 elements per client-side request.
+        Maximum of 25 origins and 25 destinations per server-side request.
+            Server-side requests using mode=transit or using the optional parameter departure_time when mode=driving are limited to 100 elements per request.
+        1,000 server-side elements per second. *Note that the client-side service offers Unlimited elements per second, per project.
+
+
+    googlemaps.exceptions.ApiError: MAX_ELEMENTS_EXCEEDED
+
+    """
     pass
 
+def rotateToStartingElement(l, e):
+    """
+    Rotate a list such that the list starts with the first element e.
+    """
+    if e not in l:
+        raise ValueError(str(e) + "is not in list")
+    while l[0] != e:
+        x = l.pop(0)
+        l.append(x)
+
+# -------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
+# -- SPACE 
+# -------------------------------------------------------------------------
+
+# @class Space
 
 class Space:
     ## Attributes :
@@ -78,6 +109,7 @@ class Space:
         self.end = None
         self.duration = None
         self.nurse_ids = None
+        self.nb_nurse = None
         self.care_duration = None
 
         self.clusters = None
@@ -120,6 +152,7 @@ class Space:
         self.end = [int(x) for x in dataDict["end"].split(":")]
         self.duration = (self.end[0] - self.start[0]) * 3600 + (self.end[1] - self.start[1]) * 60
         self.nurse_ids = [int(x) for x in dataDict["nurse_id"]]
+        self.nb_nurse = len(self.nurse_ids)
         self.points = [Point(id=0, lat=float(dataDict["office_lat"]), lon=float(dataDict["office_lon"]))]
         self.nb_points = 1
         self.care_duration = dict()
@@ -161,6 +194,7 @@ class Space:
         self.nurse_ids = nurse_ids
         if len(self.nurse_ids) == 0:
             self.nurse_ids = [0]
+        self.nb_nurse = len(self.nurse_ids)
 
         # process patients
         for patient_id, patient_position in patients.items():
@@ -221,39 +255,6 @@ class Space:
         del self.points_by_id
 
         return l
-
-    def buildVRPSolution(self, listCenters, amplMatPath, travel_times, path_number):
-        """
-        Given a list of points and the ampl transition matrix, rebuild the differents
-        pathes (according to the number of pathes).
-        Return a list of path x time.
-
-        @param listPoints: list of points (id, lat, lon) such that its order is the same as
-        the index in amplMatPath
-        @param amplMatPath: transition matrix (returned by ampl) describing the path 
-        (zero, one matrix) such that:
-            amplMatPath[i,j] = 1 iff one path goes from listPoint[i] to listPoint[j]
-        @param travel_times: time matrix such that travel_times[i][j] is the time to 
-        travel from from listPoint[i] to listPoint[j].
-        @param path_number: number of pathes that we try to rebuild
-        """
-        n = len(listCenters)
-        VRP = []
-        for p in range(n):
-            if p != 0 and amplMatPath[1, p + 1].value():
-                i = p
-                j = -1
-                path = [listCenters[0], listCenters[p]]
-                travel_time = travel_times[0][p]
-                while j != 0:
-                    for k in range(n):
-                        if i != k and amplMatPath[i + 1, k + 1].value():
-                            j = k
-                    travel_time += self.clusterTime[listCenters[i].getID()] + travel_times[i][j]
-                    i = j
-                    path.append(listCenters[i])
-                VRP.append([path, travel_time])
-        return VRP
 
     # -------------------------------------------------------------------------
 
@@ -353,15 +354,13 @@ class Space:
         """
         self.distKm = self.computeKmDistance()
 
-        print(self.nb_points)
-        import time
         a = time.time()
         self.distWalking = self.computeGmapDist(mode="walking")
         self.distDriving = self.computeGmapDist(mode="driving")
         b = time.time()
 
 
-        print("app Gmap API:", b-a)
+        print("Call to Gmap API in: {:.4f}s.".format(b-a))
 
     def getGoogleTravelTimes(self, sources, targets, mode):
         """
@@ -665,59 +664,288 @@ class Space:
     # -------------------------------------------------------------------------
     # -- PROCESS
     # -------------------------------------------------------------------------
-
-    def setClusters(self, clusters):
+    def clusterSpace(self, trace=False):
         """
-        self.cluster is a dictionnary.
-            - key: pointID if the cluster center
-            - value: list of pointID's belonging to the cluster
+        Cluster the space, using a weighted k-median paradigm.
+        The goal is to minimize k (thus maximizing the walking distance)
+
+        The office is set to be a center by default. 
+        NB: The office id has to be set to 0.
+
+        Set trace to True for debugging.
+
+        @return: a dict representing the clusters
+
+        The dictionnary representing the cluster has the format:
+            - key = center
+            - value = list of the point ID's in the cluster (always starting with the center)
         """
-        self.clusters = clusters
+        maxClusterSize = 7200
+        maxWalkingTime = 1200
+        # TODO: take into account dmin and dmax
+        with open("models/maxFootTimeClustering.dat", "w") as clustering:
+            clustering.write("# threshold for cluster size\n")
+            clustering.write("param maxClusterSize:= {};\n".format(maxClusterSize))
+            
+            clustering.write("\n")
 
-    def clusterSpace(self):
-        # from dev_log.optim.processClustering import runClustering
-        from processClustering import runClustering
-        runClustering(self)
+            clustering.write("# threshold for walking time\n")
+            clustering.write("param maxWalkingTime:= {};\n".format(maxWalkingTime))
+            
+            clustering.write("\n")
+            
+            clustering.write("# nombre de sommets {}\n".format(self.nb_points))
+            clustering.write("param: V: duration :=\n")
+            for p in self.points:
+                p_ID = p.getID()
+                p_duration = self.getCareDurationByID(p_ID)
+                clustering.write("\t{} {}\n".format(p_ID, p_duration))
+            clustering.write(";\n")
 
-    def reclusterSpace(self, toRecluster):
-        #from dev_log.optim.reclustering import runReclustering
-        from reclustering import runReclustering
-        runReclustering(self, toRecluster)
+            clustering.write("\n")
+
+            clustering.write("# id_sommet1, id_sommet2, drivingTime\n")
+            clustering.write("param: A: drivingTime :=\n")
+            for p1 in self.points:
+                for p2 in self.points:
+                    if p1 == p2:
+                        p_ID = p1.getID()
+                        clustering.write("\t{} {} 0\n".format(p_ID, p_ID))
+                    else:
+                        p_ID1 = p1.getID()
+                        p_ID2 = p2.getID()
+                        clustering.write("\t{} {} {}\n".format(p_ID1, p_ID2, self.getDistDrivingSource2Target(p_ID1,p_ID2)))
+            clustering.write(";\n")
+            
+            clustering.write("# id_sommet1, id_sommet2, walkingTime\n")
+            clustering.write("param: walkingTime :=\n")
+            for p1 in self.points:
+                for p2 in self.points:
+                    if p1 == p2:
+                        p_ID = p1.getID()
+                        clustering.write("\t{} {} 0\n".format(p_ID, p_ID))
+                    else:
+                        p_ID1 = p1.getID()
+                        p_ID2 = p2.getID()
+                        clustering.write("\t{} {} {}\n".format(p_ID1, p_ID2, self.getDistWalkingSource2Target(p_ID1,p_ID2)))
+            clustering.write(";\n")
+        
+        # set up ampl
+        ampl = AMPL(Environment(ampl_path))
+
+        # Interpret the two files
+        ampl.read('models/maxFootTimeClustering.mod')
+        ampl.readData('models/maxFootTimeClustering.dat')
+
+        # Solve
+        ampl.solve()
+
+        # Get objective entity by AMPL name
+        centers = ampl.getVariable('center')
+        
+        listCenters = []
+
+        # Access all instances using an iterator
+        for index, instance in centers:
+            if instance.value():
+                # int(index) is the point_ID of a center
+                listCenters.append(int(index))
+
+        self.clusters = dict()
+        for c in listCenters:
+            self.clusters[c] = [c]
+
+        # access the variable
+        closestCenter = ampl.getVariable('closestCenter')
+        for index, instance in closestCenter:
+            if int(index[0]) not in listCenters and instance.value():
+                self.clusters[int(index[1])].append(int(index[0]))
+
+        if trace:
+            print(self.clusters)
+            
+            # Get cluster values
+            clstValues = ampl.getVariable('clusterValue')
+            for index, instance in clstValues:
+                if instance.value() > 0:
+                    print("Cluster {} has value {}".format(index, instance.value()))
     
     def getHamiltonianCycle(self, pointIDs, starting_pointID, mode="walking"):
-        #from dev_log.optim.hamiltonian import hamiltonian
-        from hamiltonian import hamiltonian
-        return hamiltonian(self, pointIDs, starting_pointID, mode)
+        """
+        Compute an hamiltonian cycle on the set of points.
+        It uses a google maps key. Note that mode is "walking" or "driving".
+        
+        @param points: should be a a list of ID's refering to subset of s.points
+        """
+        n = len(pointIDs)
+
+        if n == 1:
+            path, travel_time = pointIDs, 0
+        
+        else:
+            if n == 2:
+                if pointIDs[0] == starting_pointID:
+                    p_ID1, p_ID2 =  pointIDs[0], pointIDs[1]
+                else:
+                    p_ID2, p_ID1 =  pointIDs[0], pointIDs[1]
+                path = [p_ID1, p_ID2, p_ID1]
+                travel_time = self.getDistSource2Target(p_ID1, p_ID2, mode) +  self.getDistSource2Target(p_ID2, p_ID1, mode)
+
+            else:
+                # For the solver to work, the points has to be numbered from 1 to n
+                with open("models/travellingSalesman.dat", "w") as hamiltonian:
+                    hamiltonian.write("# nombre de sommets {}\n".format(n))
+                    hamiltonian.write("set V :=\n")
+                    for k in range(1, n+1):
+                        hamiltonian.write("\t{}\n".format(k))
+                    hamiltonian.write(";\n")
+
+                    hamiltonian.write("\n")
+
+                    hamiltonian.write("# id_sommet1, id_sommet2, travelling time\n")
+                    hamiltonian.write("param: A: time :=\n")
+                    for i in range(n):
+                        for j in range(i+1, n):
+                            p_ID1, p_ID2 =  pointIDs[i], pointIDs[j]
+                            hamiltonian.write("\t{} {} {}\n".format(i+1, j+1, self.getDistSource2Target(p_ID1, p_ID2, mode)))
+                            hamiltonian.write("\t{} {} {}\n".format(j+1, i+1, self.getDistSource2Target(p_ID2, p_ID1, mode)))
+                    hamiltonian.write(";\n")
+
+                # set up ampl
+                ampl = AMPL(Environment(ampl_path))
 
 
-    def splitAmongNurse(self, centers):
-        #from dev_log.optim.splitAmongNurses import vrp
-        from splitAmongNurses import vrp
-        return vrp(self, centers)
+                # Interpret the two files
+                ampl.read('models/travellingSalesman.mod')
+                ampl.readData('models/travellingSalesman.dat')
 
-    def solve(self, mode="schedule"):
+                # Solve
+                print("get Hamiltonian cycle")
+                ampl.solve()
+                
+                #regenerate the path
+                x = ampl.getVariable("x")
+
+                # Given a list of pointIDs and the ampl transition matrix, we need to rebuild the path.
+                # pointIDs is list of point  ID's such that its order is the same as the index in x (amplMatPath)
+                # x is the transition matrix (returned by ampl) describing the path (zero, one matrix) such that:
+                #   x[i,j] = 1 iff the path goes from pointIDs[i] to pointIDs[j]
+
+                i = 0
+                j = -1
+                path = []
+
+                while j != 0:
+                    for k in range(n):
+                        if i != k and x[i+1,k+1].value():
+                            j = k
+                    p_ID1, p_ID2 =  pointIDs[i], pointIDs[j]
+                    i = j
+                    path.append(pointIDs[i])
+                rotateToStartingElement(path, starting_pointID)
+                path.append(starting_pointID)
+
+                # compute travel_time
+                travel_time = 0
+                for k in range(n):
+                    p_ID1, p_ID2 =  path[k], path[k+1]
+                    travel_time += self.getDistSource2Target(p_ID1, p_ID2, mode)
+
+        return path, travel_time
+
+
+    def splitAmongNurse(self, trace=True):
+        """
+        Split the clusters between the various nurses.
+        """
+        n = len(self.clusters)
+        k = min(self.nb_nurse, n-1)
+        if k < 1:
+            k = 1
+        
+        with open("models/splitAmongNurses.dat", "w") as vrp:
+            # number of nurses
+            vrp.write("# number of clusters\n")
+            vrp.write("param k := {};\n".format(k))
+
+            vrp.write("\n")
+            
+            # TODO: adapt according to nurses
+            vrp.write("# max cluster size\n")
+            vrp.write("param maxt := {};\n".format(self.duration))
+
+            vrp.write("\n")
+
+            vrp.write("# nombre de sommets {}\n".format(n))
+            vrp.write("param: V: duration :=\n")
+            for p_ID in self.clusters:
+                vrp.write("\t{} {}\n".format(p_ID,self.clusterTime[p_ID]))
+            vrp.write(";\n")
+
+            vrp.write("\n")
+
+            vrp.write("# id_sommet1, id_sommet2, time\n")
+            vrp.write("param: A: time :=\n")
+            for p1_ID in self.clusters:
+                for p2_ID in self.clusters:
+                    if p1_ID == p2_ID:
+                        vrp.write("\t{} {} 0\n".format(p1_ID, p1_ID))
+                    else:
+                        vrp.write("\t{} {} {}\n".format(p1_ID, p2_ID, self.distDriving[(p1_ID,p2_ID)]))
+            vrp.write(";\n")
+
+        # set up ampl
+        ampl = AMPL(Environment(ampl_path))
+
+        # Interpret the two files
+        ampl.read('models/splitAmongNurses.mod')
+        ampl.readData('models/splitAmongNurses.dat')
+
+        # Solve
+        ampl.solve()
+
+        # Get objective entity by AMPL name
+        cntrs = ampl.getVariable('center')
+        
+        listCenters = []
+
+        # Access all instances using an iterator
+        for index, instance in cntrs:
+            if instance.value():
+                listCenters.append(index)
+
+        clusters = dict()
+        for c in listCenters:
+            clusters[int(c)] = [int(c)]
+
+        # access the variable
+        closestCenter = ampl.getVariable('closestCenter')
+        for index, instance in closestCenter:
+            if index[0] not in listCenters and instance.value():
+                clusters[int(index[1])].append(int(index[0]))
+
+        if trace:
+            print(clusters)
+
+        # compact the solution
+        res = []
+        for nurse_points in clusters.values():
+            res.append(nurse_points)
+        return res
+
+    def solve(self, mode="schedule", trace=True):
         """
 
         """
+        # compute dmin and dmax
         if self.dmin is None or self.dmax is None:
             Space.computeExtremalDistances(self)
-        
-        print("1")
 
         # compute distance matrices
         self.buildDistanceMatrices()
 
-
-        print("2")
-
-        # get the minimal number of clusters
-        #self.computeClusterNumber()
-
         # cluster the space
         self.clusterSpace()
-
-
-        print("3")
 
         # compute time to see patients in each cluster
         self.clusterTime = dict()
@@ -725,13 +953,13 @@ class Space:
         for c, walking_points in self.clusters.items():
             # c and walking_points are pointID's
             walking_path, walking_time = self.getHamiltonianCycle(walking_points, c)
-            walking_time += sum(self.care_duration[app_id] for app_id in walking_path)
+            if len(walking_path) == 1:
+                walking_time += self.getCareDurationByID(walking_path[0])
+            else:
+                walking_time += sum(self.getCareDurationByID(app_id) for app_id in walking_path[:-1])
             self.hamiltonianPathes[c] = walking_path
             self.clusterTime[c] = walking_time
-
-        print(4)
-        exit()
-
+        
         """
         at this point: 
         => cluster is a dictionnary with:
@@ -745,151 +973,140 @@ class Space:
             - value = time to go through the path stored in hamiltonianPathes
         """
 
-        """
-        # recluster the patients to avoid having clusters with too important time to process
-        toRecluster = []
-        print("before reclustering:", len(self.clusters.keys()))
-        for c,t in self.clusterTime.items():
-            if t >  Space.clustering_factor * self.duration:
-                print("center", c, "cluster", self.clusters[c])
-                toRecluster.append(c)
-        while(len(toRecluster) > 0):   
-            self.reclusterSpace(toRecluster)
-            toRecluster = []
-            for c,t in self.clusterTime.items():
-                if t >=  Space.clustering_factor * self.duration:
-                    toRecluster.append(c)
-        
-        print("after reclustering:", len(self.clusters.keys()))
-        """
-
         # split the clusters among the nurses
-        centers = list(self.clusters.keys())
-        appointment_distribution = self.splitAmongNurse(centers)
+        appointment_distribution = self.splitAmongNurse()
+        
+        if trace:
+            print(appointment_distribution)
+
+        # clustering has failed
+        if len(appointment_distribution) == 0:
+            return False
 
         i = 0
-        officeIndex = centers.index(0)
         res = []
-        path_index = 0
         isOfficeDone = False
 
-        for [path,_] in appointment_distribution:
-            print("***")
-            print([p.getID() for p in path])
+        for points in appointment_distribution:
+            # reset path index 
+            path_index = 0
 
+            if trace:
+                print(points)
+
+            # set nurse id
             try:
                 n_id = self.nurse_ids[i]
             except:
                 return False
+
+            # set time to staring time and position to office
             current_time = self.start[0]*3600 + self.start[1] * 60
-            previous_index = officeIndex
-            for c in range(1, len(path) -1):
-                current_point = path[c]
-                current_pointID = current_point.getID()
-                point_index = centers.index(current_pointID)
-                current_time += self.driving_mat[previous_index,point_index]
-                if mode == "path":
-                    source = path[c-1]
-                    order = str(path_index)
-                    s_lat = str(source.getLatitude())
-                    s_lon = str(source.getLongitude())
-                    t_lat = str(current_point.getLatitude())
-                    t_lon = str(current_point.getLongitude())
-                    res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon,"mode": "driving"})
-                    path_index += 1
-                
-                walking_path = self.clusters[current_pointID]
-                if len(walking_path) > 1:
-                    walking_point = [self.getPointByID(p_id) for p_id in walking_path[:-1]]
-                    try:
-                        travel_times = self.getGoogleTravelTimes(walking_point, "walking")
-                    except:
-                        raise GmapApiError
-                    for k in range(len(walking_path)-2):
-                        next_pointID = walking_path[k+1]
+            previous_pointID = 0
+            previous_point = self.getPointByID(previous_pointID)
+
+            # handle appointment within walking distance of the office
+            if 0 in points:
+                walking_path = self.hamiltonianPathes[0]
+                if len(walking_path) > 2:
+                    current_pointID = walking_path[1]
+                    current_point = self.getPointByID(current_pointID)
+                    
+                    # first point and last points are the same and is the appointment where the nurse has to park.
+                    for k in range(1,len(walking_path)-1):
+                        next_pointID = walking_path[k]
                         next_point = self.getPointByID(next_pointID)
+
+                        # update schedule
                         if mode == "schedule":
                             res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                        
+                        # update path
                         elif mode == "path":
                             order = str(path_index)
                             s_lat = str(current_point.getLatitude())
                             s_lon = str(current_point.getLongitude())
                             t_lat = str(next_point.getLatitude())
                             t_lon = str(next_point.getLongitude())
-                            res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
+                            res.append({"order": order, "s_lat":s_lat, "s_lon":s_lon, "t_lat":t_lat, "t_lon":t_lon, "mode":"walking"})
                             path_index += 1
-                        current_time += self.care_duration[current_pointID] + travel_times[k,k+1]
+                        current_time += self.getCareDurationByID(current_pointID) + self.getDistWalkingSource2Target(current_pointID, next_pointID)
                         current_pointID = next_pointID
                         current_point = next_point
-                    if mode == "schedule":
-                        res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
-                    elif mode == "path":
+
+                isOfficeDone = True
+                
+            # add office as starting point
+            else:
+                points.append(0)
+            # get hamiltonian path for the point
+            path = self.getHamiltonianCycle(points, 0, mode ="driving")[0]
+
+            if trace:
+                print("hamiltonian path for nurse {} established: {}.".format(n_id, path))
+                
+            # path starts and ends at the office
+            for c in range(1, len(path) -1):
+
+                # driving part
+                current_pointID = path[c]
+                current_point = self.getPointByID(current_pointID)
+                current_time += self.getDistDrivingSource2Target(previous_pointID, current_pointID)
+
+                # update path
+                if mode == "path":
+                    order = str(path_index)
+                    s_lat = str(previous_point.getLatitude())
+                    s_lon = str(previous_point.getLongitude())
+                    t_lat = str(current_point.getLatitude())
+                    t_lon = str(current_point.getLongitude())
+                    res.append({"nurse_id":str(n_id), "order":order, "s_lat":s_lat, "s_lon":s_lon, "t_lat":t_lat, "t_lon":t_lon, "mode":"driving"})
+                    path_index += 1
+                
+                # walking part
+                walking_path = self.hamiltonianPathes[current_pointID]
+                if len(walking_path) > 1:
+
+                    # first point and last points are the same and is the appointment where the nurse has to park.
+                    for k in range(1,len(walking_path)):
+                        next_pointID = walking_path[k]
+                        next_point = self.getPointByID(next_pointID)
+                        
+                        # update schedule
+                        if mode == "schedule":
+                            res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+
+                        # update path
+                        elif mode == "path":
                             order = str(path_index)
                             s_lat = str(current_point.getLatitude())
                             s_lon = str(current_point.getLongitude())
-                            t_lat = str(path[c].getLatitude())
-                            t_lon = str(path[c].getLongitude())
-                            res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
+                            t_lat = str(next_point.getLatitude())
+                            t_lon = str(next_point.getLongitude())
+                            res.append({"nurse_id": str(n_id), "order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
                             path_index += 1
-                    current_time += self.care_duration[current_pointID] + travel_times[len(walking_path)-2,0]
+                        current_time += self.getCareDurationByID(current_pointID) + self.getDistWalkingSource2Target(current_pointID, next_pointID)
+                        current_pointID = next_pointID
+                        current_point = next_point
                 else:
                     if mode == "schedule":
                         res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
-                    current_time += self.care_duration[current_pointID]
-                previous_index = point_index
-            current_time += self.driving_mat[previous_index,officeIndex]
+                    current_time += self.getCareDurationByID(current_pointID)
+                previous_pointID = current_pointID
+                previous_point = current_point
+            
+            # get back to the office
+            current_time += self.getDistDrivingSource2Target(current_pointID, 0)
 
             if mode=="addAppointment" and current_time > self.end[0] * 3600 + self.end[1] * 60:
                 return False
-
-            # try and affect office cluster
-            if not isOfficeDone:
-                walking_path = self.clusters[0]
-                if len(walking_path) < 2:
-                    isOfficeDone = True
-                elif current_time + self.clusterTime[0] < self.end[0] * 3600 + self.end[1] * 60:
-                    # add office cluster
-                    walking_point = [self.getPointByID(p_id) for p_id in walking_path[:-1]]
-                    try:
-                        travel_times = self.getGoogleTravelTimes(walking_point, "walking")
-                    except:
-                        raise GmapApiError
-                    current_pointID = walking_path[1]
-                    current_point = self.getPointByID(current_pointID)
-                    for k in range(1,len(walking_path)-2):
-                        next_pointID = walking_path[k+1]
-                        next_point = self.getPointByID(next_pointID)
-                        if mode == "schedule":
-                            res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
-                        elif mode == "path":
-                            order = str(path_index)
-                            s_lat = str(current_point.getLatitude())
-                            s_lon = str(current_point.getLongitude())
-                            t_lat = str(next_point.getLatitude())
-                            t_lon = str(next_point.getLongitude())
-                            res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
-                            path_index += 1
-                        current_time += self.care_duration[current_pointID] + travel_times[k,k+1]
-                        current_pointID = next_pointID
-                        current_point = next_point
-                    if mode == "schedule":
-                        res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
-                    elif mode == "path":
-                            order = str(path_index)
-                            s_lat = str(current_point.getLatitude())
-                            s_lon = str(current_point.getLongitude())
-                            t_lat = str(path[c].getLatitude())
-                            t_lon = str(path[c].getLongitude())
-                            res.append({"order": order, "s_lat": s_lat, "s_lon": s_lon, "t_lat": t_lat, "t_lon": t_lon, "mode": "walking"})
-                            path_index += 1
-                    current_time += self.care_duration[current_pointID] + travel_times[len(walking_path)-2,0]
-                    isOfficeDone = True
-          
+            
+            # update nurse id
             i += 1
+
         if mode=="addAppointment":
             return isOfficeDone
 
-        #print(self.clusters)
         return res
 
     def formatTime(self, time):
@@ -898,7 +1115,11 @@ class Space:
         "0" if t // 3600 < 10 else "", t // 3600, "0" if (t % 3600) // 60 < 10 else "", (t % 3600) // 60)
         return s
 
+# -------------------------------------------------------------------------
 
+# -------------------------------------------------------------------------
+# -- OUTPUTS 
+# -------------------------------------------------------------------------
 def solve_complete(data):
     s = Space()
     s.buildSpaceFromDic(data)
@@ -914,6 +1135,12 @@ def solve_path(data):
     s = Space()
     s.buildSpaceFromDic(data)
     return s.solve(mode="path")
+
+# -------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
+# -- TESTS 
+# -------------------------------------------------------------------------
 
 if __name__ == "__main__":
     from random import random, seed
@@ -941,19 +1168,20 @@ if __name__ == "__main__":
 
     nurses = [1,2,3,4]
 
-    test_dict = {'nurse_id': ['2', '1'], 'office_lat': '48.7263802', 'office_lon': '2.2643467', 'start': '08:00', 'end': '12:00', 'appointments': [{'app_id': '6', 'app_lat': '48.73590189999999', 'app_lon': '2.2591394', 'app_length': '30'},{'app_id': '16', 'app_lat': '48.6559099', 'app_lon': '2.23327', 'app_length': '15'}, {'app_id': '7', 'app_lat': '48.7317076', 'app_lon': '2.2807308', 'app_length': '35'}, {'app_id': '8', 'app_lat': '48.7400286', 'app_lon': '2.3156139', 'app_length': '20'}, {'app_id': '9', 'app_lat': '48.6961912', 'app_lon': '2.2900446', 'app_length': '30'}, {'app_id': '10', 'app_lat': '48.7086557', 'app_lon': '2.241912', 'app_length': '35'}, {'app_id': '11', 'app_lat': '48.7450455', 'app_lon': '2.2664304', 'app_length': '35'}, {'app_id': '12', 'app_lat': '48.6964354', 'app_lon': '2.2691329', 'app_length': '25'}, {'app_id': '13', 'app_lat': '48.7382421', 'app_lon': '2.2176977', 'app_length': '35'}, {'app_id': '14', 'app_lat': '48.7973917', 'app_lon': '2.3484036', 'app_length': '35'}]}
+    test_dict = {'nurse_id': ['2','3','1'], 'office_lat': '48.7263802', 'office_lon': '2.2643467', 'start': '08:00', 'end': '12:00', 'appointments': [{'app_id': '6', 'app_lat': '48.73590189999999', 'app_lon': '2.2591394', 'app_length': '30'},{'app_id': '16', 'app_lat': '48.6559099', 'app_lon': '2.23327', 'app_length': '15'}, {'app_id': '7', 'app_lat': '48.7317076', 'app_lon': '2.2807308', 'app_length': '35'}, {'app_id': '8', 'app_lat': '48.7400286', 'app_lon': '2.3156139', 'app_length': '20'}, {'app_id': '9', 'app_lat': '48.6961912', 'app_lon': '2.2900446', 'app_length': '30'}, {'app_id': '10', 'app_lat': '48.7086557', 'app_lon': '2.241912', 'app_length': '35'}, {'app_id': '11', 'app_lat': '48.7450455', 'app_lon': '2.2664304', 'app_length': '35'}, {'app_id': '12', 'app_lat': '48.6964354', 'app_lon': '2.2691329', 'app_length': '25'}, {'app_id': '13', 'app_lat': '48.7382421', 'app_lon': '2.2176977', 'app_length': '35'}, {'app_id': '14', 'app_lat': '48.7973917', 'app_lon': '2.3484036', 'app_length': '35'}]}
     s = Space()
     #s.buildSpaceFromDB(office, patientDict, nurse_ids=nurses)
     s.buildSpaceFromDic(test_dict)
     
     res = s.solve()
+    if res == False:
+        print("There is no valid solution")
+        exit()
+
     nurses = dict()
     for app in res:
         try :
             nurses[app['nurse_id']].append(app['app_id'])
         except:
             nurses[app['nurse_id']] = [app['app_id']]
-    #print(nurses)
-    
-
-
+    print(nurses)

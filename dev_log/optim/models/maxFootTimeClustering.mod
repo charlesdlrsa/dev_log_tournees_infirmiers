@@ -37,15 +37,19 @@ subject to isCenter{v in V, c in V}:
 subject to hasCenter{v in V}:
 	sum{c in V} closestCenter[v,c] = 1;
 
+# the closest center should effectively be the closest one
+subject to isClosest{v in V, w in V}:
+	sum{c in V} closestCenter[v,c] * walkingTime[v,c] * center[w] <= walkingTime[v,w];
+
 # the distance to a point in the cluster should be smaller than the threshold
 subject to maxFootTime{v in V, c in V}:
 	walkingTime[v,c] * closestCenter[v,c] <= maxWalkingTime;
 
 # the cluster value is held by the center
-subject to holdValue{c in V : c <> 1}:
+subject to holdValue{c in V}:
 	clusterValue[c] = 
 		center[c] * (drivingTime[office,c] + drivingTime[c,office]) 
-		+ sum{v in V : v <> c}(duration[v] + walkingTime[v,c] + walkingTime[c,v]) * closestCenter[v,c];
+		+ sum{v in V}(duration[v] + walkingTime[v,c] + walkingTime[c,v]) * closestCenter[v,c];
 	
 # the value of a cluster has to be smaller than the threshold
 subject to clusterValueIsBounded{v in V}:
