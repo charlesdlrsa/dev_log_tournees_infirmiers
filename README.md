@@ -84,7 +84,14 @@ Nurse: `username : remi.geraud@hotmail.fr` and `password : password` <br/>
 
 #### Add nurses and patients
 
-Even if our 
+Even if our Massy office's account has a lot of nurses and patients, you can try to add new patients or to edit existing nurses by yourself. You will see that we have implemented autocompletion for the postal address by using the Google Maps API and that we check the format of each input (phone number, email address).
+
+#### See and add vacations
+
+By clicking on the button "see vacations" in the nurses list, you can see, add and delete vacations of a specific nurse. For example, if you go to Laurent Cabaret's vacations, you will see that we print in red the vacations in the past and that the administrator has the power to delete his nurse vacations.
+
+#### See and add appointments
+
 
 <br/>
 
