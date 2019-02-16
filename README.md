@@ -13,11 +13,11 @@ they also can also report their days off.
 
 ## Installing and running Nursissimo application
 
-**1**. Install the Python `virtualenv` package:
+**1.** Install the Python `virtualenv` package:
 
 `pip3 install virtualenv` or `pip install virtualenv`
 
-**2**. Go in the directory of your choice and there, create a python virtual environment in the said 
+**2.** Go in the directory of your choice and there, create a python virtual environment in the said 
 directory and activate it:
 
 `cd ./your_directory`
@@ -28,7 +28,7 @@ directory and activate it:
 
 - Windows: `.\venv\Scripts\activate.bat`
 
-**3**. Go in the folder `venv` and clone the github project:
+**3.** Go in the folder `venv` and clone the github project:
 
 `cd ./venv`
 
@@ -36,7 +36,7 @@ directory and activate it:
 
 _If you don't have `git` on your computer, you can download the zip of this project at the top right of this page and unzipped it in your folder `venv` giving it the name `dev_log_tourneees_infirmiers`._
 
-**4**. To use our application, you need to install our requirements. You have two methods according to your computer:
+**4.** To use our application, you need to install our requirements. You have two methods according to your computer:
 
 - Linux / MacOs:
 
@@ -54,7 +54,7 @@ _If you don't have `git` on your computer, you can download the zip of this proj
 
 <br/>
 
-**5**. Run the app:
+**5.** Run the app:
 
 `python3 run.py` or `python run.py`
 
@@ -88,20 +88,33 @@ Even if our Massy office's account has a lot of nurses and patients, you can try
 
 #### See and add vacations
 
-By clicking on the button "See vacations" in the nurses list, you can see, add and delete the vacations of a specific nurse. For example, if you go to Laurent Cabaret's vacations, you will see that we display in red the vacations in the past and that the administrator has the power to delete the nurse vacations.
+By clicking on the button `See vacations` in the nurses list, you can see, add and delete the vacations of a specific nurse. For example, if you go to Laurent Cabaret's vacations, you will see that we display in red the vacations in the past and that the administrator has the power to delete the nurse vacations.
 
 #### See and add appointments
 
-By going to the Appointments tab, you can see all the planned appoinments for a specific date or for a specific patient, or for both. <br/>
-You can also choose to add a new appointment for a specific patient, a specific care and a specific date. Here, you will see several features we have implemented.
-**1.** You cannot add an appointment 24 hours before the desired date. This constraint is unfortunatly necessary to allow the nurses to know their exact planning 24 hours before each day.
-**2.** By clicking on the button "Search availabilities", our application will show to the administrator if there are some availabilities to add a new appointment during the week of the selected date. These availabilities are determined in function of the date, of the patient appointments, and of the available nurses. It's our optimizer goal to predict if the nurses will be able to do all the planned appointments more the new appointment during a specific halfday.
+By going to the `Appointments` tab, you can see all the planned appoinments for a specific date or for a specific patient, or for both. <br/>
+You can also choose to add a new appointment for a specific patient, a specific care and a specific date. Here, you will see several features we have implemented:
 
-For example, you can try to add a new appointment for the patient "Charles de la Roche" on the 24/04/2109.<br/>
+- You cannot add an appointment less than 24 hours before the desired date. This constraint is unfortunatly necessary to allow the nurses to know their exact planning 24 hours before each day.
+
+- By clicking on the button `Search availabilities`, our application will show to the administrator if there are some availabilities to add a new appointment during the week of the selected date. These availabilities are determined in function of the date, of the patient appointments, and of the available nurses. It's our optimizer goal to predict if the nurses will be able to do all the planned appointments more the new appointment during a specific halfday.
+
+For example, you can try to add a new appointment for the patient `Charles de la Roche` on the 24/04/2109.<br/>
 You will see that the patient has already an appointment the 26/04/2019, so you cannot add another appointment.<br/>
 You will also see that no nurse is available the 23/04/2019 in the morning and that's perfectly normal. Indeed, if you check the vacation of the nurses, you will show that 3 of the 4 nurses are in day off and the only one available has already 7 appointments in the morning.
 
 #### See a nurse planning
+
+By going to the `Planning` tab, you can see the planning of each nurse. Here, you will see several features we have implemented:
+
+- You cannot see a planning more than 24 hours before the desired date. This is due to our optimizer. To set all the appointments to the nurses and optimize their journeys, we need to have all the appointments of the selected half-day. Yet, we can add appointments until 24 hours before a day. Therefore, we must wait that all the possible appointments had been added to launch the optimizer and show the planning of each nurse.
+
+- By clicking on the button `View planning`, our application will launch the optimizer. This last one will attribute the planned appointments to all the available nurses in order to minimize their traveled distance and maximize their walk.
+
+For the example, we have only autorized the Massy's office administrator to view the planning of morning on the 02/05/2019, and we closed the appointment booking for this half-day. <br/>
+On this date, two nurses are in vacations so only `Laurent Cabaret` and `Jean-Philippe Poli` are available. <br/>
+You can check the distribution of the appointments done by the optimizer between the two nurses and check their journeys. <br/>
+You can also try by yourself to add appointments for a date and check the planning of the nurses the day before this date.
 
 <br/>
 
