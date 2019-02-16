@@ -11,7 +11,7 @@ they also can also report their days off.
 
 **1**. Install the Python `virtualenv` package:
 
-`pip install virtualenv`
+`pip3 install virtualenv` or `pip install virtualenv`
 
 **2**. Go in the directory of your choice and there, create a python virtual environment in the said 
 directory and activate it:
@@ -20,9 +20,9 @@ directory and activate it:
 
 `virtualenv venv`
 
-Linux / MacOS: `source venv/bin/activate`
+- Linux / MacOS: `source venv/bin/activate`
 
-Windows: `.\venv\Scripts\activate.bat`
+- Windows: `.\venv\Scripts\activate.bat`
 
 **3**. Go in the folder `venv` and clone the github project:
 
@@ -30,11 +30,11 @@ Windows: `.\venv\Scripts\activate.bat`
 
 `git clone git@github.com:charlesdlrsa/dev_log_tournees_infirmiers.git`
 
-If you don't have `git` on your computer, you can download the zip of this project and unzipped it in your folder `venv`.
+_If you don't have `git` on your computer, you can download the zip of this project and unzipped it in your folder `venv`._
 
 **4**. To use our application, you need to install our requirements. You have two methods according to your computer:
 
-Linux / MacOs:
+- Linux / MacOs:
 
 `cd ./dev_log_tourneees_infirimiers`
 
@@ -42,16 +42,16 @@ Linux / MacOs:
 
 `make install`
 
-Windows:
+- Windows:
 
 `cd ./dev_log_tournees_infirimiers`
 
 `pip3 install -r requirements.txt` or `pip install -r requirements.txt`
 
+
 ## Running Nursissimo
 
-
-**1**. Go to your virtualenv folder.
+**1**. Go to your virtualenv folder:
 
 `cd ./venv`
 
