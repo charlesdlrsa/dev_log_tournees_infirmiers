@@ -64,23 +64,23 @@ _If you don't have `git` on your computer, you can download the zip of this proj
 
 #### Authentification
 
-You can log in to the application as an office administrator or as an office nurs.
-To try our features, we set in the database two offices with their corresponding nurses and patients.
+You can log in to the application as an office administrator or as an office nurs. <br/>
+To try our features, we set in the database two offices with their corresponding nurses and patients. <br/>
 We advise you to use the Doctissimo account which is more provided with examples, but feel free to use both accounts.
 
 - Doctissimo office
 
-Admin: `username: doctissimo@hotmail.fr` and `password : password`
-Nurse: `username : laurent.cabaret@hotmail.fr` and `password : password`
-Nurse: `username : jpp@hotmail.fr` and `password : password`
-Nurse: `username : celine.hudelot@hotmail.fr` and `password : password`
-Nurse: `username : jeanmarie.detriche@hotmail.fr` and `password : password`
+Admin: `username: doctissimo@hotmail.fr` and `password : password` <br/>
+Nurse: `username : laurent.cabaret@hotmail.fr` and `password : password` <br/>
+Nurse: `username : jpp@hotmail.fr` and `password : password` <br/>
+Nurse: `username : celine.hudelot@hotmail.fr` and `password : password` <br/>
+Nurse: `username : jeanmarie.detriche@hotmail.fr` and `password : password` <br/>
 
 - Malakoff office
 
-Admin: `username : malakoff@gmail.com` and `password : password`
-Nurse: `username : nicolas.travers@hotmail.fr` and `password : password`
-Nurse: `username : remi.geraud@hotmail.fr` and `password : password`
+Admin: `username : malakoff@gmail.com` and `password : password` <br/>
+Nurse: `username : nicolas.travers@hotmail.fr` and `password : password` <br/>
+Nurse: `username : remi.geraud@hotmail.fr` and `password : password` <br/>
 
 <br/>
 
