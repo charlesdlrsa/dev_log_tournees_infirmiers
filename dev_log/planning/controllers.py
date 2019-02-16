@@ -6,7 +6,7 @@ from dev_log.utils import calendar
 import datetime
 from dev_log import db
 from dev_log.utils.optimizer_functions import build_data_for_optimizer
-from dev_log.optim.space import solve_complete, solve_path
+from dev_log.optim.space import solve_complete, solve_path, GmapApiError
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
@@ -33,11 +33,11 @@ def home():
             error = "You need to select a halfday"
         elif date is None:
             error = "You need to select a date"
-        elif date_selected > datetime.date.today() + datetime.timedelta(1) and date_selected != datetime.date(2019, 5,
-                                                                                                              2):
+        elif date_selected > datetime.date.today() + datetime.timedelta(1) and \
+                not (date_selected == datetime.date(2019, 5, 2) and halfday == "Morning"):
             error = "You cannot see a nurse planning more than 24 hours before the desired date."
             # This is due to our optimizer. To set all the appointments to the nurses and optimize their journeys,
-            # we need to have all the appointments of the selected half-day. But, we can add appointments until 24 hours
+            # we need to have all the appointments of the selected half-day. Yet, we can add appointments until 24 hours
             # before a day. Therefore, we must wait that all the possible appointments had been added to launch
             # the optimizer and show the planning of each nurse.
 
@@ -112,21 +112,6 @@ def reinit_db():
     # TODO : to be deleted
     init_db()
     message = "The database has been reinitialised"
-    flash(message)
-    return redirect(url_for("planning.home"))
-
-
-@planning.route("/delete_schedules", methods=['GET', 'POST'])
-@admin_required
-def delete_schedules():
-    """ Initializes the database on click """
-
-    # TODO : to be deleted
-    schedules = Schedule.query.filter(Schedule.nurse.office_id == session["office_id"]).all()
-    db.session.delete(schedules)
-    db.session.commit()
-    flash("The appointment was successfully deleted.")
-    message = "The schedules have been deleted"
     flash(message)
     return redirect(url_for("planning.home"))
 
