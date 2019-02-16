@@ -64,8 +64,8 @@ _If you don't have `git` on your computer, you can download the zip of this proj
 
 #### Authentification
 
-You can log in to the application as an office administrator or as an office nurs. <br/>
-To try our features, we set in the database two offices with their corresponding nurses and patients. <br/>
+You can log in to the application as an office administrator or as an office nurse. <br/>
+To try our features, we set in the database two office accounts with their corresponding nurses and patients. <br/>
 We advise you to use Massy office's account which is more provided with examples, but feel free to use both accounts.
 
 - Massy office
@@ -84,7 +84,24 @@ Nurse: `username : remi.geraud@hotmail.fr` and `password : password` <br/>
 
 #### Add nurses and patients
 
-Even if our 
+Even if our Massy office's account has a lot of nurses and patients, you can try to add new patients or to edit existing nurses by yourself. You will see that we have implemented autocompletion for the postal address by using the Google Maps API and that we check the format of each input (phone number, email address).
+
+#### See and add vacations
+
+By clicking on the button "See vacations" in the nurses list, you can see, add and delete the vacations of a specific nurse. For example, if you go to Laurent Cabaret's vacations, you will see that we display in red the vacations in the past and that the administrator has the power to delete the nurse vacations.
+
+#### See and add appointments
+
+By going to the Appointments tab, you can see all the planned appoinments for a specific date or for a specific patient, or for both. <br/>
+You can also choose to add a new appointment for a specific patient, a specific care and a specific date. Here, you will see several features we have implemented.
+**1.** You cannot add an appointment 24 hours before the desired date. This constraint is unfortunatly necessary to allow the nurses to know their exact planning 24 hours before each day.
+**2.** By clicking on the button "Search availabilities", our application will show to the administrator if there are some availabilities to add a new appointment during the week of the selected date. These availabilities are determined in function of the date, of the patient appointments, and of the available nurses. It's our optimizer goal to predict if the nurses will be able to do all the planned appointments more the new appointment during a specific halfday.
+
+For example, you can try to add a new appointment for the patient "Charles de la Roche" on the 24/04/2109.<br/>
+You will see that the patient has already an appointment the 26/04/2019, so you cannot add another appointment.<br/>
+You will also see that no nurse is available the 23/04/2019 in the morning and that's perfectly normal. Indeed, if you check the vacation of the nurses, you will show that 3 of the 4 nurses are in day off and the only one available has already 7 appointments in the morning.
+
+#### See a nurse planning
 
 <br/>
 
