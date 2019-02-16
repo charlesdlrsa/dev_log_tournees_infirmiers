@@ -97,6 +97,10 @@ You can also choose to add a new appointment for a specific patient, a specific 
 **1.** You cannot add an appointment 24 hours before the desired date. This constraint is unfortunatly necessary to allow the nurses to know their exact planning 24 hours before each day.
 **2.** By clicking on the button "Search availabilities", our application will show to the administrator if there are some availabilities to add a new appointment during the week of the selected date. These availabilities are determined in function of the date, of the patient appointments, and of the available nurses. It's our optimizer goal to predict if the nurses will be able to do all the planned appointments more the new appointment during a specific halfday.
 
+For example, you can try to add a new appointment for the patient "Charles de la Roche" on the 24/04/2109.<br/>
+You will see that the patient has already an appointment the 26/04/2019, so you cannot add another appointment.<br/>
+You will also see that no nurse is available the 23/04/2019 in the morning and that's perfectly normal. Indeed, if you check the vacation of the nurses, you will show that 3 of the 4 nurses are in day off and the only one available has already 7 appointments in the morning.
+
 <br/>
 
 ## Our strengths
