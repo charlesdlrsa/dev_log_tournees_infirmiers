@@ -9,10 +9,10 @@ def init_db():
     db.drop_all()
     db.create_all()
     password = generate_password_hash("password")
-    db.session.add(Office(name="Doctissimo", phone="0647859648", address="2 Rue Christophe Colomb, 91300 Massy",
-                          email="doctissimo@hotmail.fr", password=password))
+    db.session.add(Office(name="Massy", phone="0647859648", address="2 Rue Christophe Colomb, 91300 Massy",
+                          email="massy@hotmail.fr", password=password))
     db.session.add(Office(name="Malakoff", phone="0609456784", address="27 Rue Alexis Martin, 92240 Malakoff",
-                          email="malakoff@gmail.com", password=password))
+                          email="malakoff@hotmail.fr", password=password))
 
     db.session.add(Nurse(last_name="Cabaret", first_name="Laurent", email="laurent.cabaret@hotmail.fr",
                          phone="0699458758", password=password, address="25 rue de la Ferronerie, 91430 Igny",
