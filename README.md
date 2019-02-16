@@ -16,7 +16,7 @@ they also can also report their days off.
 **2**. Go in the directory of your choice and there, create a python virtual environment in the said 
 directory and activate it:
 
-`cd /your_directory`
+`cd ./your_directory`
 
 `virtualenv venv`
 
@@ -63,13 +63,13 @@ _If you don't have `git` on your computer, you can download the zip of this proj
 
 You can log in with an administrator account. Depending on your office, select the *As Admin* mode and fill in the identifiers : 
 
-Doctissimo office
+- Doctissimo office
 
 `username: doctissimo@hotmail.fr`
 
 `password : password`
 
-Malakoff office
+- Malakoff office
 
 `username : malakoff@gmail.com`
 
@@ -77,7 +77,7 @@ Malakoff office
 
 You can also log in with a nurse account corresponding to the initial database. The following profiles have been initialized :
 
-Doctissimo office
+- Doctissimo office
 
 `username : laurent.cabaret@hotmail.fr`
 
@@ -87,7 +87,7 @@ Doctissimo office
 
 `username : jeanmarie.detriche@hotmail.fr`
 
-Malakoff office
+- Malakoff office
 
 `username : pierre.dupont@hotmail.fr`
 
