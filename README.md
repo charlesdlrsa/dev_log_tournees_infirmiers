@@ -4,9 +4,9 @@
 
 ## Collaborative school project
 
-Nursissimo is a software for nurses' offices. It allows the nurses' offices to register patients in the database easily,
-to make appointments, and to quickly visualize the different nurses timetable depending on the day. Nursissimo also 
-allows nurses to check their daily planning, the different appointments and the tips between these appointments. Moreover,
+Nursissimo is a software for nurses' offices. It allows the offices to easily register patients and nurses in their database,
+to schedule appointments, and to quickly visualize the different nurses schedules depending on the day. Nursissimo applciation also 
+allows nurses to check their daily planning, the different appointments and the journeys between these appointments. Moreover,
 they also can also report their days off.
 
 <br/>
@@ -64,37 +64,23 @@ _If you don't have `git` on your computer, you can download the zip of this proj
 
 #### Authentification
 
-You can log in with an administrator account. Depending on your office, select the *As Admin* mode and fill in the identifiers : 
+You can log in to the application as an office administrator or as an office nurs.
+To try our features, we set in the database two offices with their corresponding nurses and patients.
+We advise you to use the Doctissimo account which is more provided with examples, but feel free to use both accounts.
 
 - Doctissimo office
 
-`username: doctissimo@hotmail.fr`
-
-`password : password`
-
-- Malakoff office
-
-`username : malakoff@gmail.com`
-
-`password : password`
-
-You can also log in with a nurse account corresponding to the initial database. The following profiles have been initialized :
-
-- Doctissimo office
-
-`username : laurent.cabaret@hotmail.fr`
-
-`username : jpp@hotmail.fr`
-
-`username : celine.hudelot@hotmail.fr`
-
-`username : jeanmarie.detriche@hotmail.fr`
+Admin: `username: doctissimo@hotmail.fr` and `password : password`
+Nurse: `username : laurent.cabaret@hotmail.fr` and `password : password`
+Nurse: `username : jpp@hotmail.fr` and `password : password`
+Nurse: `username : celine.hudelot@hotmail.fr` and `password : password`
+Nurse: `username : jeanmarie.detriche@hotmail.fr` and `password : password`
 
 - Malakoff office
 
-`username : pierre.dupont@hotmail.fr`
-
-The passwords are initialized to `password`
+Admin: `username : malakoff@gmail.com` and `password : password`
+Nurse: `username : nicolas.travers@hotmail.fr` and `password : password`
+Nurse: `username : remi.geraud@hotmail.fr` and `password : password`
 
 <br/>
 
