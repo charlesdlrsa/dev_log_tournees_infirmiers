@@ -1,14 +1,11 @@
 # Nursissimo   <img src="dev_log/static/nurse_logo.png" width=60 align=center />
 
-## Collaborative project
+## Collaborative school project
 
 Nursissimo is a software for nurses' offices. It allows the nurses' offices to register patients in the database easily,
 to make appointments, and to quickly visualize the different nurses timetable depending on the day. Nursissimo also 
 allows nurses to check their daily planning, the different appointments and the tips between these appointments. Moreover,
 they also can also report their days off.
-
-*Accès au site web, en fonction du déploiement*
-
 
 ## Installation
 
@@ -27,11 +24,13 @@ Linux / MacOS: `source venv/bin/activate`
 
 Windows: `.\venv\Scripts\activate.bat`
 
-**3**. Go in `venv` and clone the github project:
+**3**. Go in the folder `venv` and clone the github project:
 
 `cd ./venv`
 
 `git clone git@github.com:charlesdlrsa/dev_log_tournees_infirmiers.git`
+
+If you don't have `git` on your computer, you can download the zip of this project and unzipped it in your folder `venv`.
 
 **4**. To use our application, you need to install our requirements. You have two methods according to your computer:
 
@@ -39,7 +38,7 @@ Linux / MacOs:
 
 `cd ./dev_log_tourneees_infirimiers`
 
-`pip3 install wheel`
+`pip3 install wheel` or `pip install wheel`
 
 `make install`
 
@@ -47,20 +46,18 @@ Windows:
 
 `cd ./dev_log_tournees_infirimiers`
 
-`pip3 install -r requirements.txt`
+`pip3 install -r requirements.txt` or `pip install -r requirements.txt`
 
 ## Running Nursissimo
 
 
-**1**. Go to your virtualenv. Add the app to your environment variables:
+**1**. Go to your virtualenv folder.
 
-Linux / MacOS : 
-
-Windows : 
+`cd ./venv`
 
 **2**. Run the app:
 
-`python3 run.py`
+`python3 run.py` or `python run.py`
 
 **Authentification**
 
