@@ -5,7 +5,7 @@
 ## Collaborative school project
 
 Nursissimo is a software for nurses' offices. It allows the offices to easily register patients and nurses in their database,
-to schedule appointments, and to quickly visualize the different nurses schedules depending on the day. Nursissimo applciation also 
+to schedule appointments, and to quickly visualize the different nurses schedules depending on the day. Nursissimo applciation also
 allows nurses to check their daily planning, the different appointments and the journeys between these appointments. Moreover,
 they also can also report their days off.
 
@@ -17,7 +17,7 @@ they also can also report their days off.
 
 `pip3 install virtualenv` or `pip install virtualenv`
 
-**2.** Go in the directory of your choice and there, create a python virtual environment in the said 
+**2.** Go in the directory of your choice and there, create a python virtual environment in the said
 directory and activate it:
 
 `cd ./your_directory`
@@ -45,6 +45,10 @@ _If you don't have `git` on your computer, you can download the zip of this proj
 `pip3 install wheel` or `pip install wheel`
 
 `make install`
+
+- For MacOs give right permissions to AMPL :
+
+`chmod 755 dev_log/optim/ampl/macos/ampl`
 
 - Windows:
 
@@ -127,10 +131,10 @@ Feel free to add as many appointments as you want (no more than 14, the number o
 #### Our optimizer
 
 Our software uses a specific optimizer to determine the different appointments of a nurse in a day. Its goal is to minimize
-the transport time of a nurse. 
+the transport time of a nurse.
 - It allows to attribute to each nurse the largest number of appointments in a reduced geographic area around
-their office. 
-- It gives the best way to go to each appointment, minimizing the time of travel. 
+their office.
+- It gives the best way to go to each appointment, minimizing the time of travel.
 - If it is possible, our optimizer favors walking rather than driving.
 
 #### The Google Maps visualization
@@ -142,5 +146,5 @@ We propose to the nurses to visualize their daily journeys in a Google Maps map.
 
 #### An intuitive use
 
-Our technical choices for this software have one goal: creating a simple to use service. Every essential task for a nurses' office have a dedicated tab in our application (appointments, nurses, patients,...). The Bootstrap interface gives us this simplicity. It also allows the use of the software on a smartphone (responsive design), an essential issue for the nurses during their travels. 
- 
+Our technical choices for this software have one goal: creating a simple to use service. Every essential task for a nurses' office have a dedicated tab in our application (appointments, nurses, patients,...). The Bootstrap interface gives us this simplicity. It also allows the use of the software on a smartphone (responsive design), an essential issue for the nurses during their travels.
+
