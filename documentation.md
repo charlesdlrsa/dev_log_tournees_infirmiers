@@ -177,12 +177,60 @@ L'utilisateur infirmier visualise directement ses rendez-vous de la demi-journé
 
 L'utilisateur infirmier a également la possibilité de modifier ses informations personnelles et sur la même page il peut renseigner des congés.  
 
+### Optimisation des tournées
 
+L'optimisation des tournées des infirmièrs doit principalement répondre à deux contraintes : essayer de promouvoir les déplacements à pieds entre les rendez-vous et minimiser le temps de parcours afin qu'une infirmière puisse effectuer autant de rendez-vous que possible.
 
+L'L'optimisation des tournées des infirmières peut être utilisée à trois fins :
 
-justification de l’algo
+- vérifier s'il est encore possible d'ajouter un rendez-vous sur une demi-journée,
+- déterminer le planning d'un infirmier,
+- déterminer le trajet effectué par un infirmier sur une demi-journée.
 
-Configuration
+Pour ce faire, l'optimisation est découpée en quatre étapes :
+
+- maximisation des transports à pieds par clustering des différents rendez-vous,
+- calculs des trajets à effectuer à pied dans chaque cluster sous forme de recherche d'un chemin hamiltonien,
+- les groupes de rendez-vous effectués à pied sont ensuite répartis entre les infirmiers de manière équilibrer la charge de travail par clustering des différents sous-groupes de rendez-vous,
+- les parcours effectués en voitures par les différents infirmiers sont ensuite recalculés comme des chemins hamiltoniens.
+
+Les différentes étapes de l'optimisation sont modélisées comme des problèmes d'optimisation linéaire. Elles sont résolues à l'aide d'AMPL qui découpe le problème en un modèle, qui est justifié ci-dessous pour chacune des étapes, et un jeu de donnée, qui est simplement construit à partir des données fournies pour chercher à optimiser la tournée.
+
+#### Contrainte de déplacement à pied
+
+La première étape cherche à encourager les déplacements à pieds entre les rendez-vous. Pour cela, il convient de fixer une distance maximale que l'on autorise à parcourir à pied. Le problème d'optimisation linéaire est donc nu problème de clustering. On cherche à séparer l'espace en un certain nombre de groupes de rendez-vous. On impose donc que chaque point appartienne à un cluster unique. Et on cherche à minimiser le nombre de cluster, ce qui revient à minimiser le nombre de segments à faire en voiture et donc à maximiser le nombre de trajets parcourus à pied.
+
+Afin d'assurer que tout le trajet ne sera pas fait à pied, on impose par ailleurs que chaque rendez-vous soit à une distance inférieure à 1 km du centre de son cluster. Par ailleurs, si trop de rendez-vous sont pris dans une trop petite zone géographique, tous les déplacements pourraient s'y faire à pied et ne pas rentrer dans la durée d'une demi-journée. Aussi on impose au temps de parcours d'un cluster (durée des déplacements, durée des rendez-vous et durée aller-retour entre le centre du cluster et le cabinet) d'être inférieur à une fraction de temps de travail de l'infirmier. Enfin, il convient de ne pas oublier que l'infirmier peut se déplacer à pied directement depuis le cabinet, aussi on impose que le point correspondant au cabinet soit le centre d'un cluster (éventuellement réduit à lui-même)
+
+Par ailleurs, un pré-calcul des distance minimale et maximale est effectuée afin d'éliminer deux cas extrèmes pour l'optimisation :
+
+- toutes les distances sont inférieures à la distance maximale décidée pour un trajet à pied. Dans ce cas la distance maximale est modifiée pour valoir la moyenne entre la distance minimale et la distance maximale.
+- toutes les distances sont supérieures à la distance maximale décidée pour un trajet à pied. Alors tout les trajets seront effectués en voiture et les deux premières étapes n'ont pas à être effectueées.
+
+Le modèle du problème linéaire est donné dans `maxWalkingTimeClustering`.
+
+#### Répartition des rendez-vous
+
+La troisième étape consiste à répartir les différents rendez-vous entre les infirmiers. Bien que ce problème ressemble fortement à une généralisation du problème de tournées de véhicules (VRP pour Vehicle Routing Problem), la description du problème s'est avérée très difficile puisque les poids des chemins ne peut pas être calculé à l'avance. Nous avons essayé de généraliser le problème en ajoutant une coloration des sommets en fonction du chemin auquel ils appartienent afin de pouvoir calculer le poids correctement mais celà n'a pas fonctionné. Le choix finalement retenu est donc une résolution comme un problème de clustering.
+
+Comme pour la première étape, il convient d'assurer que le parcours d'un infirmier tienne dans une demi-journée. Le poids d'un cluster, calculé comme la somme des trajets aller-retour de chaque point du cluster au centre plus la distance aller-retour entre le centre et le cabinet ne doit donc pas excéder, la durée d'une demi-journée. Notons que ce poids est en général bien supérieur à la durée nécessaire pour effectivement réalisé le parcours mais que c'est borne est atteinte losrque le cluster contient deux points et que le centre est situé sur le trajet entre le dexième point et le cabinet, comme on peut le voir sur la figure suivante :
+
+![Exemple](dev_log/static/ctr_ex.png)
+_Borne atteinte dans le parcours d'un cluster_
+
+Par ailleurs, il n'est pas aberrant d'assurer une marge de sécurité. En effet, il est plus que probable que les trajets soient affectées par la circulation ouque l'infirmier reste plus longtemps que prévu à un rendez-vous si l'infirmier discute quelques minutes avec le patient par exemple. Ainsi même si l'on obtiendra un certaine marge de temps en fin de demi-journée après calcul du temps réellement nécessaire à l'infirmier pour effectuer son parcours, ce temps sera probablement moindre en pratique.
+
+Enfin, l'utilisation d'un problème de clustering et non de tournées de véhicules permet, grace à l'approximation du temps de travail, d'équilibrer les charges de travail entre les infirmiers. En effet le modèle utilisé calcule l'écart à la moyenne du temps de travail de chaque infirmier et cherche à le minimiser.
+
+Le modèle du problème linéaire est donné dans `splitAmongNurses`.
+
+#### Chemins hamiltoniens
+
+La deuxième et la quatrième étape sont sensiblement identiques bien que les distances prises en compte et la signification des différents points soient différents. On peut donc utiliser un unique modèle de problème d'optimisation linéaire pour les deux étapes. Il s'agit d'une généralisation du problème du voyageur de commerce avec des poids sur les arêtes.
+
+En plus de permettre de calculer les chemins à effectuer pour chacun des infirmiers, le recours à la recherche de chemin hamiltonien permet de calculer le temps effectivement nécessaire pour effectuer le morceau de tournée correspondant à un cluster (cluster à effectuer à pied dans le cas de la deuxième étape ou en voiture pour la quatrième étépe).
+
+Le modèle du problème linéaire est donné dans `travellingSalesman`.
 
 ## Modèle
 

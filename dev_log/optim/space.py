@@ -749,7 +749,7 @@ class Space:
         maxClusterSize = 7200
         maxWalkingTime = 1200
         # TODO: take into account dmin and dmax
-        with open(pre_path + "models/maxFootTimeClustering.dat", "w") as clustering:
+        with open(pre_path + "models/maxWalkingTimeClustering.dat", "w") as clustering:
             clustering.write("# threshold for cluster size\n")
             clustering.write("param maxClusterSize:= {};\n".format(maxClusterSize))
             
@@ -800,8 +800,8 @@ class Space:
         ampl = AMPL(Environment(ampl_path))
 
         # Interpret the two files
-        ampl.read(pre_path + 'models/maxFootTimeClustering.mod')
-        ampl.readData(pre_path + 'models/maxFootTimeClustering.dat')
+        ampl.read(pre_path + 'models/maxWalkingTimeClustering.mod')
+        ampl.readData(pre_path + 'models/maxWalkingTimeClustering.dat')
 
         # Solve
         ampl.solve()
@@ -1103,13 +1103,13 @@ class Space:
             else:
                 points.append(0)
             # get hamiltonian path for the point
-            path = self.getHamiltonianCycle(points, 0, mode ="driving")[0]
+            path = self.getHamiltonianCycle(points, 0, mode = "driving")[0]
 
             if trace:
                 print("hamiltonian path for nurse {} established: {}.".format(n_id, path))
                 
             # path starts and ends at the office
-            for c in range(1, len(path) -1):
+            for c in range(1, len(path) - 1):
 
                 # driving part
                 current_pointID = path[c]
@@ -1161,13 +1161,13 @@ class Space:
             # get back to the office
             current_time += self.getDistDrivingSource2Target(current_pointID, 0)
 
-            if mode=="addAppointment" and current_time > self.end[0] * 3600 + self.end[1] * 60:
+            if mode == "addAppointment" and current_time > self.end[0] * 3600 + self.end[1] * 60:
                 return False
             
             # update nurse id
             i += 1
 
-        if mode=="addAppointment":
+        if mode == "addAppointment":
             return isOfficeDone
 
         return res
@@ -1177,6 +1177,8 @@ class Space:
 # -------------------------------------------------------------------------
 # -- OUTPUTS 
 # -------------------------------------------------------------------------
+
+
 def solve_complete(data):
     s = Space()
     s.buildSpaceFromDic(data)
@@ -1187,6 +1189,7 @@ def solve_boolean(data):
     s = Space()
     s.buildSpaceFromDic(data)
     return s.solve(mode="addAppointment")
+
 
 def solve_path(data):
     s = Space()
