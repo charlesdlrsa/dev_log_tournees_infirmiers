@@ -4,6 +4,7 @@
 
 *Louis Cassedanne, Maxime Dieudonné, Charles de la Roche, Hippolyte Lévêque,  Alix Mallard, Romain Pascual*
 
+Code disponible à l'adresse suivante : https://github.com/charlesdlrsa/dev_log_tournees_infirmiers
 <br/>
 
 # 1. Description du projet
