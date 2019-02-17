@@ -49,7 +49,7 @@ elif _platform == "darwin":
    ampl_path = pre_path + "ampl/macos"
 elif _platform == "win32" or _platform == "win64":
     # Windows
-    ampl_path = pre_path + "windows"
+    ampl_path = pre_path + "ampl/windows"
 
 googlekey = key
 
