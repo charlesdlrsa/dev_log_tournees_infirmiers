@@ -4,6 +4,7 @@
 
 *Louis Cassedanne, Maxime Dieudonné, Charles de la Roche, Hippolyte Lévêque,  Alix Mallard, Romain Pascual*
 
+Code disponible à l'adresse suivante : https://github.com/charlesdlrsa/dev_log_tournees_infirmiers
 <br/>
 
 # 1. Description du projet
@@ -278,3 +279,9 @@ _Diagramme de séquence d'authentification_
 ![Diagramme de séquence 2](dev_log/static/diag_seq_2.png)
 _Diagramme de séquence de prise de rendez-vous_
 
+## Couverture de code
+
+En utilisant le framework coverage de python sur l'optimiseur, on obtient le résultat ci-dessous (notons qu'uniquement les scores de `space` et `point` nous intéressent). Le coverage n'est pas de 100% car une partie du code n'as été utilisé que pour débuggé le reste. Par ailleurs, en fonction des scenarios que l'on cherche à optimiser, toutes les fonctions ne sont pas nécessairement utilisées.
+
+![Couverture de code](dev_log/static/coverage.png)
+_Couverture de code sur l'optimiseur_

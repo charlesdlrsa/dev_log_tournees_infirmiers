@@ -34,7 +34,7 @@ directory and activate it:
 
 `git clone git@github.com:charlesdlrsa/dev_log_tournees_infirmiers.git`
 
-_If you don't have `git` on your computer, you can download the zip of this project at the top right of this page and unzipped it in your folder `venv` giving it the name `dev_log_tourneees_infirmiers`._
+_If you don't have `git` on your computer, you can download the zip of this project <a href="https://github.com/charlesdlrsa/dev_log_tournees_infirmiers">here</a> (https://github.com/charlesdlrsa/dev_log_tournees_infirmiers) and unzip it in your folder `venv` giving it the name `dev_log_tourneees_infirmiers`._
 
 **4.** To use our application, you need to install our requirements. You have two methods according to your computer:
 
@@ -54,9 +54,11 @@ _If you don't have `git` on your computer, you can download the zip of this proj
 
 <br/>
 
-**5.** Run the app:
+**5.** To run the application, check before that you are connected to Internet and then do:
 
 `python3 run.py` or `python run.py`
+
+And go to http://127.0.0.1:5000 to see our aplication.
 
 <br/>
 
