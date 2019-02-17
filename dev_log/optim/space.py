@@ -6,27 +6,40 @@
 # -------------------------------------------------------------------------
 # -- IMPORTS 
 # -------------------------------------------------------------------------
-import os
-import sys
+
+# general imports
 import math
 import time
-from point import Point
 from operator import attrgetter
 import numpy as np
 import googlemaps
-from key import key
 from amplpy import AMPL, Environment
+import os
+
+cwd = os.getcwd()[-5:]
+if cwd == "optim":
+    # modules imports
+    from point import Point
+    from key import key
+    # path
+    pre_path = ""
+else:
+    #module imports
+    from dev_log.optim.point import Point
+    from dev_log.utils.key import key
+    # path
+    pre_path = "dev_log/optim/"
 
 from sys import platform as _platform
 if _platform == "linux" or _platform == "linux2":
    # linux
-   ampl_path = "ampl/linux"
+   ampl_path = pre_path + "ampl/linux"
 elif _platform == "darwin":
    # MAC OS X
-   ampl_path = "ampl/macos"
+   ampl_path = pre_path + "ampl/macos"
 elif _platform == "win32" or _platform == "win64":
     # Windows
-    ampl_path = "ampl/windows"
+    ampl_path = pre_path + "windows"
 
 googlekey = key
 
@@ -683,7 +696,7 @@ class Space:
         maxClusterSize = 7200
         maxWalkingTime = 1200
         # TODO: take into account dmin and dmax
-        with open("models/maxFootTimeClustering.dat", "w") as clustering:
+        with open(pre_path + "models/maxFootTimeClustering.dat", "w") as clustering:
             clustering.write("# threshold for cluster size\n")
             clustering.write("param maxClusterSize:= {};\n".format(maxClusterSize))
             
@@ -734,8 +747,8 @@ class Space:
         ampl = AMPL(Environment(ampl_path))
 
         # Interpret the two files
-        ampl.read('models/maxFootTimeClustering.mod')
-        ampl.readData('models/maxFootTimeClustering.dat')
+        ampl.read(pre_path + 'models/maxFootTimeClustering.mod')
+        ampl.readData(pre_path + 'models/maxFootTimeClustering.dat')
 
         # Solve
         ampl.solve()
@@ -770,7 +783,7 @@ class Space:
                 if instance.value() > 0:
                     print("Cluster {} has value {}".format(index, instance.value()))
     
-    def getHamiltonianCycle(self, pointIDs, starting_pointID, mode="walking"):
+    def getHamiltonianCycle(self, pointIDs, starting_pointID, mode="walking", trace=False):
         """
         Compute an hamiltonian cycle on the set of points.
         It uses a google maps key. Note that mode is "walking" or "driving".
@@ -793,7 +806,7 @@ class Space:
 
             else:
                 # For the solver to work, the points has to be numbered from 1 to n
-                with open("models/travellingSalesman.dat", "w") as hamiltonian:
+                with open(pre_path + "models/travellingSalesman.dat", "w") as hamiltonian:
                     hamiltonian.write("# nombre de sommets {}\n".format(n))
                     hamiltonian.write("set V :=\n")
                     for k in range(1, n+1):
@@ -816,12 +829,13 @@ class Space:
 
 
                 # Interpret the two files
-                ampl.read('models/travellingSalesman.mod')
-                ampl.readData('models/travellingSalesman.dat')
+                ampl.read(pre_path + 'models/travellingSalesman.mod')
+                ampl.readData(pre_path + 'models/travellingSalesman.dat')
 
                 # Solve
-                print("get Hamiltonian cycle")
                 ampl.solve()
+                if trace:
+                    print("get Hamiltonian cycle")
                 
                 #regenerate the path
                 x = ampl.getVariable("x")
@@ -863,7 +877,7 @@ class Space:
         if k < 1:
             k = 1
         
-        with open("models/splitAmongNurses.dat", "w") as vrp:
+        with open(pre_path + "models/splitAmongNurses.dat", "w") as vrp:
             # number of nurses
             vrp.write("# number of clusters\n")
             vrp.write("param k := {};\n".format(k))
@@ -898,8 +912,8 @@ class Space:
         ampl = AMPL(Environment(ampl_path))
 
         # Interpret the two files
-        ampl.read('models/splitAmongNurses.mod')
-        ampl.readData('models/splitAmongNurses.dat')
+        ampl.read(pre_path + 'models/splitAmongNurses.mod')
+        ampl.readData(pre_path + 'models/splitAmongNurses.dat')
 
         # Solve
         ampl.solve()
@@ -934,7 +948,7 @@ class Space:
             res.append(nurse_points)
         return res
 
-    def solve(self, mode="schedule", trace=True):
+    def solve(self, mode="schedule", trace=False):
         """
 
         """
