@@ -608,6 +608,11 @@ class Space:
         """
         self.sortByLat()
         self.sortByLong()
+
+        # case where their is at most one point
+        if len(self.points) < 2:
+            return None, None, 0
+        
         p1, p2, dmin = Space.closestPair(self, self.points_by_lat, self.points_by_long, stop=stop)
         return p1, p2, dmin
 
@@ -665,6 +670,10 @@ class Space:
         Compute dmax using rotation calipers on the convex hull.
         """
         p1, p2, dmax = None, None, 0
+
+        # case where their is at most one point
+        if len(self.points) < 2:
+            return  p1, p2, dmax
 
         if not (self.upperConvexHull and self.lowerConvexHull):
             Space.convexHull(self)
