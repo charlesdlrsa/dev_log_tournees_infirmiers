@@ -112,9 +112,10 @@ By going to the `Planning` tab, you can see the planning of each nurse. Here, yo
 - By clicking on the button `View planning`, our application will launch the optimizer. This last one will attribute the planned appointments to all the available nurses in order to minimize their traveled distance and maximize their walk. Taking into account that a travel duration depends on the traffic and a care duration depends on a patient, we have deliberately planned a margin at the end of the half-day.
 
 For the example, we have autorized the Massy's office administrator to view the planning of the morning on the 02/05/2019 (only this date is autorized in the future). We booked 10 appointments on this date's half-day and we closed the appointment booking for this half-day. <br/>
-On this date, two nurses are in vacations so only `Laurent Cabaret` and `Jean-Philippe Poli` are available. <br/>
-You can check the distribution of the appointments done by the optimizer between the two nurses and check their journeys. <br/>
-You can also try by yourself to add appointments for a date and check the planning of the nurses the day before this date.
+On this date, two nurses are in vacations so only `Laurent Cabaret` and `Jean-Philippe Poli` are available. You can check the distribution of the appointments done by the optimizer between the two nurses and check their journeys. <br/> <br/>
+
+You can also try to add appointments by yourself for a date and check the planning of the nurses the day before this date. <br/>
+If you want to bypass this constraint of the 24 hours to make some tests, you can add appointments using this URL `http://127.0.0.1:5000/appointments/add_appointment/patient-***/date-***/care-1/halfday-Morning` by replacing the stars *** in the URL by a patient id (number between 1 and 14) and the date of tomorrow in this format YYYYY/MM/DD. Feel free to add as many appointments as you want (no more than 14, the number of patients) and then go see the planning of each nurse for tomorrow morning. You will see how our algorithm optimizes the paths.
 
 <br/>
 
@@ -138,5 +139,5 @@ We propose to the nurses to visualize their daily tips in a Google Maps map. Thi
 
 #### An intuitive use
 
-Our technical choices for this software have a goal : having a simple to use service. Every essential task in a nurses' office have a dedicated tab in our application. We
+Our technical choices for this software have a goal : having a simple to use service. Every essential task in a nurses' office have a dedicated tab in our application (appointments, nurses, patients,...). The Bootstrap interface gives us this simplicity. It also allows the use of the software on a smartphone (responsive design), an essential issue for the nurses during their trips. 
  
