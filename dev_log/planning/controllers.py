@@ -109,7 +109,6 @@ def get_nurse_planning(nurse_id, date, halfday):
 def reinit_db():
     """ Initializes the database on click """
 
-    # TODO : to be deleted
     init_db()
     message = "The database has been reinitialised"
     flash(message)
