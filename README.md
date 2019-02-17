@@ -34,7 +34,7 @@ directory and activate it:
 
 `git clone git@github.com:charlesdlrsa/dev_log_tournees_infirmiers.git`
 
-_If you don't have `git` on your computer, you can download the zip of this project at the top right of this page and unzipped it in your folder `venv` giving it the name `dev_log_tourneees_infirmiers`._
+_If you don't have `git` on your computer, you can download the zip of this project <a href="https://github.com/charlesdlrsa/dev_log_tournees_infirmiers">here</a> (https://github.com/charlesdlrsa/dev_log_tournees_infirmiers) and unzip it in your folder `venv` giving it the name `dev_log_tourneees_infirmiers`._
 
 **4.** To use our application, you need to install our requirements. You have two methods according to your computer:
 
@@ -54,9 +54,11 @@ _If you don't have `git` on your computer, you can download the zip of this proj
 
 <br/>
 
-**5.** Run the app:
+**5.** To run the application, check before that you are connected to Internet and then do:
 
 `python3 run.py` or `python run.py`
+
+And go to http://127.0.0.1:5000 to see our aplication.
 
 <br/>
 
@@ -115,7 +117,8 @@ For the example, we have autorized the Massy's office administrator to view the 
 On this date, two nurses are in vacations so only `Laurent Cabaret` and `Jean-Philippe Poli` are available. You can check the distribution of the appointments done by the optimizer between the two nurses and check their journeys. <br/> <br/>
 
 You can also try to add appointments by yourself for a date and check the planning of the nurses the day before this date. <br/>
-If you want to bypass this constraint of the 24 hours to make some tests, you can add appointments using this URL `http://127.0.0.1:5000/appointments/add_appointment/patient-***/date-***/care-1/halfday-Morning` by replacing the stars *** in the URL by a patient id (number between 1 and 14) and the date of tomorrow in this format YYYYY/MM/DD. Feel free to add as many appointments as you want (no more than 14, the number of patients) and then go see the planning of each nurse for tomorrow morning. You will see how our algorithm optimizes the paths.
+If you want to bypass this constraint of the 24 hours to make some tests, you can add appointments using this URL `http://127.0.0.1:5000/appointments/add_appointment/patient-***/date-***/care-1/halfday-Morning`. You need to replace the stars *** in the URL by a patient id (number between 1 and 14) and the date of tomorrow in this format _YYYYY/MM/DD_. <br/>
+Feel free to add as many appointments as you want (no more than 14, the number of patients) and then go see the planning of each nurse for tomorrow morning. You will see how our algorithm optimizes the paths.
 
 <br/>
 
@@ -123,21 +126,21 @@ If you want to bypass this constraint of the 24 hours to make some tests, you ca
 
 #### Our optimizer
 
-Our software use a specific optimizer to determine the different appointments of a nurse in a day. Its goal is to minimize
+Our software uses a specific optimizer to determine the different appointments of a nurse in a day. Its goal is to minimize
 the transport time of a nurse. 
-- It allows the largest number of appointments to a nurse in a reduced geographic area around
-the nurse office. 
-- Then he gives the best way for every nurse to go the appointments, minimizing the tips time. 
+- It allows to attribute to each nurse the largest number of appointments in a reduced geographic area around
+their office. 
+- It gives the best way to go to each appointment, minimizing the time of travel. 
 - If it is possible, our optimizer favors walking rather than driving.
 
 #### The Google Maps visualization
 
-We propose to the nurses to visualize their daily tips in a Google Maps map. This functionnality will help them to prepare their daily work.
+We propose to the nurses to visualize their daily journeys in a Google Maps map. This functionnality will help them to prepare their daily work:
 - The nurse can visualize the complete itinerary of the day in his map, with all the appointement markers on the map.
-- The nurse can also visualize a specific tip between two appointments by selecting the destination appointment.
-- We differenciate the "driving" tips (in blue) and the "walking" tips (in green).
+- The nurse can also visualize a specific travel between two appointments by selecting the destination appointment.
+- We differenciate the "driving" travels (in blue) and the "walking" travels (in green).
 
 #### An intuitive use
 
-Our technical choices for this software have a goal : having a simple to use service. Every essential task in a nurses' office have a dedicated tab in our application (appointments, nurses, patients,...). The Bootstrap interface gives us this simplicity. It also allows the use of the software on a smartphone (responsive design), an essential issue for the nurses during their trips. 
+Our technical choices for this software have one goal: creating a simple to use service. Every essential task for a nurses' office have a dedicated tab in our application (appointments, nurses, patients,...). The Bootstrap interface gives us this simplicity. It also allows the use of the software on a smartphone (responsive design), an essential issue for the nurses during their travels. 
  
