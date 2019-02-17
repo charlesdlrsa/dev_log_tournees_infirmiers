@@ -123,21 +123,21 @@ If you want to bypass this constraint of the 24 hours to make some tests, you ca
 
 #### Our optimizer
 
-Our software use a specific optimizer to determine the different appointments of a nurse in a day. Its goal is to minimize
+Our software uses a specific optimizer to determine the different appointments of a nurse in a day. Its goal is to minimize
 the transport time of a nurse. 
-- It allows the largest number of appointments to a nurse in a reduced geographic area around
-the nurse office. 
-- Then he gives the best way for every nurse to go the appointments, minimizing the tips time. 
+- It allows to attribute to each nurse the largest number of appointments in a reduced geographic area around
+their office. 
+- It gives the best way to go to each appointment, minimizing the time of travel. 
 - If it is possible, our optimizer favors walking rather than driving.
 
 #### The Google Maps visualization
 
-We propose to the nurses to visualize their daily tips in a Google Maps map. This functionnality will help them to prepare their daily work.
+We propose to the nurses to visualize their daily journeys in a Google Maps map. This functionnality will help them to prepare their daily work:
 - The nurse can visualize the complete itinerary of the day in his map, with all the appointement markers on the map.
-- The nurse can also visualize a specific tip between two appointments by selecting the destination appointment.
-- We differenciate the "driving" tips (in blue) and the "walking" tips (in green).
+- The nurse can also visualize a specific travel between two appointments by selecting the destination appointment.
+- We differenciate the "driving" travels (in blue) and the "walking" travels (in green).
 
 #### An intuitive use
 
-Our technical choices for this software have a goal : having a simple to use service. Every essential task in a nurses' office have a dedicated tab in our application (appointments, nurses, patients,...). The Bootstrap interface gives us this simplicity. It also allows the use of the software on a smartphone (responsive design), an essential issue for the nurses during their trips. 
+Our technical choices for this software have one goal: creating a simple to use service. Every essential task for a nurses' office have a dedicated tab in our application (appointments, nurses, patients,...). The Bootstrap interface gives us this simplicity. It also allows the use of the software on a smartphone (responsive design), an essential issue for the nurses during their travels. 
  
