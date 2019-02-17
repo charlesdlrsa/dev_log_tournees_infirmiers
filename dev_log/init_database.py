@@ -112,7 +112,7 @@ def init_db():
                                     halfday="Morning"))
 
     # to test the optimizer (solve_complete)
-    for pID in range(1, 14):
+    for pID in range(1, 11):
         db.session.add(Appointment(patient_id=pID, date=datetime.date(2019, 5, 2), care_id=random.randint(1, 6),
                                    halfday="Morning"))
     db.session.commit()
