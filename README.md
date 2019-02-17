@@ -58,6 +58,8 @@ _If you don't have `git` on your computer, you can download the zip of this proj
 
 `python3 run.py` or `python run.py`
 
+And go to http://127.0.0.1:5000 to see our aplication.
+
 <br/>
 
 ## Try our features with our database examples
