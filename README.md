@@ -54,7 +54,7 @@ _If you don't have `git` on your computer, you can download the zip of this proj
 
 <br/>
 
-**5.** Run the app:
+**5.** To run the application, check before that you are connected to Internet and then do:
 
 `python3 run.py` or `python run.py`
 
