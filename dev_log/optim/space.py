@@ -3,6 +3,14 @@
 # @author Romain Pascual
 # @author Maxime Dieudionne
 
+# output functions:
+#   - solve_boolean: tries to fit now appointments
+#        -> True/False
+#   - solve_complete: asks for the schedule
+#       -> [{"nurse_id":"n_id", "app_id":app_id, "hour":"hh:mm"}]
+#   - solve_path: asks for the pathes
+#       -> [{"nurse_id":"n_id", "order":"n", "s_lat":"s_lat", "s_lon":"s_lon", "t_lat":"t_lat", "t_lon":"t_lon","mode": ["walking"/"driving"]}]
+
 # -------------------------------------------------------------------------
 # -- IMPORTS 
 # -------------------------------------------------------------------------
@@ -16,6 +24,7 @@ import googlemaps
 from amplpy import AMPL, Environment
 import os
 
+# to allow to run in "debug"
 cwd = os.getcwd()[-5:]
 if cwd == "optim":
     # modules imports
@@ -30,6 +39,7 @@ else:
     # path
     pre_path = "dev_log/optim/"
 
+# run the proper AMPL depending on the OS
 from sys import platform as _platform
 if _platform == "linux" or _platform == "linux2":
    # linux
@@ -80,6 +90,15 @@ def rotateToStartingElement(l, e):
         x = l.pop(0)
         l.append(x)
 
+def formatTime(time):
+    """
+    Transform a time given in seconds to a time at the format "hh:mm"
+    """
+    t = int(time)
+    s = "%s%d:%s%d" % (
+    "0" if t // 3600 < 10 else "", t // 3600, "0" if (t % 3600) // 60 < 10 else "", (t % 3600) // 60)
+    return s
+
 # -------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------
@@ -94,8 +113,37 @@ class Space:
     # points: list of the points
     # dmin: minimal distance between two points in the space
     # dmax: maximal distance between two points in the space
+    # 
+    # nb_points: number of points
+    # points: list of the points
+    # walkingThreshold: walking distance a nurse agree to walk
+    #
+    # points_by_long: list of point sorted by their longitude (asc)
+    # points_by_lat: list of point sorted by their latitude (asc)
+    # points_lex_sorted: list of point sorted by their (longitude, latitude) (asc)
+    # upperConvexHull: upper convex hull for the rotating caliper
+    # lowerConvexHull: lower convex hull for the rotating caliper
+    # dmin: minimal distance between two points in the space
+    # dmax: maximal distance between two points in the space
 
-    clustering_factor = 0.5
+    # start: time at which the nurses leave the office
+    # end: time at which the nurses have to be back at the office
+    # duration: maximum working duration for the nurses
+    # nurse_ids: list of nurse ID's
+    # nb_nurse: number of nurses
+    # care_duration: dictionnary of care durations
+    #   - key: appointment ID
+    #   - value: duration in seconds
+
+    # clusters: clusters of appointments that can be done walking
+    #   - key: center (its ID)
+    #   - value: list of the point ID's in the cluster
+    # hamiltonianPathes: hamiltonian pathes of the clustered points
+    #   - key: center (its ID)
+    #   - value: hamiltonian path in the cluster (always starting with the center)
+    # clusterTime: time for a nurse to do all the cluster (travel and appointment durations)
+    #   - key: center (its ID)
+    #   - value: time to go through the path stored in hamiltonianPathes
 
     # -------------------------------------------------------------------------
     # -- INITIALIZATION
@@ -110,6 +158,7 @@ class Space:
         self.nb_points = nb_points
         self.points = points
         self.walkingThreshold = walkingThreshold
+
         self.points_by_long = []
         self.points_by_lat = []
         self.points_lex_sorted = []
@@ -227,7 +276,7 @@ class Space:
         """
         Return the care duration list
         """
-        return self.care_duration
+        return list(self.care_duration.values)
     
     def getCareDurationByID(self, p_ID):
         """
@@ -249,7 +298,8 @@ class Space:
         Return the list of points in the space having the given ids, can be empty.
         """
         l = []
-        self.sortByID()
+        if self.points_by_id is None:
+            self.sortByID()
         lID = sorted(listIds)
         i_list = 0
         i_points = 0
@@ -584,6 +634,9 @@ class Space:
         return (cp1 > cp2) - (cp1 < cp2)
 
     def convexHull(self):
+        """
+        Set the convex hull (upper and lower part)
+        """
         upper = list()
         lower = list()
 
@@ -603,7 +656,7 @@ class Space:
 
     def computeDmax(self):
         """
-        Computte dmax using rotation calipers on the convex hull.
+        Compute dmax using rotation calipers on the convex hull.
         """
         p1, p2, dmax = None, None, 0
 
@@ -938,7 +991,6 @@ class Space:
             if index[0] not in listCenters and instance.value():
                 clusters[int(index[1])].append(int(index[0]))
 
-
         if trace:
             print(clusters)
 
@@ -950,7 +1002,16 @@ class Space:
 
     def solve(self, mode="schedule", trace=False):
         """
+        Solve the optimization problem using the four steps:
+            - cluster the space to maximize walking
+            - get hamiltonian cycles in each cluster and update its weight
+            - split the walking tour between the nurses and guarantee none will finish too late
+            - rebuild the whole path for each nurse
 
+        This can be run in three modes:
+            - "addAppointment": return whether the problem admits a solution
+            - "schedule": assuming there is a solution, return the nurse schedules in Json format
+            - "path": aassuming there is a solution, return the nurse pathes in Json format
         """
         # compute dmin and dmax
         if self.dmin is None or self.dmax is None:
@@ -974,19 +1035,6 @@ class Space:
                 walking_time += sum(self.getCareDurationByID(app_id) for app_id in walking_path[:-1])
             self.hamiltonianPathes[c] = walking_path
             self.clusterTime[c] = walking_time
-        
-        """
-        at this point: 
-        => cluster is a dictionnary with:
-            - key = center (its index)
-            - value = list of pointID's belonging to the cluster
-        => hamiltonianPathes is a dictionnary with:
-            - key = center (its index)
-            - value = hamiltonian path in the cluster (always starting with the center)
-        => clusterTime is a dictionnary with:
-            - key = center (its index)
-            - value = time to go through the path stored in hamiltonianPathes
-        """
 
         # split the clusters among the nurses
         appointment_distribution = self.splitAmongNurse()
@@ -1034,7 +1082,7 @@ class Space:
 
                         # update schedule
                         if mode == "schedule":
-                            res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                            res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":formatTime(current_time)})
                         
                         # update path
                         elif mode == "path":
@@ -1089,7 +1137,7 @@ class Space:
                         
                         # update schedule
                         if mode == "schedule":
-                            res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                            res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":formatTime(current_time)})
 
                         # update path
                         elif mode == "path":
@@ -1105,7 +1153,7 @@ class Space:
                         current_point = next_point
                 else:
                     if mode == "schedule":
-                        res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":self.formatTime(current_time)})
+                        res.append({"nurse_id":str(n_id), "app_id":str(current_pointID), "hour":formatTime(current_time)})
                     current_time += self.getCareDurationByID(current_pointID)
                 previous_pointID = current_pointID
                 previous_point = current_point
@@ -1123,12 +1171,6 @@ class Space:
             return isOfficeDone
 
         return res
-
-    def formatTime(self, time):
-        t = int(time)
-        s = "%s%d.%s%d" % (
-        "0" if t // 3600 < 10 else "", t // 3600, "0" if (t % 3600) // 60 < 10 else "", (t % 3600) // 60)
-        return s
 
 # -------------------------------------------------------------------------
 
