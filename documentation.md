@@ -4,6 +4,7 @@
 
 *Louis Cassedanne, Maxime Dieudonné, Charles de la Roche, Hippolyte Lévêque,  Alix Mallard, Romain Pascual*
 
+Code disponible à l'adresse suivante : https://github.com/charlesdlrsa/dev_log_tournees_infirmiers
 <br/>
 
 # 1. Description du projet
@@ -181,7 +182,7 @@ L'utilisateur infirmier a également la possibilité de modifier ses information
 
 L'optimisation des tournées des infirmièrs doit principalement répondre à deux contraintes : essayer de promouvoir les déplacements à pieds entre les rendez-vous et minimiser le temps de parcours afin qu'une infirmière puisse effectuer autant de rendez-vous que possible.
 
-L'L'optimisation des tournées des infirmières peut être utilisée à trois fins :
+L'optimisation des tournées des infirmières peut être utilisée à trois fins :
 
 - vérifier s'il est encore possible d'ajouter un rendez-vous sur une demi-journée,
 - déterminer le planning d'un infirmier,
@@ -198,7 +199,7 @@ Les différentes étapes de l'optimisation sont modélisées comme des problème
 
 #### Contrainte de déplacement à pied
 
-La première étape cherche à encourager les déplacements à pieds entre les rendez-vous. Pour cela, il convient de fixer une distance maximale que l'on autorise à parcourir à pied. Le problème d'optimisation linéaire est donc nu problème de clustering. On cherche à séparer l'espace en un certain nombre de groupes de rendez-vous. On impose donc que chaque point appartienne exactement à un clutser. Et on cherche à minimiser le nombre de cluster, ce qui revient à minimiser le nombre de segments à faire en voiture et donc à maximiser le nombre de trajets parcourus à pied.
+La première étape cherche à encourager les déplacements à pieds entre les rendez-vous. Pour cela, il convient de fixer une distance maximale que l'on autorise à parcourir à pied. Le problème d'optimisation linéaire est donc un problème de clustering. On cherche à séparer l'espace en un certain nombre de groupes de rendez-vous. On impose donc que chaque point appartienne exactement à un clutser. Et on cherche à minimiser le nombre de cluster, ce qui revient à minimiser le nombre de segments à faire en voiture et donc à maximiser le nombre de trajets parcourus à pied.
 
 Afin d'assurer que tout le trajet ne sera pas fait à pied, on impose par ailleurs que chaque rendez-vous soit à une distance inférieure à 1 km du centre de son cluster. Par ailleurs, si trop de rendez-vous sont pris dans une trop petite zone géographique, tous les déplacements pourraient s'y faire à pied et ne pas rentrer dans la durée d'une demi-journée. Aussi on impose au temps de parcours d'un cluster (durée des déplacements, durée des rendez-vous et durée aller-retour entre le centre du cluster et le cabinet) d'être inférieur à une fraction de temps de travail de l'infirmier. Enfin, il convient de ne pas oublier que l'infirmier peut se déplacer à pied directement depuis le cabinet, aussi on impose que le point correspondant au cabinet soit le centre d'un cluster (éventuellement réduit à lui-même)
 
