@@ -749,7 +749,7 @@ class Space:
         maxClusterSize = 7200
         maxWalkingTime = 1200
         # TODO: take into account dmin and dmax
-        with open(pre_path + "models/maxFootTimeClustering.dat", "w") as clustering:
+        with open(pre_path + "models/maxWalkingTimeClustering.dat", "w") as clustering:
             clustering.write("# threshold for cluster size\n")
             clustering.write("param maxClusterSize:= {};\n".format(maxClusterSize))
             
@@ -800,8 +800,8 @@ class Space:
         ampl = AMPL(Environment(ampl_path))
 
         # Interpret the two files
-        ampl.read(pre_path + 'models/maxFootTimeClustering.mod')
-        ampl.readData(pre_path + 'models/maxFootTimeClustering.dat')
+        ampl.read(pre_path + 'models/maxWalkingTimeClustering.mod')
+        ampl.readData(pre_path + 'models/maxWalkingTimeClustering.dat')
 
         # Solve
         ampl.solve()
