@@ -139,5 +139,5 @@ We propose to the nurses to visualize their daily tips in a Google Maps map. Thi
 
 #### An intuitive use
 
-Our technical choices for this software have a goal : having a simple to use service. Every essential task in a nurses' office have a dedicated tab in our application. We
+Our technical choices for this software have a goal : having a simple to use service. Every essential task in a nurses' office have a dedicated tab in our application (appointments, nurses, patients,...). The Bootstrap interface gives us this simplicity. It also allows the use of the software on a smartphone (responsive design), an essential issue for the nurses during their trips. 
  
