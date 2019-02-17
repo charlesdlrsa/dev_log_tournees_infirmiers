@@ -116,7 +116,8 @@ class Space:
     # 
     # nb_points: number of points
     # points: list of the points
-    # walkingThreshold: walking distance a nurse agree to walk
+    # walkingThreshold: walking time a nurse agree to walk (15 mins by default)
+    # alpha: portion of total duration allowed for one cluster (0,5 by default)
     #
     # points_by_long: list of point sorted by their longitude (asc)
     # points_by_lat: list of point sorted by their latitude (asc)
@@ -154,11 +155,13 @@ class Space:
             self,
             nb_points=0,
             points=[],
-            walkingThreshold=1.0):
+            walkingThreshold=900,
+            alpha=0.5):
 
         self.nb_points = nb_points
         self.points = points
         self.walkingThreshold = walkingThreshold
+        self.alpha = alpha
 
         self.points_by_long = []
         self.points_by_lat = []
@@ -750,8 +753,8 @@ class Space:
             - key = center
             - value = list of the point ID's in the cluster (always starting with the center)
         """
-        maxClusterSize = 7200
-        maxWalkingTime = 1200
+        maxClusterSize = self.duration * self.alpha
+        maxWalkingTime = self.walkingThreshold
         # TODO: take into account dmin and dmax
         with open(pre_path + "models/maxWalkingTimeClustering.dat", "w") as clustering:
             clustering.write("# threshold for cluster size\n")
@@ -1024,21 +1027,37 @@ class Space:
         if self.dmin is None or self.dmax is None:
             Space.computeExtremalDistances(self)
 
-        # cluster the space
-        self.clusterSpace()
+        # if no distance allows walking
+        if self.dmin >= self.walkingThreshold:
+            self.clusters = dict()
+            self.clusterTime = dict()
+            self.hamiltonianPathes = dict()
+            for p in self.points:
+                p_ID = p.getID()
+                self.clusters[p_ID] = [p_ID]
+                self.hamiltonianPathes[p_ID] = [p_ID]
+                self.clusterTime[p_ID] = self.getCareDurationByID(p_ID)
+            
+        else:
+            # if all distance are within walking reach
+            if self.dmax <= self.walkingThreshold:
+                self.walkingThreshold = (self.dmin + self.dmax)//2
 
-        # compute time to see patients in each cluster
-        self.clusterTime = dict()
-        self.hamiltonianPathes = dict()
-        for c, walking_points in self.clusters.items():
-            # c and walking_points are pointID's
-            walking_path, walking_time = self.getHamiltonianCycle(walking_points, c)
-            if len(walking_path) == 1:
-                walking_time += self.getCareDurationByID(walking_path[0])
-            else:
-                walking_time += sum(self.getCareDurationByID(app_id) for app_id in walking_path[:-1])
-            self.hamiltonianPathes[c] = walking_path
-            self.clusterTime[c] = walking_time
+            # cluster the space
+            self.clusterSpace()
+
+            # compute time to see patients in each cluster
+            self.clusterTime = dict()
+            self.hamiltonianPathes = dict()
+            for c, walking_points in self.clusters.items():
+                # c and walking_points are pointID's
+                walking_path, walking_time = self.getHamiltonianCycle(walking_points, c)
+                if len(walking_path) == 1:
+                    walking_time += self.getCareDurationByID(walking_path[0])
+                else:
+                    walking_time += sum(self.getCareDurationByID(app_id) for app_id in walking_path[:-1])
+                self.hamiltonianPathes[c] = walking_path
+                self.clusterTime[c] = walking_time
 
         # split the clusters among the nurses
         appointment_distribution = self.splitAmongNurse()
