@@ -136,7 +136,7 @@ def edit_office_account(office_id):
 def add_absence(nurse_id):
     """ Function allowing to add one or several vacations for a nurse """
 
-    # TODO : drop old absences
+
     nurse = Nurse.query.get(nurse_id)
     if request.method == "POST":
         start_date = datetime.datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
