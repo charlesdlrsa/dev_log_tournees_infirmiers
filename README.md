@@ -109,9 +109,9 @@ By going to the `Planning` tab, you can see the planning of each nurse. Here, yo
 
 - You cannot see a planning more than 24 hours before the desired date. This is due to our optimizer. To set all the appointments to the nurses and optimize their journeys, we need to have all the appointments of the selected half-day. Yet, we can add appointments until 24 hours before a day. Therefore, we must wait that all the possible appointments had been added to launch the optimizer and show the planning of each nurse.
 
-- By clicking on the button `View planning`, our application will launch the optimizer. This last one will attribute the planned appointments to all the available nurses in order to minimize their traveled distance and maximize their walk.
+- By clicking on the button `View planning`, our application will launch the optimizer. This last one will attribute the planned appointments to all the available nurses in order to minimize their traveled distance and maximize their walk. Taking in account that a travel duration depends on the traffic and a care duration depends on a patient, we have deliberately planned a margin at the end of the half-day.
 
-For the example, we have only autorized the Massy's office administrator to view the planning of morning on the 02/05/2019, and we closed the appointment booking for this half-day. <br/>
+For the example, we have autorized the Massy's office administrator to view the planning of the morning on the 02/05/2019 (only this date). We booked 10 appointments on this date's half-day and we closed the appointment booking for this half-day. <br/>
 On this date, two nurses are in vacations so only `Laurent Cabaret` and `Jean-Philippe Poli` are available. <br/>
 You can check the distribution of the appointments done by the optimizer between the two nurses and check their journeys. <br/>
 You can also try by yourself to add appointments for a date and check the planning of the nurses the day before this date.
