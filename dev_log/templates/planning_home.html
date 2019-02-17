@@ -13,7 +13,7 @@
         </div>
         <div class="card-body">
 
-            <form method="post">
+            <form method="post" onsubmit="loading();">
                 <div class="row">
                     {% if session['office_id'] %}
                     <div class="col">
@@ -50,5 +50,14 @@
 
 </div>
 
+<div id="loading" style="margin-left:200px; width: 15px; height: 15px; visibility:hidden;">
+    <img src="../static/loading_image.gif"/>
+</div>
+
+<script>
+    function loading(){
+        document.getElementById('loading').style.visibility="visible";
+    };
+</script>
 
 {% endblock %}

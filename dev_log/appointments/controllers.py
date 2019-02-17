@@ -5,7 +5,7 @@ from dev_log.utils import calendar
 from dev_log import db
 from dev_log.models import Appointment, Patient, Nurse, Care, Office, Schedule
 from dev_log.auth.controllers import admin_required
-from dev_log.optim.space import solve_boolean
+from dev_log.optim.space import solve_boolean, GmapApiError
 from dev_log.utils.optimizer_functions import build_data_for_optimizer
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
@@ -40,8 +40,7 @@ def home():
             else:
                 return redirect(url_for('appointments.availabilities', patient_id=patient_id, date=date,
                                         care_id=care_id))
-        elif request.form.get('date_appointments_research') or request.form.get(
-                'patient_appointments_research') is not None:
+        elif request.form['date_appointments_research'] != "" or request.form['patient_appointments_research'] != "":
             date_research = request.form['date_appointments_research']
             if date_research == "":
                 date_research = "all"
@@ -73,7 +72,7 @@ def availabilities(patient_id, date, care_id):
         care_id = request.form['input_care']
 
         if date_selected <= datetime.date.today():
-            error = "You cannot add an appointment 24 hours before the wanted date."
+            error = "You cannot add an appointment 24 hours before the desired date."
             # To be able to set the nurses' planning 24 hours before each day, we forbidden the admin to add
             # appointments after this delay. See planning's controllers for more explications.
             flash(error)
@@ -92,14 +91,24 @@ def availabilities(patient_id, date, care_id):
         for halfday in ['Morning', 'Afternoon']:
             # for each half-day of the week, we check if a nurse is available and if the patient doesn't already have
             # an appointment by calling the functions : check_appointments_patient and check_appointments_nurses
-            appointment = check_appointments_patient(patient_id, date, halfday=halfday)
-            if appointment is None:
-                if check_appointments_nurses(care_id, patient_id, date, halfday=halfday) is True:
-                    availabilities[week_day][halfday] = "A nurse is available"
-                else:
-                    availabilities[week_day][halfday] = "No nurse is available"
+            if date <= datetime.date.today() + datetime.timedelta(1) or date == datetime.date(2019, 5, 2):
+                # impossible to book an appointment less than 24 hours before the desired date
+                availabilities[week_day][halfday] = "Closed appointment booking"
             else:
-                availabilities[week_day][halfday] = "Appointment already scheduled: -- {} --".format(appointment)
+                appointment = check_appointments_patient(patient_id, date, halfday=halfday)
+                if appointment is None:
+                    try:
+                        if check_appointments_nurses(care_id, patient_id, date, halfday=halfday) is True:
+                            availabilities[week_day][halfday] = "A nurse is available"
+                        else:
+                            availabilities[week_day][halfday] = "No nurse is available"
+                    except GmapApiError:
+                        error = "You need to be connected to see the availabilities. " \
+                                "Please check your network connexion and try again."
+                        flash(error)
+                        return redirect(url_for('appointments.home'))
+                else:
+                    availabilities[week_day][halfday] = "Appointment already scheduled: -- {} --".format(appointment)
 
     patient = Patient.query.get(patient_id)
     care = Care.query.get(care_id)
@@ -114,8 +123,7 @@ def search_patient_appointments(date, patient):
     """ Function allowing to search the patient's appointments """
 
     if request.method == "POST":
-        if request.form.get('date_appointments_research') or request.form.get(
-                'patient_appointments_research') is not None:
+        if request.form['date_appointments_research'] != "" or request.form['patient_appointments_research'] != "":
             date_research = request.form['date_appointments_research']
             if date_research == "":
                 date_research = "all"

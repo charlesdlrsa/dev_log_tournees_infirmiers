@@ -10,7 +10,7 @@
         </div>
         <div class="card-body">
 
-            <form method="post">
+            <form action="." method="post" onsubmit="loading();">
                 <div class="row">
                     <div class="col">
                         <select id="input_patient" class="form-control" required="required" name="input_patient">
@@ -46,6 +46,7 @@
         </div>
     </div>
 
+
     <div class="card" style="margin-bottom:30px;">
         <div class="card-header">
             <h1>Search an appointment </h1>
@@ -75,5 +76,18 @@
     </div>
 
 </div>
+
+
+<div id="loading" style="margin-left:200px; width: 15px; height: 15px; visibility:hidden;">
+    <img src="../static/loading_image.gif"/>
+</div>
+
+
+<script>
+    function loading(){
+        document.getElementById('loading').style.visibility="visible";
+    };
+
+</script>
 
 {% endblock%}

@@ -6,13 +6,12 @@ from dev_log.utils import calendar
 import datetime
 from dev_log import db
 from dev_log.utils.optimizer_functions import build_data_for_optimizer
-from dev_log.optim.space import solve_complete
+from dev_log.optim.space import solve_complete, solve_path
 
 planning = Blueprint('planning', __name__, url_prefix='/planning')
 
 
 @planning.route("/", methods=['GET', 'POST'])
-@login_required
 def home():
     """ Planning's home page allowing to search a nurse planning or your planning if your are logged in as a nurse """
 
@@ -32,6 +31,8 @@ def home():
             error = "You need to select a nurse to view a planning"
         elif halfday == "":
             error = "You need to select a halfday"
+        elif date is None:
+            error = "You need to select a date"
         elif date_selected > datetime.date.today() + datetime.timedelta(1) and date_selected != datetime.date(2019, 5,
                                                                                                               2):
             error = "You cannot see a nurse planning more than 24 hours before the desired date."
@@ -76,13 +77,17 @@ def get_nurse_planning(nurse_id, date, halfday):
     # launched, so the schedules are set for the half-day and we don't need to call the optimizer.
     if len(schedules) == 0:
         nurses_and_appointments = build_data_for_optimizer(date, halfday)
-        schedules_information = solve_complete(nurses_and_appointments)
-        for info in schedules_information:
-            travel_mode = 'DRIVING'
-        #     for mode in travel_modes:
-        #         if mode["app_id"] == info["app_id"]:
-        #             travel_mode = mode["travel_mode"]
-        #             break
+        try:
+            schedules_information = solve_complete(nurses_and_appointments)
+            travel_information = simplified_path(nurses_and_appointments)
+        except GmapApiError:
+            error = "You need to be connected to see the planning. Please check your network connexion " \
+                    "and try again."
+            flash(error)
+            return redirect(url_for('planning.home'))
+
+        for (i, info) in enumerate(schedules_information):
+            travel_mode = travel_information[i]["mode"].upper()
             db.session.add(
                 Schedule(appointment_id=int(info["app_id"]),
                          hour=datetime.time(int(info["hour"][:2]), int(info["hour"][3:5])),
@@ -101,7 +106,6 @@ def get_nurse_planning(nurse_id, date, halfday):
 
 
 @planning.route("/init_db", methods=['GET', 'POST'])
-@admin_required
 def reinit_db():
     """ Initializes the database on click """
 
@@ -125,3 +129,23 @@ def delete_schedules():
     message = "The schedules have been deleted"
     flash(message)
     return redirect(url_for("planning.home"))
+
+
+def simplified_path(data):
+    """ Transform the output of the function solve_path to extract the travel modes.
+    The solve_path function returns all the steps that the nurse has to follow during the half-day."""
+
+    path = solve_path(data)
+    res = []
+    already_visited = []
+    for i in path:
+        if i["mode"] == 'driving':
+            res.append(i)
+            already_visited.append((i['t_lat'], i['t_lon']))
+        else:
+            if (i['t_lat'], i['t_lon']) in already_visited:
+                pass
+            else:
+                res.append(i)
+                already_visited.append((i['t_lat'], i['t_lon']))
+    return res

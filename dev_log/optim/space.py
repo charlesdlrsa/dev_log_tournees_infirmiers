@@ -92,7 +92,7 @@ class Space:
             self,
             nb_points=0,
             points=[],
-            walkingThreshold=2.0):
+            walkingThreshold=1.0):
 
         self.nb_points = nb_points
         self.points = points
@@ -917,12 +917,13 @@ class Space:
         clusters = dict()
         for c in listCenters:
             clusters[int(c)] = [int(c)]
-
+        
         # access the variable
         closestCenter = ampl.getVariable('closestCenter')
         for index, instance in closestCenter:
             if index[0] not in listCenters and instance.value():
                 clusters[int(index[1])].append(int(index[0]))
+
 
         if trace:
             print(clusters)

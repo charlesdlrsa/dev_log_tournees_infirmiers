@@ -4,6 +4,7 @@ requirements = """
 click
 coverage
 elasticsearch
+googlemaps
 lxml
 numpy
 openpyxl
