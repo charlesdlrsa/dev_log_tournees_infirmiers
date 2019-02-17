@@ -121,6 +121,7 @@ class Space:
     # points_by_long: list of point sorted by their longitude (asc)
     # points_by_lat: list of point sorted by their latitude (asc)
     # points_lex_sorted: list of point sorted by their (longitude, latitude) (asc)
+    # pointID_by_id: list of point ID's sorted by their ID (asc)
     # upperConvexHull: upper convex hull for the rotating caliper
     # lowerConvexHull: lower convex hull for the rotating caliper
     # dmin: minimal distance between two points in the space
@@ -162,6 +163,7 @@ class Space:
         self.points_by_long = []
         self.points_by_lat = []
         self.points_lex_sorted = []
+        self.pointID_by_id = None
         self.upperConvexHull = []
         self.lowerConvexHull = []
         self.dmin = None
@@ -298,7 +300,7 @@ class Space:
         Return the list of points in the space having the given ids, can be empty.
         """
         l = []
-        if self.points_by_id is None:
+        if self.pointID_by_id is None:
             self.sortByID()
         lID = sorted(listIds)
         i_list = 0
@@ -306,16 +308,14 @@ class Space:
         n = len(lID)
 
         while i_list < n and i_points < self.nb_points:
-            if lID[i_list] == self.points_by_id[i_points].getID():
+            if lID[i_list] == self.pointID_by_id[i_points]:
                 l.append(self.points[i_points])
                 i_list += 1
                 i_points += 1
-            elif lID[i_list] < self.points_by_id[i_points].getID():
+            elif lID[i_list] < self.pointID_by_id[i_points]:
                 i_list += 1
             else:
                 i_points += 1
-
-        del self.points_by_id
 
         return l
 
@@ -342,9 +342,10 @@ class Space:
     def sortByID(self):
         """
         Sort the points in the space according to their id.
+        Only strore the ID's
         """
-        self.points_by_id = self.points.copy()
-        self.points_by_id.sort(key=attrgetter("id"))
+        self.pointID_by_id = [p.getID() for p in self.points]
+        self.pointID_by_id.sort()
 
     def lexSort(self):
         """
@@ -522,9 +523,9 @@ class Space:
         """
         Brute force guess for small instances
         """
-        p1 = points_by_long[0]
-        p2 = points_by_long[1]
-        dmin = p1.squaredDistanceTo(p2)
+        p1, p2 = points_by_long[0], points_by_long[1]
+        p_ID1, p_ID2 = p1.getID(), p2.getID()
+        dmin = min(self.getDistWalkingSource2Target(p_ID1, p_ID2), self.getDistWalkingSource2Target(p_ID2, p_ID1))
         if dmin == 0:
             dmin = math.inf
         length = len(points_by_long)
@@ -534,8 +535,9 @@ class Space:
             for j in range(i + 1, length):
                 if i != 0 and j != 1:
                     p, q = points_by_long[i], points_by_long[j]
+                    p_ID, q_ID = p.getID(), q.getID()
                     if not p.sameLocation(q):
-                        d = p.squaredDistanceTo(q)
+                        d = min(self.getDistWalkingSource2Target(p_ID, q_ID), self.getDistWalkingSource2Target(q_ID, p_ID))
                         if d < dmin:
                             p1, p2, dmin = p, q, d
         return p1, p2, dmin
@@ -550,7 +552,8 @@ class Space:
             for j in range(i + 1, min(i + 7, length)):
                 p, q = center[i], center[j]
                 if not p.sameLocation(q):
-                    d = p.squaredDistanceTo(q)
+                    p_ID, q_ID = p.getID(), q.getID()
+                    d = min(self.getDistWalkingSource2Target(p_ID, q_ID), self.getDistWalkingSource2Target(q_ID, p_ID))
                     if d < dmin:
                         p1, p2, dmin = p, q, d
         return p1, p2, dmin
@@ -587,8 +590,8 @@ class Space:
             p, q, d = p2, q2, dmin2
 
         # get the min distance for points in the middle
-        center = [points for points in points_by_lat if
-                  longitude_midpoint - d <= p.getLongitude() <= longitude_midpoint - d]
+        center = [point for point in points_by_lat if
+                  longitude_midpoint - d <= point.getLongitude() <= longitude_midpoint - d]
         p3, q3, dmin3 = Space.closestPairCenter(self, center, d, p, q)
 
         if d <= dmin3:
@@ -696,7 +699,8 @@ class Space:
 
         for p, q in rotating_calipers:
             if not p.sameLocation(q):
-                d = p.squaredDistanceTo(q)
+                p_ID, q_ID = p.getID(), q.getID()
+                d = max(self.getDistWalkingSource2Target(p_ID, q_ID), self.getDistWalkingSource2Target(q_ID, p_ID))
                 if d > dmax:
                     p1, p2, dmax = p, q, d
         return p1, p2, dmax
@@ -714,9 +718,9 @@ class Space:
         2D space.
         """
         if self.dmin is None or self.dmax is None:
-            pmin1, pmin2, _ = Space.computeDmin(self)
-            pmax1, pmax2, _ = Space.computeDmax(self)
-            self.dmin, self.dmax = pmin1.distanceKmTo(pmin2), pmax1.distanceKmTo(pmax2)
+            _, _, dmin = Space.computeDmin(self)
+            _, _, dmax = Space.computeDmax(self)
+            self.dmin, self.dmax = dmin, dmax
 
             # freeing memory
             self.points_by_long = []
@@ -1013,12 +1017,12 @@ class Space:
             - "schedule": assuming there is a solution, return the nurse schedules in Json format
             - "path": aassuming there is a solution, return the nurse pathes in Json format
         """
+        # compute distance matrices
+        self.buildDistanceMatrices()
+
         # compute dmin and dmax
         if self.dmin is None or self.dmax is None:
             Space.computeExtremalDistances(self)
-
-        # compute distance matrices
-        self.buildDistanceMatrices()
 
         # cluster the space
         self.clusterSpace()
