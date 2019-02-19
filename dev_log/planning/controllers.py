@@ -77,22 +77,26 @@ def get_nurse_planning(nurse_id, date, halfday):
     # launched, so the schedules are set for the half-day and we don't need to call the optimizer.
     if len(schedules) == 0:
         nurses_and_appointments = build_data_for_optimizer(date, halfday)
-        try:
-            schedules_information = solve_complete(nurses_and_appointments)
-            travel_information = simplified_path(nurses_and_appointments)
-        except GmapApiError:
-            error = "You need to be connected to see the planning. Please check your network connexion " \
-                    "and try again."
-            flash(error)
-            return redirect(url_for('planning.home'))
+        if nurses_and_appointments["appointments"] == []:
+            # no appointments have been scheduled, no need to run the optimizer
+            pass
+        else:
+            try:
+                schedules_information = solve_complete(nurses_and_appointments)
+                travel_information = simplified_path(nurses_and_appointments)
+            except GmapApiError:
+                error = "You need to be connected to see the planning. Please check your network connexion " \
+                        "and try again."
+                flash(error)
+                return redirect(url_for('planning.home'))
 
-        for (i, info) in enumerate(schedules_information):
-            travel_mode = travel_information[i]["mode"].upper()
-            db.session.add(
-                Schedule(appointment_id=int(info["app_id"]),
-                         hour=datetime.time(int(info["hour"][:2]), int(info["hour"][3:5])),
-                         nurse_id=int(info["nurse_id"]), travel_mode=travel_mode))
-            db.session.commit()
+            for (i, info) in enumerate(schedules_information):
+                travel_mode = travel_information[i]["mode"].upper()
+                db.session.add(
+                    Schedule(appointment_id=int(info["app_id"]),
+                             hour=datetime.time(int(info["hour"][:2]), int(info["hour"][3:5])),
+                             nurse_id=int(info["nurse_id"]), travel_mode=travel_mode))
+                db.session.commit()
 
     schedules = Schedule.query.filter(Schedule.nurse_id == nurse_id,
                                       Schedule.appointment.has(date=date_selected),
