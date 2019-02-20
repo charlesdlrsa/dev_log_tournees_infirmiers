@@ -40,7 +40,7 @@ _If you don't have `git` on your computer, you can download the zip of this proj
 
 - Linux / MacOs:
 
-`cd ./dev_log_tourneees_infirmiers`
+`cd ./dev_log_tournees_infirmiers`
 
 `pip3 install wheel` or `pip install wheel`
 
