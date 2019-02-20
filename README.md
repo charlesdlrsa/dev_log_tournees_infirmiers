@@ -48,9 +48,10 @@ _If you don't have `git` on your computer, you can download the zip of this proj
 
 `make install`
 
-- For MacOs give right permissions to AMPL :
+- For MacOs, you need to give right permissions to AMPL :
 
 `chmod 755 dev_log/optim/ampl/macos/ampl`
+`chmod 755 dev_log/optim/ampl/macos/gurobi`
 
 - Windows:
 
