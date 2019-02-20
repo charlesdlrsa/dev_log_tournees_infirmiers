@@ -9,6 +9,8 @@ to schedule appointments, and to quickly visualize the different nurses schedule
 allows nurses to check their daily planning, the different appointments and the journeys between these appointments. Moreover,
 they also can also report their days off.
 
+We dockerized the project and deployed it on Typhoon-Viarezo, feel free to go check it out at <a href='https://dev-log-tournees-infirmiers.typhoon.viarezo.fr'> this address <a/>.
+
 <br/>
 
 ## Installing and running Nursissimo application
