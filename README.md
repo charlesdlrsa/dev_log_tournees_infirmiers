@@ -123,7 +123,7 @@ For the example, we have autorized the Massy's office administrator to view the 
 On this date, two nurses are in vacations so only `Laurent Cabaret` and `Jean-Philippe Poli` are available. You can check the distribution of the appointments done by the optimizer between the two nurses and check their journeys. <br/> <br/>
 
 You can also try to add appointments by yourself for a date and check the planning of the nurses the day before this date. <br/>
-If you want to bypass this constraint of the 24 hours to make some tests, you can add appointments using this URL `http://127.0.0.1:5000/appointments/add_appointment/patient-***/date-***/care-1/halfday-Morning`. You need to replace the stars *** in the URL by a patient id (number between 1 and 14) and the date of tomorrow in this format _YYYYY-MM-DD_. <br/>
+If you want to bypass this constraint of the 24 hours to make some tests, you can add appointments using one of these two URLs `http://127.0.0.1:5000/appointments/add_appointment/patient-***/date-***/care-1/halfday-Morning` if your are on local version, or `https://dev-log-tournees-infirmiers.typhoon.viarezo.fr/appointments/` if your are online. You need to replace the stars *** in the URL by a patient id (number between 1 and 14) and the date of tomorrow in this format _YYYYY-MM-DD_. <br/>
 Feel free to add as many appointments as you want (no more than 14, the number of patients) and then go see the planning of each nurse for tomorrow morning. You will see how our algorithm optimizes the paths.
 
 <br/>
