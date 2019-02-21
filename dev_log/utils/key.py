@@ -1,2 +1,2 @@
 # Google maps API key
-key = 'AIzaSyAoozmkZ8_YSofc8Hb7nqnG3cWcJSlY6gQ'
+key = 'AIzaSyBKQ2vTgYOwfdwdlP7Km2posm4vk4VDI34'
