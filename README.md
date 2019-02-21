@@ -120,7 +120,7 @@ By going to the `Planning` tab, you can see the planning of each nurse. Here, yo
 
 - By clicking on the button `View planning`, our application will launch the optimizer. This last one will attribute the planned appointments to all the available nurses in order to minimize their traveled distance and maximize their walk. Taking into account that a travel duration depends on the traffic and a care duration depends on a patient, we have deliberately planned a margin at the end of the half-day.
 
-For the example, we have autorized the Massy's office administrator to view the planning of the morning on the 02/05/2019 (only this date is autorized in the future). We booked 10 appointments on this date's half-day and we closed the appointment booking for this half-day. <br/>
+For the example, we have autorized the Massy's office administrator to view the planning of the morning on the 02/05/2019 (only this date is autorized in the future). We booked 8 appointments on this date's half-day and we closed the appointment booking for this half-day. <br/>
 On this date, two nurses are in vacations so only `Laurent Cabaret` and `Jean-Philippe Poli` are available. You can check the distribution of the appointments done by the optimizer between the two nurses and check their journeys. <br/> <br/>
 
 You can also try to add appointments by yourself for a date and check the planning of the nurses the day before this date. <br/>
