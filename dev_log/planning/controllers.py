@@ -2,7 +2,7 @@ from flask import Blueprint, request, render_template, flash, session, redirect,
 from dev_log.init_database import init_db
 from dev_log.auth.controllers import login_required, admin_required
 from dev_log.models import Nurse, Schedule, Office
-from dev_log.utils import calendar
+from dev_log.utils import calendar, key
 import datetime
 from dev_log import db
 from dev_log.utils.optimizer_functions import build_data_for_optimizer
@@ -106,7 +106,7 @@ def get_nurse_planning(nurse_id, date, halfday):
     nb_schedules = len(schedules)
 
     return render_template("planning_nurse.html", nurse=nurse, date=date_selected, halfday=halfday,
-                           schedules=schedules, nb_schedules=nb_schedules)
+                           schedules=schedules, nb_schedules=nb_schedules, api_key=key)
 
 
 @planning.route("/init_db", methods=['GET', 'POST'])
