@@ -233,6 +233,13 @@ En plus de permettre de calculer les chemins à effectuer pour chacun des infirm
 
 Le modèle du problème linéaire est donné dans `travellingSalesman`.
 
+#### Test
+
+Afin de tester l'efficacité de notre optimisation, nous avons décrit un scénario simple mais réaliste.
+Nous avons rempli notre base de données de patients habitant tous dans un rayon de quelques kilomètres d'un cabinet, certains relativement près les un des autres. Nous avons enregistré 8 rendez-vous dans la matinée du 2 mai 2019 en laissant le choix du soin aléatoire (donc une durée de soin aléatoire). 
+A cette date, deux infirmiers sont en vacances donc seuls Laurent Cabaret et Jean-Philippe Poli sont disponibles. Nous attendions une répartition relativement équitable des rendez-vous entre les 2 infirmières et un trajet optimisé pour les deux. Le point important étant que l'optimiseur propose bien un trajet à pied entre deux maisons relativement proches.
+Vous pouvez vérifier la répartition des rendez-vous effectués par l'optimiseur entre les deux infirmiers et regarder leurs déplacements. 
+
 ## Modèle
 
 ### Schéma de classe, Base de données
