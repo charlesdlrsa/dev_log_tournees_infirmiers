@@ -9,11 +9,12 @@ to schedule appointments, and to quickly visualize the different nurses schedule
 allows nurses to check their daily planning, the different appointments and the journeys between these appointments. Moreover,
 they also can also report their days off.
 
-We dockerized the project and deployed it on Typhoon-Viarezo, feel free to go check it out at <a href='https://dev-log-tournees-infirmiers.typhoon.viarezo.fr'> this address <a/>.
+We dockerized the project and deployed it on Typhoon-Viarezo, feel free to go check it out at <a href='https://dev-log-tournees-infirmiers.typhoon.viarezo.fr'> this address <a/>.<br/>
+You can choose to do all your manipulations on a local version. In this case, follow the part "Installing and running Nursissimo application on a local version". But you can also choose to do all the tests on our online version. In this case, you can bypass the next part and go directly to "Try our features with the database examples"
 
 <br/>
 
-## Installing and running Nursissimo application
+## Installing and running Nursissimo application on a local version
 
 **1.** Install the Python `virtualenv` package:
 
